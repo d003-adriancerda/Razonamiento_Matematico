@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario - Sesión 4: Falacias de inducción débil, presunción y ambigüedad</title>
+    <!-- MathJax para notación lógica (opcional) -->
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+    </script>
+    <style>
+        /* ===== Variables CSS ===== */
+        :root {
+            --primary-dark: #1e3a8a;
+            --primary-bright: #3b82f6;
+            --success-green: #10b981;
+            --error-red: #ef4444;
+            --bg-light: #f3f4f6;
+            --card-white: #ffffff;
+            --text-dark: #1f2937;
+            --text-muted: #6b7280;
+            --border-radius: 12px;
+            --shadow-card: 0 10px 25px rgba(0, 0, 0, 0.08);
+            --transition: 0.25s ease-in-out;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg-light);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            margin: 0;
+        }
+
+        .quiz-container {
+            max-width: 1000px;
+            width: 100%;
+            background: var(--card-white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-card);
+            padding: 2rem 2.5rem;
+            transition: var(--transition);
+        }
+
+        /* ===== Pantallas ===== */
+        .screen {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== Títulos y textos ===== */
+        h1, h2, h3 {
+            color: var(--primary-dark);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 0.25rem;
+        }
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+        .student-name-display {
+            font-weight: 500;
+            color: var(--primary-bright);
+        }
+
+        /* ===== Barra de progreso ===== */
+        .progress-wrapper {
+            margin-bottom: 2rem;
+        }
+        .progress-bar-bg {
+            background: #e5e7eb;
+            height: 8px;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--primary-bright);
+            border-radius: 20px;
+            transition: width 0.4s ease;
+        }
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 0.3rem;
+        }
+
+        /* ===== Preguntas y opciones ===== */
+        .question-text {
+            font-size: 1.3rem;
+            font-weight: 500;
+            color: var(--text-dark);
+            margin-bottom: 1.8rem;
+            line-height: 1.5;
+        }
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+        }
+        .option-btn {
+            background: var(--bg-light);
+            border: 2px solid transparent;
+            border-radius: 10px;
+            padding: 0.9rem 1.2rem;
+            font-size: 1rem;
+            text-align: left;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--text-dark);
+            font-weight: 450;
+            line-height: 1.4;
+        }
+        .option-btn:hover:not(.disabled) {
+            background: #e0e7ff;
+            border-color: var(--primary-bright);
+        }
+        .option-btn.disabled {
+            cursor: default;
+            opacity: 0.8;
+        }
+        .option-btn.correct {
+            background: #d1fae5;
+            border-color: var(--success-green);
+            color: #065f46;
+        }
+        .option-btn.incorrect {
+            background: #fee2e2;
+            border-color: var(--error-red);
+            color: #991b1b;
+        }
+        .option-btn.show-correct {
+            background: #d1fae5;
+            border-color: var(--success-green);
+            color: #065f46;
+        }
+
+        /* ===== Feedback ===== */
+        .feedback-area {
+            background: #f9fafb;
+            border-left: 4px solid var(--primary-bright);
+            padding: 1rem 1.2rem;
+            border-radius: 8px;
+            margin: 1rem 0 1.5rem 0;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            min-height: 3.5rem;
+        }
+        .feedback-area.correct-fb {
+            border-left-color: var(--success-green);
+        }
+        .feedback-area.incorrect-fb {
+            border-left-color: var(--error-red);
+        }
+
+        /* ===== Botones de navegación ===== */
+        .nav-buttons {
+            display: flex;
+            justify-content: flex-end;
+        }
+        .btn {
+            background: var(--primary-bright);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 2rem;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
+        }
+        .btn:hover:not(:disabled) {
+            background: #2563eb;
+            transform: scale(1.02);
+        }
+        .btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+        .btn-secondary {
+            background: var(--card-white);
+            color: var(--primary-bright);
+            border: 2px solid var(--primary-bright);
+            box-shadow: none;
+        }
+        .btn-secondary:hover {
+            background: #e0e7ff;
+        }
+
+        /* ===== Pantalla de resultados ===== */
+        .result-circle {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: var(--bg-light);
+            border: 6px solid var(--primary-bright);
+            margin: 1.5rem auto;
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+        .result-circle span {
+            font-size: 1rem;
+            font-weight: 400;
+            color: var(--text-muted);
+        }
+        .result-feedback {
+            text-align: center;
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0.5rem auto 1.5rem auto;
+            line-height: 1.6;
+        }
+        .result-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        /* ===== Formulario de registro ===== */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            color: var(--text-dark);
+            margin-bottom: 0.3rem;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-bright);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+        .form-error {
+            color: var(--error-red);
+            font-size: 0.9rem;
+            margin-top: 0.2rem;
+            display: none;
+        }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 640px) {
+            .quiz-container {
+                padding: 1.5rem;
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
+            .question-text {
+                font-size: 1.1rem;
+            }
+            .option-btn {
+                padding: 0.7rem 1rem;
+                font-size: 0.95rem;
+            }
+            .result-circle {
+                width: 140px;
+                height: 140px;
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container" id="app">
+        <!-- ==================== PANTALLA 1: BIENVENIDA ==================== -->
+        <div id="screen-welcome" class="screen active">
+            <h1>🧠 Razonamiento Matemático</h1>
+            <p class="subtitle">Sesión 4 · Falacias de inducción débil, presunción y ambigüedad</p>
+            <p style="margin-bottom: 1.8rem; color: var(--text-muted);">
+                Ingresa tu nombre para comenzar el cuestionario sobre falacias de inducción débil, presunción y ambigüedad.
+            </p>
+            <div class="form-group">
+                <label for="studentName">Nombre completo</label>
+                <input type="text" id="studentName" placeholder="Ej. Sofía Ramírez" autocomplete="name">
+                <div class="form-error" id="nameError">Por favor, ingresa tu nombre para continuar.</div>
+            </div>
+            <button class="btn" id="btnStart">Comenzar cuestionario</button>
+        </div>
+
+        <!-- ==================== PANTALLA 2: CUESTIONARIO ==================== -->
+        <div id="screen-quiz" class="screen">
+            <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; margin-bottom: 0.5rem;">
+                <h2 style="font-size: 1.5rem;">Cuestionario · Sesión 4</h2>
+                <span style="color: var(--text-muted); font-size: 0.95rem;">
+                    Estudiante: <span class="student-name-display" id="displayName"></span>
+                </span>
+            </div>
+            <div class="progress-wrapper">
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="progressFill" style="width: 0%;"></div>
+                </div>
+                <div class="progress-text">
+                    <span id="progressLabel">Pregunta 1 de 10</span>
+                    <span id="scoreLabel">Aciertos: 0</span>
+                </div>
+            </div>
+
+            <div id="questionContainer">
+                <div class="question-text" id="questionText">Cargando pregunta...</div>
+                <div class="options-list" id="optionsContainer"></div>
+                <div class="feedback-area" id="feedbackArea">Selecciona una opción para ver la retroalimentación.</div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn" id="btnNext" disabled>Siguiente pregunta →</button>
+            </div>
+        </div>
+
+        <!-- ==================== PANTALLA 3: RESULTADOS ==================== -->
+        <div id="screen-results" class="screen">
+            <h2 style="text-align: center;">🎉 ¡Cuestionario completado!</h2>
+            <p style="text-align: center; color: var(--text-muted);" id="resultGreeting"></p>
+            <div class="result-circle" id="resultCircle">
+                <span id="resultScore">0/10</span>
+                <span>aciertos</span>
+            </div>
+            <div class="result-feedback" id="resultFeedback">
+                Excelente. Has demostrado comprensión de las falacias de inducción débil, presunción y ambigüedad.
+            </div>
+            <div class="result-actions">
+                <button class="btn" id="btnRetry">🔄 Volver a intentar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // ============================================================
+            //  PREGUNTAS SESIÓN 4: Falacias de inducción débil, presunción y ambigüedad
+            // ============================================================
+            const QUESTIONS = [{
+                id: 1,
+                text: '¿Cuál de los siguientes es un ejemplo de <strong>falacia de inducción débil</strong> (generalización apresurada)?',
+                options: [
+                    'He conocido a tres personas de esa ciudad y todas eran groseras; luego, todos los de esa ciudad son groseros.',
+                    'Si no estudias, reprobarás. Estudié, así que aprobaré.',
+                    'El presidente dijo que la economía mejorará, y es experto en economía.',
+                    'Todos los gatos son mamíferos. Los perros son mamíferos. Luego, los gatos son perros.'
+                ],
+                correct: 0,
+                feedback: {
+                    correct: 'Correcto. Es una generalización apresurada (converse accident) porque se infiere una regla general de una muestra insuficiente y atípica.',
+                    incorrect: 'Los otros son ejemplos de falacias formales, apelación a autoridad o argumentos válidos.'
+                }
+            }, {
+                id: 2,
+                text: 'La falacia de <strong>falsa causa</strong> (post hoc ergo propter hoc) se comete cuando:',
+                options: [
+                    'Se asume que porque un evento ocurre después de otro, el primero causó el segundo.',
+                    'Se confunde la causa con el efecto.',
+                    'Se simplifica una causa compleja a una sola.',
+                    'Todas las anteriores son formas de falsa causa.'
+                ],
+                correct: 3,
+                feedback: {
+                    correct: 'Correcto. La falsa causa incluye post hoc (sucesión temporal), non causa pro causa (causa incorrecta) y sobresimplificación.',
+                    incorrect: 'Todas son variedades de la falacia de falsa causa, como se explica en la sección 3.3 de Hurley.'
+                }
+            }, {
+                id: 3,
+                text: 'Identifica la <strong>falacia de presunción</strong> en el siguiente argumento: "Todos los ciudadanos deben pagar impuestos. Los residentes permanentes son ciudadanos. Luego, deben pagar impuestos." (Asumiendo que "ciudadano" se usa en dos sentidos)',
+                options: [
+                    'Petición de principio (begging the question)',
+                    'Falso dilema',
+                    'Equivocación',
+                    'Anfibología'
+                ],
+                correct: 2,
+                feedback: {
+                    correct: 'Correcto. Hay una equivocación en el uso de "ciudadano" (legal vs. miembro de la comunidad), que es una falacia de ambigüedad.',
+                    incorrect: 'La petición de principio sería si la conclusión se asume en la premisa. El falso dilema presenta opciones falsas. La anfibología es ambigüedad sintáctica.'
+                }
+            }, {
+                id: 4,
+                text: 'El siguiente argumento comete la falacia de <strong>pregunta compleja</strong> (complex question): "¿Has dejado de fumar?" ¿Por qué es falaz?',
+                options: [
+                    'Porque asume que la persona fumaba antes.',
+                    'Porque es una pregunta que no puede responderse con sí o no.',
+                    'Porque es una pregunta retórica.',
+                    'Porque contiene más de dos opciones.'
+                ],
+                correct: 0,
+                feedback: {
+                    correct: 'Correcto. La pregunta compleja presupone algo que no se ha establecido (que la persona fumaba).',
+                    incorrect: 'Sí se puede responder con sí/no, pero la respuesta admite una conclusión no probada. Es una falacia de presunción.'
+                }
+            }, {
+                id: 5,
+                text: '¿Cuál de los siguientes es un ejemplo de <strong>falacia de ambigüedad</strong> (anfibología)?',
+                options: [
+                    '"El guardia dijo que el perro mordió al niño en el parque." (¿quién mordió a quién? ambiguo)',
+                    '"Los políticos son honestos." (uso vago de "honestos")',
+                    '"Compré un coche usado y me costó un ojo de la cara." (metáfora)',
+                    '"Todos los estudiantes son inteligentes." (generalización)'
+                ],
+                correct: 0,
+                feedback: {
+                    correct: 'Correcto. La anfibología surge de una estructura gramatical ambigua (sujeto u objeto no claro).',
+                    incorrect: 'La vaguedad ("honestos") no es anfibología sino ambigüedad léxica. La metáfora es figura retórica, no falacia. La generalización puede ser apresurada.'
+                }
+            }, {
+                id: 6,
+                text: 'La falacia de <strong>supresión de evidencia</strong> ocurre cuando:',
+                options: [
+                    'Se omiten datos relevantes que cambiarían la conclusión.',
+                    'Se usan datos irrelevantes para apoyar una conclusión.',
+                    'Se distorsiona el argumento del oponente.',
+                    'Se apela a la fuerza para imponer una conclusión.'
+                ],
+                correct: 0,
+                feedback: {
+                    correct: 'Correcto. La supresión de evidencia es una falacia de presunción que ignora información que debilitaría la conclusión.',
+                    incorrect: 'Los datos irrelevantes son otra falacia (falacia de relevancia). La distorsión es straw man. La fuerza es ad baculum.'
+                }
+            }, {
+                id: 7,
+                text: 'Un argumento que presenta solo dos opciones cuando hay más es un ejemplo de:',
+                options: [
+                    'Falso dilema (falsa disyunción)',
+                    'Petición de principio',
+                    'Composición',
+                    'División'
+                ],
+                correct: 0,
+                feedback: {
+                    correct: 'Correcto. El falso dilema (o falsa bifurcación) es una falacia de presunción que limita indebidamente las alternativas.',
+                    incorrect: 'La petición de principio es diferente. Composición y división son falacias de transposición ilícita.'
+                }
+            }, {
+                id: 8,
+                text: '¿Cuál de las siguientes es una <strong>falacia de composición</strong>?',
+                options: [
+                    'Cada pieza de este rompecabezas es pequeña; luego, el rompecabezas completo es pequeño.',
+                    'El equipo tiene jugadores excelentes; luego, el equipo es excelente.',
+                    'Esta célula es invisible; luego, el organismo es invisible.',
+                    'Todas las anteriores son ejemplos de composición.'
+                ],
+                correct: 3,
+                feedback: {
+                    correct: 'Correcto. Todas transfieren incorrectamente una propiedad de las partes al todo (composición).',
+                    incorrect: 'Cada una es un ejemplo válido de la falacia de composición.'
+                }
+            }, {
+                id: 9,
+                text: 'La falacia de <strong>pendiente resbaladiza</strong> (slippery slope) se caracteriza por:',
+                options: [
+                    'Afirmar que un primer paso llevará inevitablemente a una cadena de eventos negativos sin evidencia suficiente.',
+                    'Argumentar que si algo es verdadero en parte, lo es en todo.',
+                    'Suponer que lo que es verdadero para el todo lo es para las partes.',
+                    'Usar un lenguaje vago para confundir.'
+                ],
+                correct: 0,
+                feedback: {
+                    correct: 'Correcto. La pendiente resbaladiza es una variedad de falsa causa que postula una cadena causal no probada.',
+                    incorrect: 'Las otras opciones corresponden a composición/división y ambigüedad.'
+                }
+            }, {
+                id: 10,
+                text: 'En la falacia de <strong>analogía débil</strong>, el problema central es que:',
+                options: [
+                    'Las similitudes entre los casos no son relevantes para la conclusión.',
+                    'Los casos comparados son idénticos en todos los aspectos.',
+                    'La conclusión es demasiado específica.',
+                    'Se usan muy pocos casos primarios.'
+                ],
+                correct: 0,
+                feedback: {
+                    correct: 'Correcto. La analogía débil falla porque las similitudes citadas no son relevantes para la conclusión (o hay desanalogías significativas).',
+                    incorrect: 'Los otros factores (número de casos, especificidad) también afectan, pero el núcleo es la relevancia de las similitudes.'
+                }
+            }];
+
+            // ============================================================
+            //  ESTADO
+            // ============================================================
+            let state = {
+                studentName: '',
+                currentIndex: 0,
+                score: 0,
+                totalQuestions: QUESTIONS.length,
+                answered: false,
+                shuffledOptions: [],
+                correctShuffledIndex: -1,
+            };
+
+            // ============================================================
+            //  DOM REFERENCIAS
+            // ============================================================
+            const $ = id => document.getElementById(id);
+            const screenWelcome = $('screen-welcome');
+            const screenQuiz = $('screen-quiz');
+            const screenResults = $('screen-results');
+            const studentNameInput = $('studentName');
+            const nameError = $('nameError');
+            const btnStart = $('btnStart');
+            const displayName = $('displayName');
+            const progressFill = $('progressFill');
+            const progressLabel = $('progressLabel');
+            const scoreLabel = $('scoreLabel');
+            const questionText = $('questionText');
+            const optionsContainer = $('optionsContainer');
+            const feedbackArea = $('feedbackArea');
+            const btnNext = $('btnNext');
+            const resultScore = $('resultScore');
+            const resultGreeting = $('resultGreeting');
+            const resultFeedback = $('resultFeedback');
+            const btnRetry = $('btnRetry');
+
+            // ============================================================
+            //  BARAJADO
+            // ============================================================
+            function shuffleArray(arr) {
+                const a = [...arr];
+                for (let i = a.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [a[i], a[j]] = [a[j], a[i]];
+                }
+                return a;
+            }
+
+            // ============================================================
+            //  RENDER
+            // ============================================================
+            function renderQuestion(index) {
+                const q = QUESTIONS[index];
+                if (!q) return;
+
+                if (!state.shuffledOptions[index]) {
+                    const shuffled = shuffleArray(q.options);
+                    state.shuffledOptions[index] = shuffled;
+                    const correctText = q.options[q.correct];
+                    state.correctShuffledIndex = shuffled.indexOf(correctText);
+                }
+                const shuffled = state.shuffledOptions[index];
+                const correctIdx = state.correctShuffledIndex;
+
+                questionText.innerHTML = q.text;
+
+                optionsContainer.innerHTML = '';
+                shuffled.forEach((opt, idx) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'option-btn';
+                    btn.textContent = String.fromCharCode(65 + idx) + '. ' + opt;
+                    btn.dataset.idx = idx;
+                    btn.addEventListener('click', () => handleOptionClick(index, idx));
+                    optionsContainer.appendChild(btn);
+                });
+
+                feedbackArea.className = 'feedback-area';
+                feedbackArea.textContent = 'Selecciona una opción para ver la retroalimentación.';
+                feedbackArea.style.borderLeftColor = 'var(--primary-bright)';
+
+                btnNext.disabled = true;
+                state.answered = false;
+
+                updateProgress(index);
+
+                if (window.MathJax && MathJax.typesetPromise) {
+                    MathJax.typesetPromise().catch(() => {});
+                }
+            }
+
+            function updateProgress(index) {
+                const total = state.totalQuestions;
+                const pct = ((index + 1) / total) * 100;
+                progressFill.style.width = pct + '%';
+                progressLabel.textContent = `Pregunta ${index + 1} de ${total}`;
+                scoreLabel.textContent = `Aciertos: ${state.score}`;
+            }
+
+            function handleOptionClick(qIndex, optIdx) {
+                if (state.answered) return;
+                const q = QUESTIONS[qIndex];
+                const correctIdx = state.correctShuffledIndex;
+                const isCorrect = (optIdx === correctIdx);
+
+                const btns = optionsContainer.querySelectorAll('.option-btn');
+                btns.forEach(btn => btn.classList.add('disabled'));
+
+                btns.forEach((btn, idx) => {
+                    if (idx === correctIdx) {
+                        btn.classList.add('show-correct');
+                    }
+                    if (idx === optIdx && !isCorrect) {
+                        btn.classList.add('incorrect');
+                    }
+                    if (idx === optIdx && isCorrect) {
+                        btn.classList.add('correct');
+                    }
+                });
+
+                feedbackArea.className = 'feedback-area';
+                if (isCorrect) {
+                    feedbackArea.classList.add('correct-fb');
+                    feedbackArea.textContent = '✅ ' + q.feedback.correct;
+                    state.score++;
+                } else {
+                    feedbackArea.classList.add('incorrect-fb');
+                    feedbackArea.textContent = '❌ ' + q.feedback.incorrect;
+                }
+                feedbackArea.style.borderLeftColor = isCorrect ? 'var(--success-green)' : 'var(--error-red)';
+
+                state.answered = true;
+                btnNext.disabled = false;
+                scoreLabel.textContent = `Aciertos: ${state.score}`;
+            }
+
+            // ============================================================
+            //  NAVEGACIÓN
+            // ============================================================
+            function goToNextQuestion() {
+                if (!state.answered) return;
+                const nextIndex = state.currentIndex + 1;
+                if (nextIndex < state.totalQuestions) {
+                    state.currentIndex = nextIndex;
+                    renderQuestion(nextIndex);
+                } else {
+                    showResults();
+                }
+            }
+
+            // ============================================================
+            //  RESULTADOS
+            // ============================================================
+            function showResults() {
+                screenQuiz.classList.remove('active');
+                screenResults.classList.add('active');
+
+                const total = state.totalQuestions;
+                const score = state.score;
+                resultScore.textContent = `${score}/${total}`;
+
+                const name = state.studentName || 'Estudiante';
+                resultGreeting.textContent = `¡Buen trabajo, ${name}!`;
+
+                let msg = '';
+                const pct = score / total;
+                if (pct >= 0.9) {
+                    msg = 'Excelente. Reconoces con claridad las falacias de inducción débil, presunción y ambigüedad. Puedes aplicar estos conceptos en análisis de discursos.';
+                } else if (pct >= 0.7) {
+                    msg = 'Buen desempeño. Tienes una base sólida, pero te sugiero revisar las diferencias entre falsa causa, pendiente resbaladiza y las falacias de ambigüedad.';
+                } else if (pct >= 0.5) {
+                    msg = 'Es necesario reforzar la identificación de falacias de presunción y ambigüedad. Revisa los ejemplos del capítulo 3 de Hurley (secciones 3.3 y 3.4).';
+                } else {
+                    msg = 'Te recomiendo estudiar nuevamente la sesión 4, prestando especial atención a los ejemplos de cada falacia y practicando con ejercicios de clasificación.';
+                }
+                resultFeedback.textContent = msg;
+            }
+
+            // ============================================================
+            //  REINICIO
+            // ============================================================
+            function resetQuiz() {
+                state.currentIndex = 0;
+                state.score = 0;
+                state.answered = false;
+                state.shuffledOptions = [];
+                state.correctShuffledIndex = -1;
+
+                screenResults.classList.remove('active');
+                screenWelcome.classList.remove('active');
+                screenQuiz.classList.add('active');
+
+                displayName.textContent = state.studentName;
+                renderQuestion(0);
+                updateProgress(0);
+            }
+
+            // ============================================================
+            //  REGISTRO
+            // ============================================================
+            function startQuiz() {
+                const name = studentNameInput.value.trim();
+                if (!name) {
+                    nameError.style.display = 'block';
+                    return;
+                }
+                nameError.style.display = 'none';
+                state.studentName = name;
+
+                screenWelcome.classList.remove('active');
+                screenQuiz.classList.add('active');
+
+                displayName.textContent = name;
+                state.shuffledOptions = [];
+                state.currentIndex = 0;
+                state.score = 0;
+                renderQuestion(0);
+                updateProgress(0);
+            }
+
+            // ============================================================
+            //  EVENTOS
+            // ============================================================
+            btnStart.addEventListener('click', startQuiz);
+            studentNameInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') startQuiz();
+            });
+            studentNameInput.addEventListener('input', () => {
+                nameError.style.display = 'none';
+            });
+
+            btnNext.addEventListener('click', goToNextQuestion);
+
+            btnRetry.addEventListener('click', () => {
+                resetQuiz();
+            });
+
+            // ============================================================
+            //  INICIO
+            // ============================================================
+            screenWelcome.classList.add('active');
+            screenQuiz.classList.remove('active');
+            screenResults.classList.remove('active');
+
+            console.log('Cuestionario Sesión 4 cargado.');
+        })();
+    </script>
+
+</body>
+</html>
