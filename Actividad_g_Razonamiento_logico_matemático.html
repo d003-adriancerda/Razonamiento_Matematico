@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario - Sesión 8: Reglas de inferencia y reemplazo</title>
+    <!-- MathJax para notación lógica -->
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+    </script>
+    <style>
+        /* ===== Variables CSS ===== */
+        :root {
+            --primary-dark: #1e3a8a;
+            --primary-bright: #3b82f6;
+            --success-green: #10b981;
+            --error-red: #ef4444;
+            --bg-light: #f3f4f6;
+            --card-white: #ffffff;
+            --text-dark: #1f2937;
+            --text-muted: #6b7280;
+            --border-radius: 12px;
+            --shadow-card: 0 10px 25px rgba(0, 0, 0, 0.08);
+            --transition: 0.25s ease-in-out;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg-light);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            margin: 0;
+        }
+
+        .quiz-container {
+            max-width: 1000px;
+            width: 100%;
+            background: var(--card-white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-card);
+            padding: 2rem 2.5rem;
+            transition: var(--transition);
+        }
+
+        /* ===== Pantallas ===== */
+        .screen {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== Títulos y textos ===== */
+        h1, h2, h3 {
+            color: var(--primary-dark);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 0.25rem;
+        }
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+        .student-name-display {
+            font-weight: 500;
+            color: var(--primary-bright);
+        }
+
+        /* ===== Barra de progreso ===== */
+        .progress-wrapper {
+            margin-bottom: 2rem;
+        }
+        .progress-bar-bg {
+            background: #e5e7eb;
+            height: 8px;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--primary-bright);
+            border-radius: 20px;
+            transition: width 0.4s ease;
+        }
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 0.3rem;
+        }
+
+        /* ===== Preguntas y opciones ===== */
+        .question-text {
+            font-size: 1.3rem;
+            font-weight: 500;
+            color: var(--text-dark);
+            margin-bottom: 1.8rem;
+            line-height: 1.5;
+        }
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+        }
+        .option-btn {
+            background: var(--bg-light);
+            border: 2px solid transparent;
+            border-radius: 10px;
+            padding: 0.9rem 1.2rem;
+            font-size: 1rem;
+            text-align: left;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--text-dark);
+            font-weight: 450;
+            line-height: 1.4;
+        }
+        .option-btn:hover:not(.disabled) {
+            background: #e0e7ff;
+            border-color: var(--primary-bright);
+        }
+        .option-btn.disabled {
+            cursor: default;
+            opacity: 0.8;
+        }
+        .option-btn.correct {
+            background: #d1fae5;
+            border-color: var(--success-green);
+            color: #065f46;
+        }
+        .option-btn.incorrect {
+            background: #fee2e2;
+            border-color: var(--error-red);
+            color: #991b1b;
+        }
+        .option-btn.show-correct {
+            background: #d1fae5;
+            border-color: var(--success-green);
+            color: #065f46;
+        }
+
+        /* ===== Feedback ===== */
+        .feedback-area {
+            background: #f9fafb;
+            border-left: 4px solid var(--primary-bright);
+            padding: 1rem 1.2rem;
+            border-radius: 8px;
+            margin: 1rem 0 1.5rem 0;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            min-height: 3.5rem;
+        }
+        .feedback-area.correct-fb {
+            border-left-color: var(--success-green);
+        }
+        .feedback-area.incorrect-fb {
+            border-left-color: var(--error-red);
+        }
+
+        /* ===== Botones de navegación ===== */
+        .nav-buttons {
+            display: flex;
+            justify-content: flex-end;
+        }
+        .btn {
+            background: var(--primary-bright);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 2rem;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
+        }
+        .btn:hover:not(:disabled) {
+            background: #2563eb;
+            transform: scale(1.02);
+        }
+        .btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+        .btn-secondary {
+            background: var(--card-white);
+            color: var(--primary-bright);
+            border: 2px solid var(--primary-bright);
+            box-shadow: none;
+        }
+        .btn-secondary:hover {
+            background: #e0e7ff;
+        }
+
+        /* ===== Pantalla de resultados ===== */
+        .result-circle {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: var(--bg-light);
+            border: 6px solid var(--primary-bright);
+            margin: 1.5rem auto;
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+        .result-circle span {
+            font-size: 1rem;
+            font-weight: 400;
+            color: var(--text-muted);
+        }
+        .result-feedback {
+            text-align: center;
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0.5rem auto 1.5rem auto;
+            line-height: 1.6;
+        }
+        .result-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        /* ===== Formulario de registro ===== */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            color: var(--text-dark);
+            margin-bottom: 0.3rem;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-bright);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+        .form-error {
+            color: var(--error-red);
+            font-size: 0.9rem;
+            margin-top: 0.2rem;
+            display: none;
+        }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 640px) {
+            .quiz-container {
+                padding: 1.5rem;
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
+            .question-text {
+                font-size: 1.1rem;
+            }
+            .option-btn {
+                padding: 0.7rem 1rem;
+                font-size: 0.95rem;
+            }
+            .result-circle {
+                width: 140px;
+                height: 140px;
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container" id="app">
+        <!-- ==================== PANTALLA 1: BIENVENIDA ==================== -->
+        <div id="screen-welcome" class="screen active">
+            <h1>🧠 Razonamiento Matemático</h1>
+            <p class="subtitle">Sesión 8 · Reglas de inferencia y reglas de reemplazo</p>
+            <p style="margin-bottom: 1.8rem; color: var(--text-muted);">
+                Ingresa tu nombre para comenzar el cuestionario sobre reglas de inferencia, reglas de reemplazo y demostraciones formales.
+            </p>
+            <div class="form-group">
+                <label for="studentName">Nombre completo</label>
+                <input type="text" id="studentName" placeholder="Ej. Andrés Herrera" autocomplete="name">
+                <div class="form-error" id="nameError">Por favor, ingresa tu nombre para continuar.</div>
+            </div>
+            <button class="btn" id="btnStart">Comenzar cuestionario</button>
+        </div>
+
+        <!-- ==================== PANTALLA 2: CUESTIONARIO ==================== -->
+        <div id="screen-quiz" class="screen">
+            <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; margin-bottom: 0.5rem;">
+                <h2 style="font-size: 1.5rem;">Cuestionario · Sesión 8</h2>
+                <span style="color: var(--text-muted); font-size: 0.95rem;">
+                    Estudiante: <span class="student-name-display" id="displayName"></span>
+                </span>
+            </div>
+            <div class="progress-wrapper">
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="progressFill" style="width: 0%;"></div>
+                </div>
+                <div class="progress-text">
+                    <span id="progressLabel">Pregunta 1 de 10</span>
+                    <span id="scoreLabel">Aciertos: 0</span>
+                </div>
+            </div>
+
+            <div id="questionContainer">
+                <div class="question-text" id="questionText">Cargando pregunta...</div>
+                <div class="options-list" id="optionsContainer"></div>
+                <div class="feedback-area" id="feedbackArea">Selecciona una opción para ver la retroalimentación.</div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn" id="btnNext" disabled>Siguiente pregunta →</button>
+            </div>
+        </div>
+
+        <!-- ==================== PANTALLA 3: RESULTADOS ==================== -->
+        <div id="screen-results" class="screen">
+            <h2 style="text-align: center;">🎉 ¡Cuestionario completado!</h2>
+            <p style="text-align: center; color: var(--text-muted);" id="resultGreeting"></p>
+            <div class="result-circle" id="resultCircle">
+                <span id="resultScore">0/10</span>
+                <span>aciertos</span>
+            </div>
+            <div class="result-feedback" id="resultFeedback">
+                Excelente. Has demostrado comprensión de las reglas de inferencia, reglas de reemplazo y su aplicación en demostraciones formales.
+            </div>
+            <div class="result-actions">
+                <button class="btn" id="btnRetry">🔄 Volver a intentar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // ============================================================
+            //  PREGUNTAS SESIÓN 8: Reglas de inferencia y reglas de reemplazo
+            // ============================================================
+            const QUESTIONS = [{
+                id: 1,
+                text: '¿Qué regla de inferencia permite pasar de "$P \\supset Q$" y "$P$" a "$Q$"?',
+                options: [
+                    'Modus Tollens (MT)',
+                    'Modus Ponens (MP)',
+                    'Silogismo Hipotético (HS)',
+                    'Silogismo Disyuntivo (DS)'
+                ],
+                correct: 1,
+                feedback: {
+                    correct: 'Correcto. Modus Ponens (MP) establece que de $P \\supset Q$ y $P$ se puede inferir $Q$.',
+                    incorrect: 'Modus Tollens va de $P \\supset Q$ y $\\neg Q$ a $\\neg P$. Silogismo Hipotético encadena condicionales. Silogismo Disyuntivo trabaja con disyunciones.'
+                }
+            }, {
+                id: 2,
+                text: '¿Cuál de las siguientes es una <strong>regla de reemplazo</strong> (no una regla de implicación)?',
+                options: [
+                    'Simplificación (Simp)',
+                    'Conjunción (Conj)',
+                    'Doble Negación (DN)',
+                    'Adición (Add)'
+                ],
+                correct: 2,
+                feedback: {
+                    correct: 'Correcto. Doble Negación (DN) es una regla de reemplazo porque permite sustituir $P$ por $\\neg\\neg P$ en cualquier parte de una fórmula.',
+                    incorrect: 'Simplificación, Conjunción y Adición son reglas de implicación (se aplican a líneas completas).'
+                }
+            }, {
+                id: 3,
+                text: 'Según la <strong>ley de De Morgan</strong>, la expresión $\\neg(P \\land Q)$ es equivalente a:',
+                options: [
+                    '$\\neg P \\lor \\neg Q$',
+                    '$\\neg P \\land \\neg Q$',
+                    '$P \\lor Q$',
+                    '$\\neg(P \\lor Q)$'
+                ],
+                correct: 0,
+                feedback: {
+                    correct: 'Correcto. Por De Morgan, la negación de una conjunción es la disyunción de las negaciones.',
+                    incorrect: '$\\neg P \\land \\neg Q$ es la negación de una disyunción. Las otras opciones no son equivalentes.'
+                }
+            }, {
+                id: 4,
+                text: 'En una demostración formal, la regla de <strong>Transposición (Trans)</strong> permite transformar:',
+                options: [
+                    '$P \\supset Q$ en $\\neg Q \\supset \\neg P$',
+                    '$P \\supset Q$ en $\\neg P \\lor Q$',
+                    '$P \\land Q$ en $Q \\land P$',
+                    '$P \\lor Q$ en $Q \\lor P$'
+                ],
+                correct: 0,
+                feedback: {
+                    correct: 'Correcto. Transposición (Trans) permite intercambiar antecedente y consecuente negando ambos: $P \\supset Q \\equiv \\neg Q \\supset \\neg P$.',
+                    incorrect: 'Material Implication (Impl) convierte $P \\supset Q$ en $\\neg P \\lor Q$. Commutativity reordena conjunciones o disyunciones.'
+                }
+            }, {
+                id: 5,
+                text: '¿Qué regla permite inferir $R$ a partir de $(P \\lor Q)$ y $(P \\supset R) \\land (Q \\supset R)$?',
+                options: [
+                    'Modus Ponens (MP)',
+                    'Constructive Dilemma (CD)',
+                    'Destructive Dilemma (DD)',
+                    'Silogismo Disyuntivo (DS)'
+                ],
+                correct: 1,
+                feedback: {
+                    correct: 'Correcto. Constructive Dilemma (CD) permite concluir la disyunción de los consecuentes a partir de la disyunción de los antecedentes.',
+                    incorrect: 'Modus Ponens requiere un condicional y su antecedente. Destructive Dilemma trabaja con negación de consecuentes. Silogismo Disyuntivo elimina una opción.'
+                }
+            }, {
+                id: 6,
+                text: 'La regla de <strong>Exportación (Exp)</strong> establece que $[P \\land Q] \\supset R$ es equivalente a:',
+                options: [
+                    '$P \\supset (Q \\supset R)$',
+                    '$(P \\supset Q) \\supset R$',
+                    '$P \\supset (Q \\land R)$',
+                    '$(P \\lor Q) \\supset R$'
+                ],
+                correct: 0,
+                feedback: {
+                    correct: 'Correcto. Exportación (Exp) permite mover la conjunción del antecedente a un condicional anidado: $[P \\land Q] \\supset R \\equiv P \\supset (Q \\supset R)$.',
+                    incorrect: 'Las otras opciones no corresponden a la regla de Exportación.'
+                }
+            }, {
+                id: 7,
+                text: 'En una demostración, la regla de <strong>Simplificación (Simp)</strong> permite inferir:',
+                options: [
+                    '$P$ a partir de $P \\land Q$',
+                    '$P \\lor Q$ a partir de $P$',
+                    '$Q$ a partir de $P \\supset Q$ y $P$',
+                    '$P$ a partir de $\\neg\\neg P$'
+                ],
+                correct: 0,
+                feedback: {
+                    correct: 'Correcto. Simplificación (Simp) permite inferir cualquiera de los dos conjunctos de una conjunción.',
+                    incorrect: '$P \\lor Q$ a partir de $P$ es Adición. $Q$ a partir de $P \\supset Q$ y $P$ es Modus Ponens. $P$ a partir de $\\neg\\neg P$ es Doble Negación.'
+                }
+            }, {
+                id: 8,
+                text: '¿Cuál de las siguientes es una <strong>regla de inferencia</strong> que requiere <strong>dos premisas</strong>?',
+                options: [
+                    'Adición (Add)',
+                    'Simplificación (Simp)',
+                    'Silogismo Disyuntivo (DS)',
+                    'Doble Negación (DN)'
+                ],
+                correct: 2,
+                feedback: {
+                    correct: 'Correcto. Silogismo Disyuntivo (DS) requiere una disyunción y la negación de uno de sus disyuntos.',
+                    incorrect: 'Adición, Simplificación y Doble Negación son reglas de una sola premisa.'
+                }
+            }, {
+                id: 9,
+                text: 'La expresión $\\neg(P \\lor Q)$ es equivalente, por De Morgan, a:',
+                options: [
+                    '$\\neg P \\lor \\neg Q$',
+                    '$\\neg P \\land \\neg Q$',
+                    '$P \\lor Q$',
+                    '$\\neg(P \\land Q)$'
+                ],
+                correct: 1,
+                feedback: {
+                    correct: 'Correcto. La negación de una disyunción es la conjunción de las negaciones: $\\neg(P \\lor Q) \\equiv \\neg P \\land \\neg Q$.',
+                    incorrect: '$\\neg P \\lor \\neg Q$ es la negación de una conjunción. Las otras no son equivalentes.'
+                }
+            }, {
+                id: 10,
+                text: 'En una demostración, si tenemos $(A \\lor B) \\supset C$ y $\\neg C$, ¿qué podemos inferir usando <strong>Modus Tollens</strong>?',
+                options: [
+                    '$\\neg(A \\lor B)$',
+                    '$\\neg A \\land \\neg B$',
+                    '$C$',
+                    '$A \\lor B$'
+                ],
+                correct: 0,
+                feedback: {
+                    correct: 'Correcto. Modus Tollens: de $(A \\lor B) \\supset C$ y $\\neg C$ se infiere $\\neg(A \\lor B)$. Luego, por De Morgan, podría obtenerse $\\neg A \\land \\neg B$, pero el paso inmediato con MT es $\\neg(A \\lor B)$.',
+                    incorrect: '$\\neg A \\land \\neg B$ es el resultado de aplicar De Morgan a $\\neg(A \\lor B)$, pero no es el paso directo de MT.'
+                }
+            }];
+
+            // ============================================================
+            //  ESTADO
+            // ============================================================
+            let state = {
+                studentName: '',
+                currentIndex: 0,
+                score: 0,
+                totalQuestions: QUESTIONS.length,
+                answered: false,
+                shuffledOptions: [],
+                correctShuffledIndex: -1,
+            };
+
+            // ============================================================
+            //  DOM REFERENCIAS
+            // ============================================================
+            const $ = id => document.getElementById(id);
+            const screenWelcome = $('screen-welcome');
+            const screenQuiz = $('screen-quiz');
+            const screenResults = $('screen-results');
+            const studentNameInput = $('studentName');
+            const nameError = $('nameError');
+            const btnStart = $('btnStart');
+            const displayName = $('displayName');
+            const progressFill = $('progressFill');
+            const progressLabel = $('progressLabel');
+            const scoreLabel = $('scoreLabel');
+            const questionText = $('questionText');
+            const optionsContainer = $('optionsContainer');
+            const feedbackArea = $('feedbackArea');
+            const btnNext = $('btnNext');
+            const resultScore = $('resultScore');
+            const resultGreeting = $('resultGreeting');
+            const resultFeedback = $('resultFeedback');
+            const btnRetry = $('btnRetry');
+
+            // ============================================================
+            //  BARAJADO
+            // ============================================================
+            function shuffleArray(arr) {
+                const a = [...arr];
+                for (let i = a.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [a[i], a[j]] = [a[j], a[i]];
+                }
+                return a;
+            }
+
+            // ============================================================
+            //  RENDER
+            // ============================================================
+            function renderQuestion(index) {
+                const q = QUESTIONS[index];
+                if (!q) return;
+
+                if (!state.shuffledOptions[index]) {
+                    const shuffled = shuffleArray(q.options);
+                    state.shuffledOptions[index] = shuffled;
+                    const correctText = q.options[q.correct];
+                    state.correctShuffledIndex = shuffled.indexOf(correctText);
+                }
+                const shuffled = state.shuffledOptions[index];
+                const correctIdx = state.correctShuffledIndex;
+
+                questionText.innerHTML = q.text;
+
+                optionsContainer.innerHTML = '';
+                shuffled.forEach((opt, idx) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'option-btn';
+                    btn.textContent = String.fromCharCode(65 + idx) + '. ' + opt;
+                    btn.dataset.idx = idx;
+                    btn.addEventListener('click', () => handleOptionClick(index, idx));
+                    optionsContainer.appendChild(btn);
+                });
+
+                feedbackArea.className = 'feedback-area';
+                feedbackArea.textContent = 'Selecciona una opción para ver la retroalimentación.';
+                feedbackArea.style.borderLeftColor = 'var(--primary-bright)';
+
+                btnNext.disabled = true;
+                state.answered = false;
+
+                updateProgress(index);
+
+                if (window.MathJax && MathJax.typesetPromise) {
+                    MathJax.typesetPromise().catch(() => {});
+                }
+            }
+
+            function updateProgress(index) {
+                const total = state.totalQuestions;
+                const pct = ((index + 1) / total) * 100;
+                progressFill.style.width = pct + '%';
+                progressLabel.textContent = `Pregunta ${index + 1} de ${total}`;
+                scoreLabel.textContent = `Aciertos: ${state.score}`;
+            }
+
+            function handleOptionClick(qIndex, optIdx) {
+                if (state.answered) return;
+                const q = QUESTIONS[qIndex];
+                const correctIdx = state.correctShuffledIndex;
+                const isCorrect = (optIdx === correctIdx);
+
+                const btns = optionsContainer.querySelectorAll('.option-btn');
+                btns.forEach(btn => btn.classList.add('disabled'));
+
+                btns.forEach((btn, idx) => {
+                    if (idx === correctIdx) {
+                        btn.classList.add('show-correct');
+                    }
+                    if (idx === optIdx && !isCorrect) {
+                        btn.classList.add('incorrect');
+                    }
+                    if (idx === optIdx && isCorrect) {
+                        btn.classList.add('correct');
+                    }
+                });
+
+                feedbackArea.className = 'feedback-area';
+                if (isCorrect) {
+                    feedbackArea.classList.add('correct-fb');
+                    feedbackArea.textContent = '✅ ' + q.feedback.correct;
+                    state.score++;
+                } else {
+                    feedbackArea.classList.add('incorrect-fb');
+                    feedbackArea.textContent = '❌ ' + q.feedback.incorrect;
+                }
+                feedbackArea.style.borderLeftColor = isCorrect ? 'var(--success-green)' : 'var(--error-red)';
+
+                state.answered = true;
+                btnNext.disabled = false;
+                scoreLabel.textContent = `Aciertos: ${state.score}`;
+            }
+
+            // ============================================================
+            //  NAVEGACIÓN
+            // ============================================================
+            function goToNextQuestion() {
+                if (!state.answered) return;
+                const nextIndex = state.currentIndex + 1;
+                if (nextIndex < state.totalQuestions) {
+                    state.currentIndex = nextIndex;
+                    renderQuestion(nextIndex);
+                } else {
+                    showResults();
+                }
+            }
+
+            // ============================================================
+            //  RESULTADOS
+            // ============================================================
+            function showResults() {
+                screenQuiz.classList.remove('active');
+                screenResults.classList.add('active');
+
+                const total = state.totalQuestions;
+                const score = state.score;
+                resultScore.textContent = `${score}/${total}`;
+
+                const name = state.studentName || 'Estudiante';
+                resultGreeting.textContent = `¡Buen trabajo, ${name}!`;
+
+                let msg = '';
+                const pct = score / total;
+                if (pct >= 0.9) {
+                    msg = 'Excelente. Demuestras un sólido dominio de las reglas de inferencia y reemplazo, y su aplicación en demostraciones formales.';
+                } else if (pct >= 0.7) {
+                    msg = 'Buen desempeño. Reforzar la identificación de las reglas de reemplazo y su uso en pasos de demostración. Practica con más ejercicios de deducción natural.';
+                } else if (pct >= 0.5) {
+                    msg = 'Es necesario practicar más con la aplicación de reglas en demostraciones. Revisa los capítulos 7.1 a 7.4 de Hurley.';
+                } else {
+                    msg = 'Te sugiero estudiar nuevamente las reglas de inferencia y reemplazo, y practicar con ejercicios paso a paso.';
+                }
+                resultFeedback.textContent = msg;
+            }
+
+            // ============================================================
+            //  REINICIO
+            // ============================================================
+            function resetQuiz() {
+                state.currentIndex = 0;
+                state.score = 0;
+                state.answered = false;
+                state.shuffledOptions = [];
+                state.correctShuffledIndex = -1;
+
+                screenResults.classList.remove('active');
+                screenWelcome.classList.remove('active');
+                screenQuiz.classList.add('active');
+
+                displayName.textContent = state.studentName;
+                renderQuestion(0);
+                updateProgress(0);
+            }
+
+            // ============================================================
+            //  REGISTRO
+            // ============================================================
+            function startQuiz() {
+                const name = studentNameInput.value.trim();
+                if (!name) {
+                    nameError.style.display = 'block';
+                    return;
+                }
+                nameError.style.display = 'none';
+                state.studentName = name;
+
+                screenWelcome.classList.remove('active');
+                screenQuiz.classList.add('active');
+
+                displayName.textContent = name;
+                state.shuffledOptions = [];
+                state.currentIndex = 0;
+                state.score = 0;
+                renderQuestion(0);
+                updateProgress(0);
+            }
+
+            // ============================================================
+            //  EVENTOS
+            // ============================================================
+            btnStart.addEventListener('click', startQuiz);
+            studentNameInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') startQuiz();
+            });
+            studentNameInput.addEventListener('input', () => {
+                nameError.style.display = 'none';
+            });
+
+            btnNext.addEventListener('click', goToNextQuestion);
+
+            btnRetry.addEventListener('click', () => {
+                resetQuiz();
+            });
+
+            // ============================================================
+            //  INICIO
+            // ============================================================
+            screenWelcome.classList.add('active');
+            screenQuiz.classList.remove('active');
+            screenResults.classList.remove('active');
+
+            console.log('Cuestionario Sesión 8 cargado.');
+        })();
+    </script>
+
+</body>
+</html>
