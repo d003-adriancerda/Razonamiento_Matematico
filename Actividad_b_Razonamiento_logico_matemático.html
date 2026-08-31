@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cuestionario Interactivo - Sesión 2: Economía Circular, Desarrollo Sostenible e IA</title>
-    <!-- MathJax para notación matemática -->
+    <title>Cuestionario - Sesión 2: Indicadores Lógicos, Verdad y Validez</title>
     <script>
         MathJax = {
             tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
@@ -15,7 +14,6 @@
         src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
     </script>
     <style>
-        /* ===== Variables CSS ===== */
         :root {
             --primary-dark: #1e3a8a;
             --primary-bright: #3b82f6;
@@ -29,13 +27,7 @@
             --shadow-card: 0 10px 25px rgba(0, 0, 0, 0.08);
             --transition: 0.25s ease-in-out;
         }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             background: var(--bg-light);
@@ -46,7 +38,6 @@
             padding: 1.5rem;
             margin: 0;
         }
-
         .quiz-container {
             max-width: 1000px;
             width: 100%;
@@ -56,31 +47,18 @@
             padding: 2rem 2.5rem;
             transition: var(--transition);
         }
-
-        /* ===== Pantallas ===== */
-        .screen {
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-        .screen.active {
-            display: block;
-        }
-
+        .screen { display: none; animation: fadeIn 0.3s ease; }
+        .screen.active { display: block; }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
-        /* ===== Títulos y textos ===== */
         h1, h2, h3 {
             color: var(--primary-dark);
             font-weight: 600;
             letter-spacing: -0.02em;
         }
-        h1 {
-            font-size: 2.2rem;
-            margin-bottom: 0.25rem;
-        }
+        h1 { font-size: 2.2rem; margin-bottom: 0.25rem; }
         .subtitle {
             color: var(--text-muted);
             font-size: 1.1rem;
@@ -90,11 +68,7 @@
             font-weight: 500;
             color: var(--primary-bright);
         }
-
-        /* ===== Barra de progreso ===== */
-        .progress-wrapper {
-            margin-bottom: 2rem;
-        }
+        .progress-wrapper { margin-bottom: 2rem; }
         .progress-bar-bg {
             background: #e5e7eb;
             height: 8px;
@@ -115,8 +89,6 @@
             color: var(--text-muted);
             margin-top: 0.3rem;
         }
-
-        /* ===== Preguntas y opciones ===== */
         .question-text {
             font-size: 1.3rem;
             font-weight: 500;
@@ -147,10 +119,7 @@
             background: #e0e7ff;
             border-color: var(--primary-bright);
         }
-        .option-btn.disabled {
-            cursor: default;
-            opacity: 0.8;
-        }
+        .option-btn.disabled { cursor: default; opacity: 0.8; }
         .option-btn.correct {
             background: #d1fae5;
             border-color: var(--success-green);
@@ -166,8 +135,6 @@
             border-color: var(--success-green);
             color: #065f46;
         }
-
-        /* ===== Feedback ===== */
         .feedback-area {
             background: #f9fafb;
             border-left: 4px solid var(--primary-bright);
@@ -178,18 +145,9 @@
             color: var(--text-dark);
             min-height: 3.5rem;
         }
-        .feedback-area.correct-fb {
-            border-left-color: var(--success-green);
-        }
-        .feedback-area.incorrect-fb {
-            border-left-color: var(--error-red);
-        }
-
-        /* ===== Botones de navegación ===== */
-        .nav-buttons {
-            display: flex;
-            justify-content: flex-end;
-        }
+        .feedback-area.correct-fb { border-left-color: var(--success-green); }
+        .feedback-area.incorrect-fb { border-left-color: var(--error-red); }
+        .nav-buttons { display: flex; justify-content: flex-end; }
         .btn {
             background: var(--primary-bright);
             color: white;
@@ -212,17 +170,6 @@
             box-shadow: none;
             transform: none;
         }
-        .btn-secondary {
-            background: var(--card-white);
-            color: var(--primary-bright);
-            border: 2px solid var(--primary-bright);
-            box-shadow: none;
-        }
-        .btn-secondary:hover {
-            background: #e0e7ff;
-        }
-
-        /* ===== Pantalla de resultados ===== */
         .result-circle {
             display: flex;
             flex-direction: column;
@@ -256,11 +203,7 @@
             gap: 1rem;
             flex-wrap: wrap;
         }
-
-        /* ===== Formulario de registro ===== */
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
+        .form-group { margin-bottom: 1.5rem; }
         .form-group label {
             display: block;
             font-weight: 500;
@@ -286,38 +229,22 @@
             margin-top: 0.2rem;
             display: none;
         }
-
-        /* ===== Responsive ===== */
         @media (max-width: 640px) {
-            .quiz-container {
-                padding: 1.5rem;
-            }
-            h1 {
-                font-size: 1.8rem;
-            }
-            .question-text {
-                font-size: 1.1rem;
-            }
-            .option-btn {
-                padding: 0.7rem 1rem;
-                font-size: 0.95rem;
-            }
-            .result-circle {
-                width: 140px;
-                height: 140px;
-                font-size: 2.2rem;
-            }
+            .quiz-container { padding: 1.5rem; }
+            h1 { font-size: 1.8rem; }
+            .question-text { font-size: 1.1rem; }
+            .option-btn { padding: 0.7rem 1rem; font-size: 0.95rem; }
+            .result-circle { width: 140px; height: 140px; font-size: 2.2rem; }
         }
     </style>
 </head>
 <body>
     <div class="quiz-container" id="app">
-        <!-- ==================== PANTALLA 1: BIENVENIDA ==================== -->
         <div id="screen-welcome" class="screen active">
-            <h1>♻️ Economía Circular, Desarrollo Sostenible e IA</h1>
-            <p class="subtitle">Sesión 2 · Análisis de fragmentos científicos (2024-2026)</p>
+            <h1>🔍 Sesión 2: Indicadores Lógicos, Verdad y Validez</h1>
+            <p class="subtitle">Razonamiento Matemático · Análisis de argumentos y validez lógica</p>
             <p style="margin-bottom: 1.8rem; color: var(--text-muted);">
-                Antes de comenzar, ingresa tu nombre completo para personalizar tu experiencia.
+                Ingresa tu nombre para comenzar el cuestionario sobre indicadores lógicos, verdad y validez.
             </p>
             <div class="form-group">
                 <label for="studentName">Nombre completo</label>
@@ -327,10 +254,9 @@
             <button class="btn" id="btnStart">Comenzar cuestionario</button>
         </div>
 
-        <!-- ==================== PANTALLA 2: CUESTIONARIO ==================== -->
         <div id="screen-quiz" class="screen">
             <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; margin-bottom: 0.5rem;">
-                <h2 style="font-size: 1.5rem;">Cuestionario diagnóstico</h2>
+                <h2 style="font-size: 1.5rem;">Cuestionario · Sesión 2</h2>
                 <span style="color: var(--text-muted); font-size: 0.95rem;">
                     Estudiante: <span class="student-name-display" id="displayName"></span>
                 </span>
@@ -356,7 +282,6 @@
             </div>
         </div>
 
-        <!-- ==================== PANTALLA 3: RESULTADOS ==================== -->
         <div id="screen-results" class="screen">
             <h2 style="text-align: center;">🎉 ¡Cuestionario completado!</h2>
             <p style="text-align: center; color: var(--text-muted);" id="resultGreeting"></p>
@@ -365,7 +290,7 @@
                 <span>aciertos</span>
             </div>
             <div class="result-feedback" id="resultFeedback">
-                Excelente trabajo. Has demostrado un buen entendimiento de la estructura de los argumentos.
+                Excelente trabajo. Has demostrado comprensión de indicadores lógicos, verdad y validez.
             </div>
             <div class="result-actions">
                 <button class="btn" id="btnRetry">🔄 Volver a intentar</button>
@@ -377,183 +302,176 @@
         (function() {
             'use strict';
 
-            // ============================================================
-            //  DATOS DE PREGUNTAS (12 preguntas basadas en artículos 2024-2026)
-            //  Economía Circular, Desarrollo Sostenible, Inteligencia Artificial
-            // ============================================================
             const QUESTIONS = [{
                 id: 1,
-                text: 'Fragmento (Bashynska & Prokopenko, 2024): "La IA transforma la gestión de recursos, cadenas de suministro y prácticas de manufactura mediante optimización predictiva". Según este enunciado, ¿qué mecanismo de la IA es central para la economía circular?',
+                text: 'Fragmento (Nature Energy, 2025): "La IA mejora el desempeño de transición energética, <strong>porque</strong> optimiza el uso de recursos". ¿Qué función cumple "porque" en este argumento?',
                 options: [
-                    'Automatización robótica de líneas de ensamblaje sin intervención humana.',
-                    'Optimización predictiva que reduce desperdicios y mejora la eficiencia de recursos.',
-                    'Generación de contenido creativo para marketing de productos sostenibles.',
-                    'Reemplazo completo de trabajadores humanos por sistemas autónomos.'
+                    'Introduce la conclusión.',
+                    'Introduce una premisa.',
+                    'Introduce una explicación.',
+                    'Introduce una opinión sin evidencia.'
                 ],
                 correct: 1,
                 feedback: {
-                    correct: 'Correcto. La IA habilita la optimización predictiva para reducir desperdicios y mejorar la eficiencia, mecanismos clave de la economía circular [19].',
-                    incorrect: 'El texto enfatiza la optimización predictiva para gestión de recursos, no la automatización robótica ni el reemplazo humano [19].'
+                    correct: 'Correcto. "Porque" es un indicador de premisa; señala la razón que apoya la conclusión.',
+                    incorrect: '"Porque" introduce la premisa (la razón), no la conclusión. La conclusión es "la IA mejora el desempeño".'
                 }
             }, {
                 id: 2,
-                text: 'Fragmento (Hernandez et al., 2025): "La IA juega un papel clave en la promoción del desarrollo sostenible dentro de la Industria 4.0 y 5.0, con enfoque en ODS 12 (producción y consumo responsables)". ¿Qué tendencia de investigación se identifica?',
+                text: '¿Cuál de los siguientes es un indicador de <strong>premisa</strong>?',
                 options: [
-                    'De eficiencia operativa en cadenas tradicionales hacia digitalización con IA y sostenibilidad (economía circular).',
-                    'De sostenibilidad hacia automatización industrial sin consideraciones ambientales.',
-                    'De investigación básica en matemáticas puras hacia aplicaciones militares.',
-                    'De economía circular hacia modelos lineales de producción y consumo.'
+                    'por lo tanto',
+                    'en consecuencia',
+                    'ya que',
+                    'así que'
                 ],
-                correct: 0,
+                correct: 2,
                 feedback: {
-                    correct: 'Correcto. Las tendencias de palabras clave muestran un cambio de eficiencia operativa hacia digitalización (IA) y sostenibilidad (economía circular) [20].',
-                    incorrect: 'La tendencia es de eficiencia operativa hacia digitalización con IA y economía circular, no hacia modelos lineales [20].'
+                    correct: 'Correcto. "Ya que" es un indicador de premisa, al igual que "porque", "puesto que", "dado que".',
+                    incorrect: '"Por lo tanto", "en consecuencia" y "así que" son indicadores de conclusión, no de premisa.'
                 }
             }, {
                 id: 3,
-                text: 'Fragmento (Rehman et al., 2025): "La IA ofrece soluciones poderosas para acción climática y gestión de recursos, pero su propia huella ecológica y potencial de sesgo presentan riesgos críticos". ¿Qué marco se propone?',
+                text: 'Fragmento (Science, 2024): "Si las ciudades implementan smart grids, entonces reducirán emisiones. Las ciudades implementaron smart grids. Por tanto, reducirán emisiones". ¿Este argumento es válido?',
                 options: [
-                    'Un marco unidimensional que solo evalúa beneficios económicos de la IA.',
-                    'Un marco multidimensional que conecta aplicaciones de IA con riesgos ecológicos, algorítmicos y socioeconómicos.',
-                    'Un marco que ignora los riesgos éticos y se enfoca exclusivamente en innovación técnica.',
-                    'Un marco que prohíbe toda aplicación de IA en contextos de sostenibilidad.'
+                    'Sí, es Modus Ponens válido.',
+                    'No, es falacia de afirmación del consecuente.',
+                    'No, es falacia de negación del antecedente.',
+                    'Sí, pero solo si las premisas son verdaderas.'
                 ],
-                correct: 1,
+                correct: 0,
                 feedback: {
-                    correct: 'Correcto. El estudio propone un marco multidimensional que analiza aplicaciones de IA junto con riesgos ecológicos, algorítmicos y socioeconómicos [21].',
-                    incorrect: 'El marco es multidimensional e integra riesgos ecológicos, algorítmicos y socioeconómicos, no solo beneficios económicos [21].'
+                    correct: 'Correcto. Es Modus Ponens: si P entonces Q, P, luego Q. Es una forma deductiva válida.',
+                    incorrect: 'Es Modus Ponens válido. La validez depende de la forma, no de la verdad de las premisas.'
                 }
             }, {
                 id: 4,
-                text: 'En economía circular, el principio de "cerrar el ciclo" implica:',
+                text: 'Un argumento deductivo es <strong>válido</strong> cuando:',
                 options: [
-                    'Mantener materiales y productos en uso el mayor tiempo posible mediante reutilización, reparación y reciclaje.',
-                    'Eliminar todos los procesos de producción y consumir solo productos importados.',
-                    'Incrementar la producción lineal sin considerar el fin de vida del producto.',
-                    'Sustituir todos los materiales por plásticos de un solo uso.'
+                    'Las premisas son verdaderas.',
+                    'La conclusión es verdadera.',
+                    'Si las premisas son verdaderas, la conclusión debe ser verdadera.',
+                    'Las premisas y la conclusión son verdaderas.'
                 ],
-                correct: 0,
+                correct: 2,
                 feedback: {
-                    correct: 'Correcto. "Cerrar el ciclo" significa mantener materiales en uso mediante reutilización, reparación y reciclaje, minimizando residuos [18].',
-                    incorrect: 'El principio es mantener materiales en uso (reutilizar, reparar, reciclar), no eliminar producción ni usar plásticos de un solo uso [18].'
+                    correct: 'Correcto. La validez es sobre la forma: si las premisas fueran verdaderas, la conclusión necesariamente lo sería.',
+                    incorrect: 'La validez no depende de la verdad real de premisas o conclusión, sino de la relación lógica entre ellas.'
                 }
             }, {
                 id: 5,
-                text: 'Fragmento (Pinto, 2025): "La economía circular se consolida como alternativa sostenible frente al modelo lineal, orientada a optimizar recursos y reducir residuos". ¿Qué rol tiene la IA según este autor?',
+                text: 'Fragmento (MIT Tech Review, 2025): "Los algoritmos de IA tienen sesgos. Los sistemas de contratación usan algoritmos de IA. Por lo tanto, los sistemas de contratación tienen sesgos". ¿Este argumento es válido?',
                 options: [
-                    'Medir indicadores de circularidad y facilitar trazabilidad en toda la cadena de valor.',
-                    'Reemplazar completamente la toma de decisiones humanas en la cadena de suministro.',
-                    'Generar contenido publicitario para productos no sostenibles.',
-                    'Automatizar procesos sin considerar impactos ambientales.'
+                    'Sí, es un silogismo categórico válido (forma AAA-1).',
+                    'No, es una falacia formal.',
+                    'Sí, pero solo si las premisas son verdaderas.',
+                    'No, porque la conclusión es falsa.'
                 ],
                 correct: 0,
                 feedback: {
-                    correct: 'Correcto. La IA permite medir indicadores de circularidad y facilitar trazabilidad en la cadena de valor [18].',
-                    incorrect: 'El rol de la IA es medir indicadores y facilitar trazabilidad, no reemplazar decisiones humanas ni automatizar sin considerar el ambiente [18].'
+                    correct: 'Correcto. Es un silogismo válido: todos M son P, todos S son M, luego todos S son P.',
+                    incorrect: 'La forma es válida (silogismo AAA-1). La validez no depende de la verdad de las premisas o conclusión.'
                 }
             }, {
                 id: 6,
-                text: 'Fragmento (Bashynska & Prokopenko, 2024): "Las soluciones basadas en IA tienen el potencial de disminuir residuos en 30-45%, mejorar uso de recursos en 25-40% y aumentar precisión de decisiones en sistemas circulares hasta 60%". ¿Qué se requiere para escalar estas soluciones?',
+                text: '¿Cuál de los siguientes enunciados es <strong>verdadero</strong> sobre la relación entre verdad y validez?',
                 options: [
-                    'Integración intersectorial, uso ético de IA y escalabilidad para PYMES.',
-                    'Prohibición de IA en países en desarrollo para evitar dependencia tecnológica.',
-                    'Centralización de datos en grandes corporaciones sin regulación.',
-                    'Eliminación de todas las regulaciones ambientales para acelerar la innovación.'
+                    'Un argumento válido siempre tiene premisas verdaderas.',
+                    'Un argumento válido siempre tiene conclusión verdadera.',
+                    'Un argumento válido puede tener premisas falsas y conclusión falsa.',
+                    'Un argumento inválido nunca puede tener conclusión verdadera.'
                 ],
-                correct: 0,
+                correct: 2,
                 feedback: {
-                    correct: 'Correcto. Se requieren integración intersectorial, uso ético de IA y soluciones escalables para PYMES [28].',
-                    incorrect: 'Los requisitos son integración intersectorial, ética y escalabilidad para PYMES, no prohibición ni centralización sin regulación [28].'
+                    correct: 'Correcto. Un argumento válido puede tener premisas falsas y conclusión falsa. La validez es sobre la forma, no el contenido.',
+                    incorrect: 'La validez no garantiza verdad de premisas o conclusión. Un argumento inválido sí puede tener conclusión verdadera por accidente.'
                 }
             }, {
                 id: 7,
-                text: 'En el contexto de ciudades inteligentes, ¿qué aplicaciones de IA para economía circular se identifican como dominantes (2024-2025)?',
+                text: 'Fragmento (The Guardian, 2025): "Las ciudades inteligentes reducen emisiones, <strong>por consiguiente</strong>, deberíamos invertir en ellas". ¿Qué indica "por consiguiente"?',
                 options: [
-                    'Manufactura circular, automatización de gestión de residuos, optimización predictiva de energía, plataformas de datos urbanos y movilidad inteligente.',
-                    'Vigilancia masiva sin propósitos de sostenibilidad.',
-                    'Generación de criptomonedas para financiar proyectos no sostenibles.',
-                    'Reemplazo de gobiernos locales por sistemas autónomos de IA.'
+                    'Que viene una premisa.',
+                    'Que viene una explicación.',
+                    'Que viene una conclusión.',
+                    'Que viene una opinión sin evidencia.'
                 ],
-                correct: 0,
+                correct: 2,
                 feedback: {
-                    correct: 'Correcto. Las aplicaciones dominantes son manufactura circular, automatización de residuos, optimización energética, plataformas de datos y movilidad inteligente [22].',
-                    incorrect: 'Las aplicaciones son manufactura circular, gestión de residuos, optimización energética, plataformas de datos y movilidad, no vigilancia masiva [22].'
+                    correct: 'Correcto. "Por consiguiente" es un indicador de conclusión, al igual que "por lo tanto", "en consecuencia", "así que".',
+                    incorrect: '"Por consiguiente" señala la conclusión, no una premisa ni explicación.'
                 }
             }, {
                 id: 8,
-                text: 'Fragmento (RSM, 2026): "La IA es un habilitador clave de la economía circular en la Industria 5.0, pero persisten vacíos teóricos, metodológicos y geográficos, especialmente en gobernanza ética y evidencia empírica en economías emergentes". ¿Qué se propone?',
+                text: 'Considera el argumento: "Si hay transición energética, entonces hay inversión en renovables. No hay inversión en renovables. Por tanto, no hay transición energética". ¿Qué forma lógica es?',
                 options: [
-                    'Una agenda científica 2027-2035 en cinco ejes prioritarios para orientar investigación futura.',
-                    'La eliminación de toda investigación en IA y economía circular.',
-                    'La centralización de investigación en Europa y Norteamérica exclusivamente.',
-                    'La prohibición de IA en países de América Latina y África.'
+                    'Modus Ponens.',
+                    'Modus Tollens.',
+                    'Falacia de afirmación del consecuente.',
+                    'Falacia de negación del antecedente.'
                 ],
-                correct: 0,
+                correct: 1,
                 feedback: {
-                    correct: 'Correcto. Se propone una agenda científica 2027-2035 en cinco ejes prioritarios para investigación futura [25].',
-                    incorrect: 'La propuesta es una agenda científica 2027-2035, no eliminar investigación ni centralizarla exclusivamente en Europa [25].'
+                    correct: 'Correcto. Es Modus Tollens: si P entonces Q, no Q, luego no P. Es una forma deductiva válida.',
+                    incorrect: 'Modus Tollens es: si P entonces Q, no Q, luego no P. No es Modus Ponens (P, luego Q) ni falacia.'
                 }
             }, {
                 id: 9,
-                text: 'Fragmento (Dimuke et al., 2026): "La IA juega un rol ambivalente: puede mejorar coordinación, innovación y toma de decisiones, pero también genera riesgos de sesgo algorítmico, concentración de poder y captura de gobernanza". ¿Qué se requiere para superar estas tensiones?',
+                text: 'Fragmento (Wired, 2025): "La IA es útil para ciudades sostenibles. La IA optimiza recursos. Por lo tanto, la IA es útil". ¿Este argumento es sólido?',
                 options: [
-                    'Ecosistemas de innovación que integren gobernanza multinivel, financiamiento combinado con esquemas de riesgo compartido y métricas de impacto verificables.',
-                    'Prohibición total de IA en contextos de sostenibilidad.',
-                    'Centralización de poder en grandes corporaciones tecnológicas.',
-                    'Eliminación de todas las regulaciones ambientales y sociales.'
+                    'Sí, es válido y las premisas son verdaderas.',
+                    'No, es inválido.',
+                    'Sí, pero solo si la conclusión es verdadera.',
+                    'No, porque la conclusión es falsa.'
                 ],
                 correct: 0,
                 feedback: {
-                    correct: 'Correcto. Se requieren ecosistemas de innovación con gobernanza multinivel, financiamiento combinado y métricas de impacto verificables [26].',
-                    incorrect: 'La solución es gobernanza multinivel, financiamiento combinado y métricas verificables, no prohibición ni centralización [26].'
+                    correct: 'Correcto. Es válido (forma correcta) y las premisas son verdaderas, por lo tanto es sólido.',
+                    incorrect: 'Un argumento sólido es válido y tiene premisas verdaderas. Este cumple ambas condiciones.'
                 }
             }, {
                 id: 10,
-                text: 'Fragmento (Bashynska & Prokopenko, 2024): "Los sensores IoT junto con algoritmos de aprendizaje de alto rendimiento permiten monitoreo y control adaptativo en tiempo real de procesos de economía circular". ¿Qué desafío persiste?',
+                text: '¿Cuál de los siguientes argumentos es <strong>inválido</strong>?',
                 options: [
-                    'Calidad de datos, sesgo en algoritmos, consumo de modelos de IA y falta de implementación en economías en desarrollo.',
-                    'Exceso de datos que colapsa los sistemas de almacenamiento.',
-                    'Falta de interés de las empresas en sostenibilidad.',
-                    'Sobrefinanciamiento que distorsiona los principios de economía circular.'
+                    'Si P entonces Q. P. Por tanto, Q.',
+                    'Si P entonces Q. No Q. Por tanto, no P.',
+                    'Si P entonces Q. Q. Por tanto, P.',
+                    'Todos los S son M. Todos los M son P. Por tanto, todos los S son P.'
                 ],
-                correct: 0,
+                correct: 2,
                 feedback: {
-                    correct: 'Correcto. Los desafíos son calidad de datos, sesgo algorítmico, consumo de modelos de IA y falta de implementación en economías en desarrollo [28].',
-                    incorrect: 'Los desafíos son calidad de datos, sesgo, consumo de modelos y falta de implementación en economías en desarrollo, no exceso de datos [28].'
+                    correct: 'Correcto. Es falacia de afirmación del consecuente: si P entonces Q, Q, luego P. Es inválido.',
+                    incorrect: 'Las otras formas son válidas (Modus Ponens, Modus Tollens, silogismo). Solo la tercera es falacia.'
                 }
             }, {
                 id: 11,
-                text: 'En eco-diseño, ¿qué hallazgo se reporta sobre la aplicación de IA (revisión sistemática 2014-2024)?',
+                text: 'Fragmento (Reuters, 2025): "Las smart grids mejoran eficiencia. Las smart grids reducen costos. Por lo tanto, las smart grids mejoran eficiencia y reducen costos". ¿Qué tipo de argumento es?',
                 options: [
-                    'Enfoque desbalanceado en ciertas etapas del ciclo de vida, prácticas comunes de eco-diseño y subutilización de métodos avanzados de IA.',
-                    'Uso equilibrado de IA en todas las etapas del ciclo de vida sin brechas.',
-                    'Eliminación completa de métodos tradicionales de eco-diseño.',
-                    'Prohibición de IA en contextos de diseño sostenible.'
+                    'Deductivo válido (conjunción de premisas).',
+                    'Inductivo fuerte.',
+                    'Falacia formal.',
+                    'Explicación causal.'
                 ],
                 correct: 0,
                 feedback: {
-                    correct: 'Correcto. Se reporta un enfoque desbalanceado en ciertas etapas del ciclo de vida y subutilización de métodos avanzados de IA [29].',
-                    incorrect: 'El hallazgo es un enfoque desbalanceado y subutilización de métodos avanzados, no uso equilibrado ni eliminación de métodos tradicionales [29].'
+                    correct: 'Correcto. Es deductivo válido: de P y Q se sigue P y Q. La conclusión es la conjunción de las premisas.',
+                    incorrect: 'Es deductivo válido. La conclusión es la conjunción lógica de las premisas, no una generalización inductiva.'
                 }
             }, {
                 id: 12,
-                text: 'Fragmento (RSM, 2025): "La IA se posiciona como catalizador fiable para transición hacia economía circular, impulsando modelos como producto-como-servicio (PaaS) y remanufactura, pero surgen desafíos: aumento de consumo energético, huella de carbono y riesgos éticos de sesgos algorítmicos". ¿Qué enfoque se propone?',
+                text: 'Un argumento deductivo <strong>sólido</strong> cumple con:',
                 options: [
-                    'Un enfoque de gestión integral que anticipe riesgos, fortalezca colaboración entre actores y cultive liderazgo adaptativo.',
-                    'Un enfoque que ignore los riesgos energéticos y éticos de la IA.',
-                    'Un enfoque que centralice el poder en grandes corporaciones tecnológicas.',
-                    'Un enfoque que elimine toda regulación ambiental para acelerar la innovación.'
+                    'Ser válido y tener premisas verdaderas.',
+                    'Ser válido y tener conclusión verdadera.',
+                    'Tener premisas verdaderas y conclusión verdadera.',
+                    'Ser fuerte y tener premisas verdaderas.'
                 ],
                 correct: 0,
                 feedback: {
-                    correct: 'Correcto. Se propone un enfoque de gestión integral que anticipe riesgos, fortalezca colaboración y cultive liderazgo adaptativo [30].',
-                    incorrect: 'El enfoque es de gestión integral que anticipe riesgos y fortalezca colaboración, no ignorar riesgos ni centralizar poder [30].'
+                    correct: 'Correcto. Un argumento sólido es válido y tiene premisas verdaderas. Esto garantiza conclusión verdadera.',
+                    incorrect: 'La solidez requiere validez + premisas verdaderas. "Fuerte" es para argumentos inductivos, no deductivos.'
                 }
             }];
 
-            // ============================================================
-            //  ESTADO DE LA APLICACIÓN
-            // ============================================================
             let state = {
                 studentName: '',
                 currentIndex: 0,
@@ -564,9 +482,6 @@
                 correctShuffledIndex: -1,
             };
 
-            // ============================================================
-            //  DOM REFERENCIAS
-            // ============================================================
             const $ = id => document.getElementById(id);
             const screenWelcome = $('screen-welcome');
             const screenQuiz = $('screen-quiz');
@@ -587,9 +502,6 @@
             const resultFeedback = $('resultFeedback');
             const btnRetry = $('btnRetry');
 
-            // ============================================================
-            //  FUNCIÓN DE BARAJADO (Fisher-Yates)
-            // ============================================================
             function shuffleArray(arr) {
                 const a = [...arr];
                 for (let i = a.length - 1; i > 0; i--) {
@@ -599,9 +511,6 @@
                 return a;
             }
 
-            // ============================================================
-            //  FUNCIONES DE RENDERIZADO
-            // ============================================================
             function renderQuestion(index) {
                 const q = QUESTIONS[index];
                 if (!q) return;
@@ -652,7 +561,6 @@
             function handleOptionClick(qIndex, optIdx) {
                 if (state.answered) return;
                 const q = QUESTIONS[qIndex];
-                const shuffled = state.shuffledOptions[qIndex];
                 const correctIdx = state.correctShuffledIndex;
                 const isCorrect = (optIdx === correctIdx);
 
@@ -687,9 +595,6 @@
                 scoreLabel.textContent = `Aciertos: ${state.score}`;
             }
 
-            // ============================================================
-            //  NAVEGACIÓN
-            // ============================================================
             function goToNextQuestion() {
                 if (!state.answered) return;
                 const nextIndex = state.currentIndex + 1;
@@ -701,9 +606,6 @@
                 }
             }
 
-            // ============================================================
-            //  RESULTADOS
-            // ============================================================
             function showResults() {
                 screenQuiz.classList.remove('active');
                 screenResults.classList.add('active');
@@ -718,20 +620,17 @@
                 let msg = '';
                 const pct = score / total;
                 if (pct >= 0.9) {
-                    msg = 'Excelente dominio. Has demostrado una comprensión profunda de los fragmentos científicos sobre economía circular, desarrollo sostenible e IA. Sigue así.';
+                    msg = 'Excelente. Distingues claramente entre verdad y validez, y reconoces formas lógicas válidas e inválidas. Sigue así.';
                 } else if (pct >= 0.7) {
-                    msg = 'Buen desempeño. Identificas correctamente los conceptos clave, pero aún puedes mejorar en la distinción de matices en textos complejos. Revisa los artículos de referencia.';
+                    msg = 'Buen desempeño. Tienes una base sólida, pero te sugiero repasar la diferencia entre solidez y validez.';
                 } else if (pct >= 0.5) {
-                    msg = 'Has mostrado una base aceptable, pero es importante reforzar el reconocimiento de conceptos como optimización predictiva, gobernanza ética y riesgos de IA. Te recomiendo repasar los fragmentos.';
+                    msg = 'Es necesario reforzar la identificación de formas válidas e inválidas. Revisa el libro Hurley, capítulos 1 y 6.';
                 } else {
-                    msg = 'Es necesario que dediques más tiempo a los conceptos fundamentales. Practica identificando premisas, conclusiones y conceptos clave en artículos científicos sobre economía circular e IA. Utiliza las referencias proporcionadas.';
+                    msg = 'Te recomiendo estudiar nuevamente la sesión 2, prestando especial atención a indicadores lógicos y validez.';
                 }
                 resultFeedback.textContent = msg;
             }
 
-            // ============================================================
-            //  REINICIO
-            // ============================================================
             function resetQuiz() {
                 state.currentIndex = 0;
                 state.score = 0;
@@ -748,9 +647,6 @@
                 updateProgress(0);
             }
 
-            // ============================================================
-            //  MANEJO DE REGISTRO
-            // ============================================================
             function startQuiz() {
                 const name = studentNameInput.value.trim();
                 if (!name) {
@@ -771,9 +667,6 @@
                 updateProgress(0);
             }
 
-            // ============================================================
-            //  EVENT LISTENERS
-            // ============================================================
             btnStart.addEventListener('click', startQuiz);
             studentNameInput.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') startQuiz();
@@ -783,21 +676,16 @@
             });
 
             btnNext.addEventListener('click', goToNextQuestion);
-
             btnRetry.addEventListener('click', () => {
                 resetQuiz();
             });
 
-            // ============================================================
-            //  INICIALIZAR
-            // ============================================================
             screenWelcome.classList.add('active');
             screenQuiz.classList.remove('active');
             screenResults.classList.remove('active');
 
-            console.log('Cuestionario Sesión 2 cargado. ¡Buena suerte!');
+            console.log('Cuestionario Sesión 2 cargado.');
         })();
     </script>
-
 </body>
 </html>
