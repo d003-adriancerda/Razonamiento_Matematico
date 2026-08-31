@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cuestionario Interdisciplinario - Análisis de Fragmentos Científicos</title>
-    <!-- MathJax para notación matemática -->
+    <title>Cuestionario - Sesión 1: Diagnóstico y Anatomía del Discurso</title>
     <script>
         MathJax = {
             tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
@@ -15,7 +14,6 @@
         src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
     </script>
     <style>
-        /* ===== Variables CSS ===== */
         :root {
             --primary-dark: #1e3a8a;
             --primary-bright: #3b82f6;
@@ -29,13 +27,7 @@
             --shadow-card: 0 10px 25px rgba(0, 0, 0, 0.08);
             --transition: 0.25s ease-in-out;
         }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             background: var(--bg-light);
@@ -46,7 +38,6 @@
             padding: 1.5rem;
             margin: 0;
         }
-
         .quiz-container {
             max-width: 1000px;
             width: 100%;
@@ -56,31 +47,18 @@
             padding: 2rem 2.5rem;
             transition: var(--transition);
         }
-
-        /* ===== Pantallas ===== */
-        .screen {
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-        .screen.active {
-            display: block;
-        }
-
+        .screen { display: none; animation: fadeIn 0.3s ease; }
+        .screen.active { display: block; }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
-        /* ===== Títulos y textos ===== */
         h1, h2, h3 {
             color: var(--primary-dark);
             font-weight: 600;
             letter-spacing: -0.02em;
         }
-        h1 {
-            font-size: 2.2rem;
-            margin-bottom: 0.25rem;
-        }
+        h1 { font-size: 2.2rem; margin-bottom: 0.25rem; }
         .subtitle {
             color: var(--text-muted);
             font-size: 1.1rem;
@@ -90,11 +68,7 @@
             font-weight: 500;
             color: var(--primary-bright);
         }
-
-        /* ===== Barra de progreso ===== */
-        .progress-wrapper {
-            margin-bottom: 2rem;
-        }
+        .progress-wrapper { margin-bottom: 2rem; }
         .progress-bar-bg {
             background: #e5e7eb;
             height: 8px;
@@ -115,8 +89,6 @@
             color: var(--text-muted);
             margin-top: 0.3rem;
         }
-
-        /* ===== Preguntas y opciones ===== */
         .question-text {
             font-size: 1.3rem;
             font-weight: 500;
@@ -147,10 +119,7 @@
             background: #e0e7ff;
             border-color: var(--primary-bright);
         }
-        .option-btn.disabled {
-            cursor: default;
-            opacity: 0.8;
-        }
+        .option-btn.disabled { cursor: default; opacity: 0.8; }
         .option-btn.correct {
             background: #d1fae5;
             border-color: var(--success-green);
@@ -166,8 +135,6 @@
             border-color: var(--success-green);
             color: #065f46;
         }
-
-        /* ===== Feedback ===== */
         .feedback-area {
             background: #f9fafb;
             border-left: 4px solid var(--primary-bright);
@@ -178,18 +145,9 @@
             color: var(--text-dark);
             min-height: 3.5rem;
         }
-        .feedback-area.correct-fb {
-            border-left-color: var(--success-green);
-        }
-        .feedback-area.incorrect-fb {
-            border-left-color: var(--error-red);
-        }
-
-        /* ===== Botones de navegación ===== */
-        .nav-buttons {
-            display: flex;
-            justify-content: flex-end;
-        }
+        .feedback-area.correct-fb { border-left-color: var(--success-green); }
+        .feedback-area.incorrect-fb { border-left-color: var(--error-red); }
+        .nav-buttons { display: flex; justify-content: flex-end; }
         .btn {
             background: var(--primary-bright);
             color: white;
@@ -212,17 +170,6 @@
             box-shadow: none;
             transform: none;
         }
-        .btn-secondary {
-            background: var(--card-white);
-            color: var(--primary-bright);
-            border: 2px solid var(--primary-bright);
-            box-shadow: none;
-        }
-        .btn-secondary:hover {
-            background: #e0e7ff;
-        }
-
-        /* ===== Pantalla de resultados ===== */
         .result-circle {
             display: flex;
             flex-direction: column;
@@ -256,11 +203,7 @@
             gap: 1rem;
             flex-wrap: wrap;
         }
-
-        /* ===== Formulario de registro ===== */
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
+        .form-group { margin-bottom: 1.5rem; }
         .form-group label {
             display: block;
             font-weight: 500;
@@ -286,38 +229,22 @@
             margin-top: 0.2rem;
             display: none;
         }
-
-        /* ===== Responsive ===== */
         @media (max-width: 640px) {
-            .quiz-container {
-                padding: 1.5rem;
-            }
-            h1 {
-                font-size: 1.8rem;
-            }
-            .question-text {
-                font-size: 1.1rem;
-            }
-            .option-btn {
-                padding: 0.7rem 1rem;
-                font-size: 0.95rem;
-            }
-            .result-circle {
-                width: 140px;
-                height: 140px;
-                font-size: 2.2rem;
-            }
+            .quiz-container { padding: 1.5rem; }
+            h1 { font-size: 1.8rem; }
+            .question-text { font-size: 1.1rem; }
+            .option-btn { padding: 0.7rem 1rem; font-size: 0.95rem; }
+            .result-circle { width: 140px; height: 140px; font-size: 2.2rem; }
         }
     </style>
 </head>
 <body>
     <div class="quiz-container" id="app">
-        <!-- ==================== PANTALLA 1: BIENVENIDA ==================== -->
         <div id="screen-welcome" class="screen active">
-            <h1>🔬 Cuestionario Interdisciplinario</h1>
-            <p class="subtitle">Análisis de fragmentos científicos · Programación, ESS, Matemáticas, Biología, Políticas Públicas, Interculturalidad</p>
+            <h1>🧠 Sesión 1: Diagnóstico y Anatomía del Discurso</h1>
+            <p class="subtitle">Razonamiento Matemático · Identificación de argumentos, premisas y conclusiones</p>
             <p style="margin-bottom: 1.8rem; color: var(--text-muted);">
-                Antes de comenzar, ingresa tu nombre completo para personalizar tu experiencia.
+                Ingresa tu nombre para comenzar el cuestionario diagnóstico sobre anatomía del discurso.
             </p>
             <div class="form-group">
                 <label for="studentName">Nombre completo</label>
@@ -327,10 +254,9 @@
             <button class="btn" id="btnStart">Comenzar cuestionario</button>
         </div>
 
-        <!-- ==================== PANTALLA 2: CUESTIONARIO ==================== -->
         <div id="screen-quiz" class="screen">
             <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; margin-bottom: 0.5rem;">
-                <h2 style="font-size: 1.5rem;">Cuestionario diagnóstico</h2>
+                <h2 style="font-size: 1.5rem;">Cuestionario · Sesión 1</h2>
                 <span style="color: var(--text-muted); font-size: 0.95rem;">
                     Estudiante: <span class="student-name-display" id="displayName"></span>
                 </span>
@@ -356,7 +282,6 @@
             </div>
         </div>
 
-        <!-- ==================== PANTALLA 3: RESULTADOS ==================== -->
         <div id="screen-results" class="screen">
             <h2 style="text-align: center;">🎉 ¡Cuestionario completado!</h2>
             <p style="text-align: center; color: var(--text-muted);" id="resultGreeting"></p>
@@ -365,7 +290,7 @@
                 <span>aciertos</span>
             </div>
             <div class="result-feedback" id="resultFeedback">
-                Excelente trabajo. Has demostrado un buen entendimiento de la estructura de los argumentos.
+                Excelente trabajo. Has demostrado un buen entendimiento de la anatomía del discurso.
             </div>
             <div class="result-actions">
                 <button class="btn" id="btnRetry">🔄 Volver a intentar</button>
@@ -377,182 +302,176 @@
         (function() {
             'use strict';
 
-            // ============================================================
-            //  DATOS DE PREGUNTAS (12 preguntas basadas en artículos 2024-2026)
-            // ============================================================
             const QUESTIONS = [{
                 id: 1,
-                text: 'Fragmento (Vélez, 2025): "Las cooperativas de trabajo generan y adaptan conocimiento específico para mejorar su sostenibilidad y viabilidad económica". Según este enunciado, ¿qué tipo de innovación se destaca como central en la Economía Social y Solidaria?',
+                text: 'Fragmento (Nature, 2025): "La inteligencia artificial mejora significativamente el desempeño de transición energética en entornos urbanos, por lo tanto, las ciudades deberían invertir en IA para alcanzar sostenibilidad". ¿Cuál es la <strong>conclusión</strong> de este argumento?',
                 options: [
-                    'Innovación tecnológica disruptiva que reemplaza procesos tradicionales.',
-                    'Innovación institucional que adapta conocimiento organizacional al contexto.',
-                    'Innovación de producto que introduce nuevos bienes al mercado.',
-                    'Innovación financiera que optimiza el acceso a capital externo.'
+                    'La inteligencia artificial mejora el desempeño de transición energética.',
+                    'Las ciudades deberían invertir en IA para alcanzar sostenibilidad.',
+                    'La IA es una tecnología emergente.',
+                    'Los entornos urbanos enfrentan desafíos energéticos.'
                 ],
                 correct: 1,
                 feedback: {
-                    correct: 'Correcto. El artículo enfatiza las "innovaciones institucionales" como adaptación de conocimiento organizacional para la sostenibilidad [4].',
-                    incorrect: 'El texto subraya la innovación institucional y el aprendizaje organizacional, no la tecnología disruptiva ni productos nuevos [4].'
+                    correct: 'Correcto. La conclusión es la afirmación que se defiende: "las ciudades deberían invertir en IA". La primera oración es la premisa que la apoya.',
+                    incorrect: 'La conclusión es la recomendación ("deberían invertir"), no la premisa empírica sobre el desempeño de la IA.'
                 }
             }, {
                 id: 2,
-                text: 'Fragmento (Cantú-Palacios et al., 2026): "La construcción de redes de confianza y cooperación (capital social) combinada con principios de economía solidaria generó impactos positivos en organización comunitaria". ¿Qué desafío estructural se identificó en las Comunidades de Aprendizaje Campesino (CAC)?',
+                text: 'Fragmento (Science, 2024): "El 78% de las emisiones globales de carbono provienen de zonas urbanas. Las ciudades consumen el 75% de la energía mundial. Por consiguiente, la acción climática debe centrarse en entornos urbanos". Identifica las <strong>premisas</strong>.',
                 options: [
-                    'Exceso de acompañamiento técnico que generó dependencia institucional.',
-                    'Desintegración de 124 CACs en 2021 por limitaciones en acompañamiento técnico.',
-                    'Sobrefinanciamiento que distorsionó los principios de economía solidaria.',
-                    'Falta de interés de las comunidades en la autosuficiencia alimentaria.'
+                    'Solo la primera oración es premisa.',
+                    'Solo la segunda oración es premisa.',
+                    'Las dos primeras oraciones son premisas.',
+                    'Todas las oraciones son premisas, incluida la conclusión.'
                 ],
-                correct: 1,
+                correct: 2,
                 feedback: {
-                    correct: 'Correcto. El estudio reporta que 124 CACs se desintegraron en 2021, evidenciando limitaciones en acompañamiento técnico [6].',
-                    incorrect: 'El desafío fue la desintegración de CACs por acompañamiento técnico insuficiente, no exceso ni sobrefinanciamiento [6].'
+                    correct: 'Correcto. Las premisas son las dos afirmaciones empíricas (78% emisiones, 75% energía) que aportan evidencia para la conclusión.',
+                    incorrect: 'Las premisas son los enunciados que ofrecen razones. Aquí, las dos primeras oraciones proporcionan la evidencia estadística.'
                 }
             }, {
                 id: 3,
-                text: 'Fragmento (Medina, 2022, citado en Barbosa & Aires, 2025): "Las orientaciones estatales son la base para que las instituciones educativas organicen su propuesta educativa, que el maestro asume, adecua y pone en práctica". ¿Qué implica esto para la enseñanza de la biología?',
+                text: '¿Cuál de las siguientes palabras es un <strong>indicador de conclusión</strong> típico?',
                 options: [
-                    'Que los docentes deben ignorar los documentos curriculares y crear sus propios contenidos.',
-                    'Que la escuela recoge la ideología del Estado, buscando un modelo de persona y sociedad.',
-                    'Que las políticas públicas no influyen en la práctica docente cotidiana.',
-                    'Que los referentes curriculares son opcionales y no tienen impacto en la ciudadanía.'
+                    'porque',
+                    'ya que',
+                    'por lo tanto',
+                    'puesto que'
                 ],
-                correct: 1,
+                correct: 2,
                 feedback: {
-                    correct: 'Correcto. El texto señala que la escuela, a través de los documentos, recoge la ideología estatal y configura un modelo de ciudadanía [1].',
-                    incorrect: 'El fragmento enfatiza que los documentos orientan la práctica y reflejan la ideología estatal, no que sean opcionales [1].'
+                    correct: 'Correcto. "Por lo tanto" es un indicador de conclusión, al igual que "por consiguiente", "en consecuencia", "así que".',
+                    incorrect: '"Porque", "ya que" y "puesto que" son indicadores de premisa, no de conclusión.'
                 }
             }, {
                 id: 4,
-                text: 'En el análisis de documentos de política pública (Brasil, Chile, Colombia, México), ¿qué tendencia de "imagen de ciencia" predomina en la enseñanza de la biología según Barbosa & Aires (2025)?',
+                text: 'Fragmento (Reuters, 2025): "El aumento del salario mínimo beneficia a los trabajadores, porque les permite cubrir mejor sus necesidades básicas". ¿Este texto contiene un argumento o una explicación?',
                 options: [
-                    'Imagen decolonial con fuerte presencia de saberes originarios.',
-                    'Imagen contextualista con textualista y persistencia positivista.',
-                    'Imagen puramente experimental sin componentes teóricos.',
-                    'Imagen tecnocrática centrada exclusivamente en competencias digitales.'
+                    'Es un argumento, porque intenta probar que el aumento beneficia a los trabajadores.',
+                    'Es una explicación, porque da una causa para un hecho aceptado.',
+                    'Es tanto argumento como explicación.',
+                    'No es ni argumento ni explicación, es una mera opinión.'
                 ],
-                correct: 1,
+                correct: 0,
                 feedback: {
-                    correct: 'Correcto. Los resultados muestran una imagen de ciencia contextualista con textualista y persistencia positivista [1].',
-                    incorrect: 'La imagen decolonial tiene baja representación; predomina la contextualista-positivista [1].'
+                    correct: 'Correcto. Es un argumento: la conclusión ("beneficia") se apoya en una razón ("porque les permite cubrir necesidades").',
+                    incorrect: 'Es un argumento porque hay una afirmación discutible respaldada por una razón. Una explicación aclararía un hecho ya aceptado.'
                 }
             }, {
                 id: 5,
-                text: 'Fragmento (Cabrera, 2002, citado en Barbosa & Aires, 2025): La ciudadanía se ejerce en dos dimensiones: política (estatus) y psicológica (práctica). ¿Qué crítica se hace al modelo de Marshall (1992)?',
+                text: 'En el argumento: "Todos los sistemas de IA requieren datos. Los gemelos digitales urbanos son sistemas de IA. Por consiguiente, los gemelos digitales urbanos requieren datos." ¿Cuál es la relación entre premisas y conclusión?',
                 options: [
-                    'Que ignora los derechos civiles y políticos.',
-                    'Que fortalece un modelo económico hegemónico de corte capitalista.',
-                    'Que es demasiado inclusivo y carece de estructura.',
-                    'Que no considera los derechos sociales.'
+                    'Las premisas son ejemplos de la conclusión.',
+                    'La conclusión es una definición de IA.',
+                    'Las premisas proporcionan evidencia que hace necesaria la conclusión.',
+                    'No hay relación lógica, es una falacia.'
                 ],
-                correct: 1,
+                correct: 2,
                 feedback: {
-                    correct: 'Correcto. Se critica que el modelo de Marshall, aunque necesario, fortalece un modelo capitalista hegemónico [1].',
-                    incorrect: 'La crítica es que el modelo tripartito de Marshall refuerza el capitalismo hegemónico, no que ignore derechos [1].'
+                    correct: 'Correcto. Es un argumento deductivo válido: las premisas establecen una regla general y un caso particular, haciendo necesaria la conclusión.',
+                    incorrect: 'La relación es deductiva: si las premisas son verdaderas, la conclusión debe serlo. No es un ejemplo ni una definición.'
                 }
             }, {
                 id: 6,
-                text: 'En programación, considera el siguiente fragmento de código Python:<br><br><code>def calcular_promedio(notas):<br>&nbsp;&nbsp;return sum(notas) / len(notas) if notas else 0</code><br><br>¿Qué principio de diseño de software se aplica aquí?',
+                text: 'Fragmento (MIT Tech Review, 2025): "Si las ciudades implementan smart grids, entonces reducirán emisiones. Las ciudades no redujeron emisiones. Por tanto, no implementaron smart grids". ¿Qué tipo de argumento es?',
                 options: [
-                    'Principio de responsabilidad única (SRP).',
-                    'Manejo de casos borde (edge cases) para evitar división por cero.',
-                    'Inversión de dependencias (DIP).',
-                    'Sobrecarga de operadores.'
+                    'Modus Ponens válido.',
+                    'Modus Tollens válido.',
+                    'Falacia de afirmación del consecuente.',
+                    'Argumento inductivo débil.'
                 ],
                 correct: 1,
                 feedback: {
-                    correct: 'Correcto. La expresión condicional <code>if notas else 0</code> maneja el caso borde de lista vacía, evitando <code>ZeroDivisionError</code>.',
-                    incorrect: 'El código previene un error de división por cero cuando la lista está vacía; no es SRP ni DIP.'
+                    correct: 'Correcto. Es Modus Tollens: si P entonces Q, no Q, luego no P. Es una forma deductiva válida.',
+                    incorrect: 'Modus Tollens es: si P entonces Q, no Q, luego no P. No es Modus Ponens (que sería: P, luego Q) ni falacia.'
                 }
             }, {
                 id: 7,
-                text: 'En matemáticas, sea la función <code>f(x) = x² - 4x + 3</code>. ¿Cuál es el valor mínimo de <code>f(x)</code> y en qué <code>x</code> se alcanza?',
+                text: 'Lee el siguiente texto: "Cada vez que uso esta app de movilidad, llego más rápido a mi destino. Además, la interfaz es intuitiva. Por eso, recomiendo esta app a todos mis amigos". ¿Cuál es la conclusión principal?',
                 options: [
-                    'Mínimo = -1 en <code>x = 2</code>.',
-                    'Mínimo = 0 en <code>x = 1</code>.',
-                    'Mínimo = 3 en <code>x = 0</code>.',
-                    'Mínimo = -4 en <code>x = 4</code>.'
+                    'Llego más rápido a mi destino.',
+                    'La interfaz es intuitiva.',
+                    'Recomiendo esta app a todos mis amigos.',
+                    'La app es buena para la movilidad.'
                 ],
-                correct: 0,
+                correct: 2,
                 feedback: {
-                    correct: 'Correcto. El vértice de la parábola está en <code>x = -b/(2a) = 4/2 = 2</code>, y <code>f(2) = 4 - 8 + 3 = -1</code>.',
-                    incorrect: 'El mínimo se halla en el vértice: <code>x = 2</code>, <code>f(2) = -1</code>. Las otras opciones son evaluaciones incorrectas.'
+                    correct: 'Correcto. La conclusión es la recomendación, que se apoya en las dos observaciones previas (rapidez e interfaz).',
+                    incorrect: 'Las dos primeras afirmaciones son premisas que justifican la recomendación final.'
                 }
             }, {
                 id: 8,
-                text: 'Fragmento (Barbosa & Aires, 2025): "La imagen de ciencia, al influir en las decisiones que toman los sujetos sobre el territorio, debe centrarse en la construcción de sujetos políticos". ¿Qué implica esto para la enseñanza de la biología?',
+                text: 'En el argumento: "No deberías implementar ese algoritmo de IA, porque tiene sesgos documentados que discriminan a minorías". ¿Qué función cumple "porque"?',
                 options: [
-                    'Que la biología debe enseñarse como un conjunto de hechos memorizables.',
-                    'Que la biología debe formar sujetos críticos que comprendan el territorio y su impacto humano.',
-                    'Que la biología debe priorizar la experimentación sobre la reflexión ética.',
-                    'Que la biología debe ser neutral y apolítica.'
+                    'Introduce la conclusión.',
+                    'Introduce una premisa.',
+                    'Introduce una explicación.',
+                    'Introduce una opinión sin evidencia.'
                 ],
                 correct: 1,
                 feedback: {
-                    correct: 'Correcto. El texto argumenta que la enseñanza de biología debe formar sujetos políticos sensibles al impacto humano en el territorio [1].',
-                    incorrect: 'La propuesta es formar sujetos críticos y políticos, no enseñar hechos memorizables o ser neutral [1].'
+                    correct: 'Correcto. "Porque" es un indicador de premisa; los sesgos documentados son la razón que apoya la conclusión de no implementarlo.',
+                    incorrect: '"Porque" señala la razón o evidencia (premisa). La conclusión es la primera parte ("no deberías implementar").'
                 }
             }, {
                 id: 9,
-                text: 'En el PENEM (México, 2022), ¿qué tipo de ciudadanía tiene mayor presencia (31%) según Barbosa & Aires (2025)?',
+                text: '¿Cuál de los siguientes textos contiene un <strong>argumento</strong> (y no una mera opinión o reporte)?',
                 options: [
-                    'Ciudadanía tipo A (normativa y conservadora).',
-                    'Ciudadanía tipo D (inclusiva, valora diversidad cultural y diálogo de saberes).',
-                    'Ciudadanía tipo E (transformadora y desafiante de opresiones).',
-                    'Ciudadanía tipo B (contextualizada pero definida por poderes hegemónicos).'
+                    '"Hoy la temperatura alcanzó 35°C, probablemente sea el día más caluroso del año."',
+                    '"La película fue aburrida, no me gustó."',
+                    '"La IA generativa reduce costos operativos en 30%, porque automatiza tareas repetitivas."',
+                    '"Mañana es feriado, así que no habrá clases."'
                 ],
-                correct: 1,
+                correct: 2,
                 feedback: {
-                    correct: 'Correcto. El PENEM 2022 muestra 31% de ciudadanía tipo D, que valora diversidad y diálogo de saberes [1].',
-                    incorrect: 'El tipo D es el más presente (31%); el tipo E es 8,57% y el tipo A es menor [1].'
+                    correct: 'Correcto. La tercera opción presenta una afirmación (reduce costos) respaldada por una razón (automatiza tareas), constituyendo un argumento.',
+                    incorrect: 'Las otras son opiniones o reportes sin estructura premisa-conclusión clara. La tercera sí tiene una razón que apoya una afirmación.'
                 }
             }, {
                 id: 10,
-                text: 'Fragmento (Cantú-Palacios et al., 2026): "Modelos económicos alternativos basados en cooperación y bienestar colectivo pueden transformar territorios rurales si se fortalecen institucionalmente". ¿Qué se requiere para ello?',
+                text: 'Fragmento (The Guardian, 2025): "El gobierno debe regular la IA. Ha habido violaciones de privacidad y discriminación algorítmica". ¿Cuáles son premisa(s) y conclusión?',
                 options: [
-                    'Acompañamiento sostenido, resolución de conflictos comunitarios y vinculación con mercados solidarios.',
-                    'Financiamiento externo masivo sin participación comunitaria.',
-                    'Imposición de modelos productivos estandarizados desde el gobierno central.',
-                    'Eliminación de todas las formas de organización comunitaria previa.'
+                    'Conclusión: "El gobierno debe regular la IA." Premisas: las dos afirmaciones posteriores.',
+                    'Conclusión: "Ha habido violaciones de privacidad." Premisa: "El gobierno debe regular la IA."',
+                    'Todas las oraciones son premisas, no hay conclusión.',
+                    'La conclusión es "discriminación algorítmica".'
                 ],
                 correct: 0,
                 feedback: {
-                    correct: 'Correcto. El estudio concluye que se necesita acompañamiento sostenido, resolución de conflictos y mercados solidarios [6].',
-                    incorrect: 'Los requisitos son acompañamiento, resolución de conflictos y mercados solidarios, no financiamiento masivo ni imposición [6].'
+                    correct: 'Correcto. La afirmación principal es la regulación; las razones son las violaciones de privacidad y discriminación.',
+                    incorrect: 'La conclusión es la afirmación que se defiende (regulación). Las premisas son las razones que la apoyan.'
                 }
             }, {
                 id: 11,
-                text: 'En biología molecular, la ecuación de Hardy-Weinberg para un locus con dos alelos (<code>p</code> y <code>q</code>) es:<br><br>\\[ p^2 + 2pq + q^2 = 1 \\]<br><br>Si <code>p = 0.7</code>, ¿cuál es la frecuencia de heterocigotos (<code>2pq</code>)?',
+                text: 'Fragmento (Wired, 2025): "Las empresas tecnológicas tienen responsabilidad ética. Sus algoritmos afectan decisiones de contratación, crédito y justicia. Por lo tanto, deben ser auditadas". ¿Qué tipo de discurso es?',
                 options: [
-                    '0.42',
-                    '0.49',
-                    '0.09',
-                    '0.21'
+                    'Mera descripción sin argumento.',
+                    'Argumento con conclusión normativa.',
+                    'Explicación causal de un hecho.',
+                    'Opinión personal sin evidencia.'
                 ],
-                correct: 0,
+                correct: 1,
                 feedback: {
-                    correct: 'Correcto. Si <code>p = 0.7</code>, entonces <code>q = 0.3</code>, y <code>2pq = 2 × 0.7 × 0.3 = 0.42</code>.',
-                    incorrect: 'Con <code>p = 0.7</code>, <code>q = 0.3</code>; <code>2pq = 0.42</code>. Las otras opciones son <code>p²</code>, <code>q²</code> o cálculos erróneos.'
+                    correct: 'Correcto. Es un argumento: la conclusión ("deben ser auditadas") es una afirmación normativa apoyada por premisas sobre el impacto de los algoritmos.',
+                    incorrect: 'Hay una conclusión normativa ("deben") apoyada por razones, no es mera descripción ni explicación.'
                 }
             }, {
                 id: 12,
-                text: 'Fragmento (Barbosa & Aires, 2025): "Los abordajes de temas transversales como los contenidos relacionados con la interculturalidad o decolonialidad se encuentran prácticamente ausentes en estos documentos de educación pública" (Colombia). ¿Qué se sugiere para la formación docente?',
+                text: 'Identifica la estructura del siguiente argumento: "La transición energética es urgente. El cambio climático acelera fenómenos extremos. Los combustibles fósiles son la causa principal". ¿Cuáles son premisa(s) y conclusión?',
                 options: [
-                    'Que los docentes opten por programas que incluyan saberes de diversos orígenes.',
-                    'Que los docentes se enfoquen exclusivamente en contenidos positivistas.',
-                    'Que se eliminen los referentes curriculares de ciencias naturales.',
-                    'Que la formación docente ignore la diversidad epistémica.'
+                    'Conclusión: "La transición energética es urgente." Premisas: las dos afirmaciones posteriores.',
+                    'Conclusión: "El cambio climático acelera fenómenos extremos." Premisas: las otras dos.',
+                    'Todas las oraciones son premisas, no hay conclusión.',
+                    'La conclusión es "Los combustibles fósiles son la causa principal".'
                 ],
                 correct: 0,
                 feedback: {
-                    correct: 'Correcto. Se sugiere que los docentes opten por programas con saberes diversos para fortalecer ciudadanías tipo C y D [1].',
-                    incorrect: 'La recomendación es incluir saberes diversos en la formación docente, no ignorarlos ni eliminar referentes [1].'
+                    correct: 'Correcto. La afirmación principal es la urgencia de la transición; las razones son el cambio climático y la causa de los combustibles fósiles.',
+                    incorrect: 'La conclusión es la afirmación que se defiende (urgencia de transición). Las premisas son las razones que la apoyan.'
                 }
             }];
 
-            // ============================================================
-            //  ESTADO DE LA APLICACIÓN
-            // ============================================================
             let state = {
                 studentName: '',
                 currentIndex: 0,
@@ -563,9 +482,6 @@
                 correctShuffledIndex: -1,
             };
 
-            // ============================================================
-            //  DOM REFERENCIAS
-            // ============================================================
             const $ = id => document.getElementById(id);
             const screenWelcome = $('screen-welcome');
             const screenQuiz = $('screen-quiz');
@@ -586,9 +502,6 @@
             const resultFeedback = $('resultFeedback');
             const btnRetry = $('btnRetry');
 
-            // ============================================================
-            //  FUNCIÓN DE BARAJADO (Fisher-Yates)
-            // ============================================================
             function shuffleArray(arr) {
                 const a = [...arr];
                 for (let i = a.length - 1; i > 0; i--) {
@@ -598,9 +511,6 @@
                 return a;
             }
 
-            // ============================================================
-            //  FUNCIONES DE RENDERIZADO
-            // ============================================================
             function renderQuestion(index) {
                 const q = QUESTIONS[index];
                 if (!q) return;
@@ -651,7 +561,6 @@
             function handleOptionClick(qIndex, optIdx) {
                 if (state.answered) return;
                 const q = QUESTIONS[qIndex];
-                const shuffled = state.shuffledOptions[qIndex];
                 const correctIdx = state.correctShuffledIndex;
                 const isCorrect = (optIdx === correctIdx);
 
@@ -686,9 +595,6 @@
                 scoreLabel.textContent = `Aciertos: ${state.score}`;
             }
 
-            // ============================================================
-            //  NAVEGACIÓN
-            // ============================================================
             function goToNextQuestion() {
                 if (!state.answered) return;
                 const nextIndex = state.currentIndex + 1;
@@ -700,9 +606,6 @@
                 }
             }
 
-            // ============================================================
-            //  RESULTADOS
-            // ============================================================
             function showResults() {
                 screenQuiz.classList.remove('active');
                 screenResults.classList.add('active');
@@ -717,20 +620,17 @@
                 let msg = '';
                 const pct = score / total;
                 if (pct >= 0.9) {
-                    msg = 'Excelente dominio. Has demostrado una comprensión profunda de los fragmentos científicos y su análisis crítico. Sigue así.';
+                    msg = 'Excelente. Identificas claramente premisas, conclusiones y la estructura de argumentos en textos científicos y noticias. Sigue así.';
                 } else if (pct >= 0.7) {
-                    msg = 'Buen desempeño. Identificas correctamente los conceptos clave, pero aún puedes mejorar en la distinción de matices en textos complejos. Revisa los artículos de referencia.';
+                    msg = 'Buen desempeño. Tienes una base sólida, pero te sugiero repasar la distinción entre argumentos y explicaciones, y los indicadores lógicos.';
                 } else if (pct >= 0.5) {
-                    msg = 'Has mostrado una base aceptable, pero es importante reforzar el reconocimiento de conceptos como economía solidaria, ciudadanía e imagen de ciencia. Te recomiendo repasar los fragmentos.';
+                    msg = 'Es necesario reforzar la identificación de premisas y conclusiones. Revisa los ejemplos del libro Hurley, capítulo 1.';
                 } else {
-                    msg = 'Es necesario que dediques más tiempo a los conceptos fundamentales. Practica identificando premisas, conclusiones y conceptos clave en artículos científicos. Utiliza las referencias proporcionadas.';
+                    msg = 'Te recomiendo estudiar nuevamente la sesión 1, prestando especial atención a la anatomía del discurso y los indicadores de premisa y conclusión.';
                 }
                 resultFeedback.textContent = msg;
             }
 
-            // ============================================================
-            //  REINICIO
-            // ============================================================
             function resetQuiz() {
                 state.currentIndex = 0;
                 state.score = 0;
@@ -747,9 +647,6 @@
                 updateProgress(0);
             }
 
-            // ============================================================
-            //  MANEJO DE REGISTRO
-            // ============================================================
             function startQuiz() {
                 const name = studentNameInput.value.trim();
                 if (!name) {
@@ -770,9 +667,6 @@
                 updateProgress(0);
             }
 
-            // ============================================================
-            //  EVENT LISTENERS
-            // ============================================================
             btnStart.addEventListener('click', startQuiz);
             studentNameInput.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') startQuiz();
@@ -782,21 +676,16 @@
             });
 
             btnNext.addEventListener('click', goToNextQuestion);
-
             btnRetry.addEventListener('click', () => {
                 resetQuiz();
             });
 
-            // ============================================================
-            //  INICIALIZAR
-            // ============================================================
             screenWelcome.classList.add('active');
             screenQuiz.classList.remove('active');
             screenResults.classList.remove('active');
 
-            console.log('Cuestionario interdisciplinario cargado. ¡Buena suerte!');
+            console.log('Cuestionario Sesión 1 cargado.');
         })();
     </script>
-
 </body>
 </html>
