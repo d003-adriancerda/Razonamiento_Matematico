@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario - Sesión 3: Deducción, Inducción y Falacias de Relevancia</title>
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+    </script>
+    <style>
+        :root {
+            --primary-dark: #1e3a8a;
+            --primary-bright: #3b82f6;
+            --success-green: #10b981;
+            --error-red: #ef4444;
+            --bg-light: #f3f4f6;
+            --card-white: #ffffff;
+            --text-dark: #1f2937;
+            --text-muted: #6b7280;
+            --border-radius: 12px;
+            --shadow-card: 0 10px 25px rgba(0, 0, 0, 0.08);
+            --transition: 0.25s ease-in-out;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg-light);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            margin: 0;
+        }
+        .quiz-container {
+            max-width: 1000px;
+            width: 100%;
+            background: var(--card-white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-card);
+            padding: 2rem 2.5rem;
+            transition: var(--transition);
+        }
+        .screen { display: none; animation: fadeIn 0.3s ease; }
+        .screen.active { display: block; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        h1, h2, h3 {
+            color: var(--primary-dark);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+        h1 { font-size: 2.2rem; margin-bottom: 0.25rem; }
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+        .student-name-display {
+            font-weight: 500;
+            color: var(--primary-bright);
+        }
+        .progress-wrapper { margin-bottom: 2rem; }
+        .progress-bar-bg {
+            background: #e5e7eb;
+            height: 8px;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--primary-bright);
+            border-radius: 20px;
+            transition: width 0.4s ease;
+        }
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 0.3rem;
+        }
+        .question-text {
+            font-size: 1.3rem;
+            font-weight: 500;
+            color: var(--text-dark);
+            margin-bottom: 1.8rem;
+            line-height: 1.5;
+        }
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+        }
+        .option-btn {
+            background: var(--bg-light);
+            border: 2px solid transparent;
+            border-radius: 10px;
+            padding: 0.9rem 1.2rem;
+            font-size: 1rem;
+            text-align: left;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--text-dark);
+            font-weight: 450;
+            line-height: 1.4;
+        }
+        .option-btn:hover:not(.disabled) {
+            background: #e0e7ff;
+            border-color: var(--primary-bright);
+        }
+        .option-btn.disabled { cursor: default; opacity: 0.8; }
+        .option-btn.correct {
+            background: #d1fae5;
+            border-color: var(--success-green);
+            color: #065f46;
+        }
+        .option-btn.incorrect {
+            background: #fee2e2;
+            border-color: var(--error-red);
+            color: #991b1b;
+        }
+        .option-btn.show-correct {
+            background: #d1fae5;
+            border-color: var(--success-green);
+            color: #065f46;
+        }
+        .feedback-area {
+            background: #f9fafb;
+            border-left: 4px solid var(--primary-bright);
+            padding: 1rem 1.2rem;
+            border-radius: 8px;
+            margin: 1rem 0 1.5rem 0;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            min-height: 3.5rem;
+        }
+        .feedback-area.correct-fb { border-left-color: var(--success-green); }
+        .feedback-area.incorrect-fb { border-left-color: var(--error-red); }
+        .nav-buttons { display: flex; justify-content: flex-end; }
+        .btn {
+            background: var(--primary-bright);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 2rem;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
+        }
+        .btn:hover:not(:disabled) {
+            background: #2563eb;
+            transform: scale(1.02);
+        }
+        .btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+        .result-circle {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: var(--bg-light);
+            border: 6px solid var(--primary-bright);
+            margin: 1.5rem auto;
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+        .result-circle span {
+            font-size: 1rem;
+            font-weight: 400;
+            color: var(--text-muted);
+        }
+        .result-feedback {
+            text-align: center;
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0.5rem auto 1.5rem auto;
+            line-height: 1.6;
+        }
+        .result-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            color: var(--text-dark);
+            margin-bottom: 0.3rem;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-bright);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+        .form-error {
+            color: var(--error-red);
+            font-size: 0.9rem;
+            margin-top: 0.2rem;
+            display: none;
+        }
+        @media (max-width: 640px) {
+            .quiz-container { padding: 1.5rem; }
+            h1 { font-size: 1.8rem; }
+            .question-text { font-size: 1.1rem; }
+            .option-btn { padding: 0.7rem 1rem; font-size: 0.95rem; }
+            .result-circle { width: 140px; height: 140px; font-size: 2.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container" id="app">
+        <div id="screen-welcome" class="screen active">
+            <h1>🔬 Sesión 3: Deducción, Inducción y Falacias de Relevancia</h1>
+            <p class="subtitle">Razonamiento Matemático · Tipos de argumentos y falacias informales</p>
+            <p style="margin-bottom: 1.8rem; color: var(--text-muted);">
+                Ingresa tu nombre para comenzar el cuestionario sobre deducción, inducción y falacias de relevancia.
+            </p>
+            <div class="form-group">
+                <label for="studentName">Nombre completo</label>
+                <input type="text" id="studentName" placeholder="Ej. Adrián Cerda" autocomplete="name">
+                <div class="form-error" id="nameError">Por favor, ingresa tu nombre para continuar.</div>
+            </div>
+            <button class="btn" id="btnStart">Comenzar cuestionario</button>
+        </div>
+
+        <div id="screen-quiz" class="screen">
+            <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; margin-bottom: 0.5rem;">
+                <h2 style="font-size: 1.5rem;">Cuestionario · Sesión 3</h2>
+                <span style="color: var(--text-muted); font-size: 0.95rem;">
+                    Estudiante: <span class="student-name-display" id="displayName"></span>
+                </span>
+            </div>
+            <div class="progress-wrapper">
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="progressFill" style="width: 0%;"></div>
+                </div>
+                <div class="progress-text">
+                    <span id="progressLabel">Pregunta 1 de 12</span>
+                    <span id="scoreLabel">Aciertos: 0</span>
+                </div>
+            </div>
+
+            <div id="questionContainer">
+                <div class="question-text" id="questionText">Cargando pregunta...</div>
+                <div class="options-list" id="optionsContainer"></div>
+                <div class="feedback-area" id="feedbackArea">Selecciona una opción para ver la retroalimentación.</div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn" id="btnNext" disabled>Siguiente pregunta →</button>
+            </div>
+        </div>
+
+        <div id="screen-results" class="screen">
+            <h2 style="text-align: center;">🎉 ¡Cuestionario completado!</h2>
+            <p style="text-align: center; color: var(--text-muted);" id="resultGreeting"></p>
+            <div class="result-circle" id="resultCircle">
+                <span id="resultScore">0/12</span>
+                <span>aciertos</span>
+            </div>
+            <div class="result-feedback" id="resultFeedback">
+                Excelente trabajo. Has demostrado comprensión de deducción, inducción y falacias de relevancia.
+            </div>
+            <div class="result-actions">
+                <button class="btn" id="btnRetry">🔄 Volver a intentar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            const QUESTIONS = [{
+                id: 1,
+                text: 'Un argumento <strong>deductivo</strong> se caracteriza porque:',
+                options: [
+                    'La conclusión es probablemente verdadera si las premisas lo son.',
+                    'La conclusión se sigue necesariamente de las premisas.',
+                    'Se basa en la experiencia y observación.',
+                    'Siempre tiene premisas verdaderas.'
+                ],
+                correct: 1,
+                feedback: {
+                    correct: 'Correcto. En la deducción, la conclusión se sigue con necesidad lógica de las premisas.',
+                    incorrect: 'La inducción se basa en probabilidad y experiencia. La deducción no garantiza premisas verdaderas, sino la relación de implicación.'
+                }
+            }, {
+                id: 2,
+                text: 'Fragmento (Nature, 2025): "He observado 50 ciudades con IA y todas redujeron emisiones. Por tanto, probablemente todas las ciudades con IA reducen emisiones". ¿Qué tipo de argumento es?',
+                options: [
+                    'Deductivo, porque la conclusión se sigue necesariamente.',
+                    'Inductivo, porque la conclusión es probable, no necesaria.',
+                    'Es una falacia, no es un argumento válido.',
+                    'Es deductivo porque usa datos empíricos.'
+                ],
+                correct: 1,
+                feedback: {
+                    correct: 'Correcto. La generalización a partir de una muestra es un argumento inductivo típico (conclusión probable).',
+                    incorrect: 'Es inductivo porque generaliza de una muestra. La deducción no usa generalizaciones empíricas.'
+                }
+            }, {
+                id: 3,
+                text: 'Identifica la <strong>falacia de relevancia</strong> en: "No deberías escuchar a María sobre cambio climático, porque ella no tiene título en ciencias ambientales".',
+                options: [
+                    'Ad hominem (ataque a la persona)',
+                    'Apelación a la autoridad',
+                    'Falsa causa',
+                    'Pendiente resbaladiza'
+                ],
+                correct: 0,
+                feedback: {
+                    correct: 'Correcto. Se descalifica a la persona (María) en lugar de abordar sus argumentos. Es un ad hominem.',
+                    incorrect: 'La apelación a la autoridad sería citar a un experto, no descalificar. La falsa causa y pendiente resbaladiza no aplican.'
+                }
+            }, {
+                id: 4,
+                text: 'Fragmento (Science, 2024): "La mayoría de las smart cities implementaron IoT. Barcelona es una smart city. Por lo tanto, Barcelona probablemente implementó IoT". ¿Es deductivo o inductivo?',
+                options: [
+                    'Deductivo, porque la conclusión se sigue necesariamente.',
+                    'Inductivo, porque la conclusión es probable, no necesaria.',
+                    'Es una falacia, no es un argumento válido.',
+                    'Es deductivo porque usa la palabra "probablemente".'
+                ],
+                correct: 1,
+                feedback: {
+                    correct: 'Correcto. Es inductivo porque la conclusión es probabilística, no se sigue con necesidad.',
+                    incorrect: 'Aunque use "probablemente", sigue siendo inductivo. La deducción no usa lenguaje probabilístico en su forma pura.'
+                }
+            }, {
+                id: 5,
+                text: '¿Cuál de las siguientes es una <strong>falacia de relevancia</strong> (apelación a la fuerza)?',
+                options: [
+                    'Si no apruebas este proyecto de IA, te voy a reportar con el director.',
+                    'Todos los políticos son corruptos, porque así lo dice mi amigo.',
+                    'Si comes mucha azúcar, te saldrán caries.',
+                    'La mayoría de la gente cree en fantasmas, luego existen.'
+                ],
+                correct: 0,
+                feedback: {
+                    correct: 'Correcto. La amenaza implícita es una apelación a la fuerza (argumentum ad baculum).',
+                    incorrect: 'El segundo es una apelación a la autoridad (no calificada). El tercero es una predicción causal. El cuarto es apelación a la mayoría (ad populum).'
+                }
+            }, {
+                id: 6,
+                text: 'Un argumento inductivo <strong>fuerte</strong> es aquel en el que:',
+                options: [
+                    'Las premisas son verdaderas y la conclusión es necesaria.',
+                    'La conclusión es probablemente verdadera si las premisas son verdaderas.',
+                    'La conclusión es siempre verdadera.',
+                    'No puede tener premisas falsas.'
+                ],
+                correct: 1,
+                feedback: {
+                    correct: 'Correcto. La fuerza inductiva se mide por el grado de probabilidad con que las premisas apoyan la conclusión.',
+                    incorrect: 'La necesidad es propia de la deducción. La verdad de las premisas no garantiza la fuerza (pueden ser falsas pero el argumento ser fuerte).'
+                }
+            }, {
+                id: 7,
+                text: 'La falacia <strong>ad populum</strong> (apelación a la gente) se comete cuando:',
+                options: [
+                    'Se apela a la mayoría para justificar una conclusión.',
+                    'Se ataca a la persona que argumenta.',
+                    'Se usa una amenaza para forzar una conclusión.',
+                    'Se asume que una causa es anterior a otra.'
+                ],
+                correct: 0,
+                feedback: {
+                    correct: 'Correcto. La falacia ad populum apela a la creencia o sentimiento de la mayoría, como "todo el mundo lo hace".',
+                    incorrect: 'El ataque personal es ad hominem, la amenaza es ad baculum, y la falsa causa es post hoc o non causa pro causa.'
+                }
+            }, {
+                id: 8,
+                text: 'Fragmento (MIT Tech Review, 2025): "Si se incrementa la inversión en IA, entonces las ciudades serán más eficientes. Se incrementó la inversión. Por tanto, las ciudades son más eficientes". ¿Qué forma lógica es?',
+                options: [
+                    'Deductivo, Modus Ponens.',
+                    'Deductivo, Modus Tollens.',
+                    'Inductivo, generalización.',
+                    'Falacia de afirmación del consecuente.'
+                ],
+                correct: 0,
+                feedback: {
+                    correct: 'Correcto. Es la forma válida de Modus Ponens: si P entonces Q, P, luego Q.',
+                    incorrect: 'Modus Tollens sería: si P entonces Q, no Q, luego no P. No es generalización ni falacia.'
+                }
+            }, {
+                id: 9,
+                text: '¿Cuál de los siguientes NO es una falacia de relevancia?',
+                options: [
+                    'Ad hominem',
+                    'Apelación a la autoridad (cuando es calificada)',
+                    'Apelación a la fuerza',
+                    'Pendiente resbaladiza'
+                ],
+                correct: 1,
+                feedback: {
+                    correct: 'Correcto. La apelación a una autoridad genuina y calificada no es una falacia, es un recurso legítimo cuando la autoridad es experta en el tema.',
+                    incorrect: 'Los otros son falacias de relevancia: ad hominem (ataque personal), ad baculum (fuerza), pendiente resbaladiza (cadena causal no probada).'
+                }
+            }, {
+                id: 10,
+                text: 'Un argumento inductivo <strong>cogente</strong> (cogent) cumple con:',
+                options: [
+                    'Ser válido y tener premisas verdaderas.',
+                    'Ser fuerte y tener premisas verdaderas.',
+                    'Ser válido y tener conclusión verdadera.',
+                    'Ser fuerte y tener conclusión verdadera.'
+                ],
+                correct: 1,
+                feedback: {
+                    correct: 'Correcto. Un argumento inductivo cogente es fuerte y tiene premisas verdaderas (análogo a sólido en deducción).',
+                    incorrect: 'La solidez es para deductivos (válido + premisas verdaderas). La fuerza no es lo mismo que validez.'
+                }
+            }, {
+                id: 11,
+                text: 'Fragmento (The Guardian, 2025): "Elon Musk dice que la IA es segura. Elon Musk es experto en tecnología. Por tanto, la IA es segura". ¿Qué tipo de argumento es?',
+                options: [
+                    'Falacia ad hominem.',
+                    'Apelación a la autoridad (potencialmente legítima si es calificada).',
+                    'Falacia ad populum.',
+                    'Argumento deductivo válido.'
+                ],
+                correct: 1,
+                feedback: {
+                    correct: 'Correcto. Es apelación a la autoridad. Puede ser legítima si la autoridad es calificada en el tema específico.',
+                    incorrect: 'No es ad hominem (no ataca), ni ad populum (no apela a la mayoría). Es apelación a la autoridad.'
+                }
+            }, {
+                id: 12,
+                text: 'Fragmento (Wired, 2025): "Si permitimos IA sin regulación, entonces habrá desempleo masivo. Si hay desempleo masivo, entonces habrá crisis social. Por tanto, si permitimos IA sin regulación, habrá crisis social". ¿Qué tipo de argumento es?',
+                options: [
+                    'Deductivo válido (silogismo hipotético).',
+                    'Inductivo fuerte.',
+                    'Falacia de pendiente resbaladiza.',
+                    'Falacia de falsa causa.'
+                ],
+                correct: 0,
+                feedback: {
+                    correct: 'Correcto. Es un silogismo hipotético válido: si P entonces Q, si Q entonces R, luego si P entonces R.',
+                    incorrect: 'Es deductivo válido. La pendiente resbaladiza sería si las conexiones causales no estuvieran justificadas, pero aquí la forma es válida.'
+                }
+            }];
+
+            let state = {
+                studentName: '',
+                currentIndex: 0,
+                score: 0,
+                totalQuestions: QUESTIONS.length,
+                answered: false,
+                shuffledOptions: [],
+                correctShuffledIndex: -1,
+            };
+
+            const $ = id => document.getElementById(id);
+            const screenWelcome = $('screen-welcome');
+            const screenQuiz = $('screen-quiz');
+            const screenResults = $('screen-results');
+            const studentNameInput = $('studentName');
+            const nameError = $('nameError');
+            const btnStart = $('btnStart');
+            const displayName = $('displayName');
+            const progressFill = $('progressFill');
+            const progressLabel = $('progressLabel');
+            const scoreLabel = $('scoreLabel');
+            const questionText = $('questionText');
+            const optionsContainer = $('optionsContainer');
+            const feedbackArea = $('feedbackArea');
+            const btnNext = $('btnNext');
+            const resultScore = $('resultScore');
+            const resultGreeting = $('resultGreeting');
+            const resultFeedback = $('resultFeedback');
+            const btnRetry = $('btnRetry');
+
+            function shuffleArray(arr) {
+                const a = [...arr];
+                for (let i = a.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [a[i], a[j]] = [a[j], a[i]];
+                }
+                return a;
+            }
+
+            function renderQuestion(index) {
+                const q = QUESTIONS[index];
+                if (!q) return;
+
+                if (!state.shuffledOptions[index]) {
+                    const shuffled = shuffleArray(q.options);
+                    state.shuffledOptions[index] = shuffled;
+                    const correctText = q.options[q.correct];
+                    state.correctShuffledIndex = shuffled.indexOf(correctText);
+                }
+                const shuffled = state.shuffledOptions[index];
+                const correctIdx = state.correctShuffledIndex;
+
+                questionText.innerHTML = q.text;
+
+                optionsContainer.innerHTML = '';
+                shuffled.forEach((opt, idx) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'option-btn';
+                    btn.textContent = String.fromCharCode(65 + idx) + '. ' + opt;
+                    btn.dataset.idx = idx;
+                    btn.addEventListener('click', () => handleOptionClick(index, idx));
+                    optionsContainer.appendChild(btn);
+                });
+
+                feedbackArea.className = 'feedback-area';
+                feedbackArea.textContent = 'Selecciona una opción para ver la retroalimentación.';
+                feedbackArea.style.borderLeftColor = 'var(--primary-bright)';
+
+                btnNext.disabled = true;
+                state.answered = false;
+
+                updateProgress(index);
+
+                if (window.MathJax && MathJax.typesetPromise) {
+                    MathJax.typesetPromise().catch(() => {});
+                }
+            }
+
+            function updateProgress(index) {
+                const total = state.totalQuestions;
+                const pct = ((index + 1) / total) * 100;
+                progressFill.style.width = pct + '%';
+                progressLabel.textContent = `Pregunta ${index + 1} de ${total}`;
+                scoreLabel.textContent = `Aciertos: ${state.score}`;
+            }
+
+            function handleOptionClick(qIndex, optIdx) {
+                if (state.answered) return;
+                const q = QUESTIONS[qIndex];
+                const correctIdx = state.correctShuffledIndex;
+                const isCorrect = (optIdx === correctIdx);
+
+                const btns = optionsContainer.querySelectorAll('.option-btn');
+                btns.forEach(btn => btn.classList.add('disabled'));
+
+                btns.forEach((btn, idx) => {
+                    if (idx === correctIdx) {
+                        btn.classList.add('show-correct');
+                    }
+                    if (idx === optIdx && !isCorrect) {
+                        btn.classList.add('incorrect');
+                    }
+                    if (idx === optIdx && isCorrect) {
+                        btn.classList.add('correct');
+                    }
+                });
+
+                feedbackArea.className = 'feedback-area';
+                if (isCorrect) {
+                    feedbackArea.classList.add('correct-fb');
+                    feedbackArea.textContent = '✅ ' + q.feedback.correct;
+                    state.score++;
+                } else {
+                    feedbackArea.classList.add('incorrect-fb');
+                    feedbackArea.textContent = '❌ ' + q.feedback.incorrect;
+                }
+                feedbackArea.style.borderLeftColor = isCorrect ? 'var(--success-green)' : 'var(--error-red)';
+
+                state.answered = true;
+                btnNext.disabled = false;
+                scoreLabel.textContent = `Aciertos: ${state.score}`;
+            }
+
+            function goToNextQuestion() {
+                if (!state.answered) return;
+                const nextIndex = state.currentIndex + 1;
+                if (nextIndex < state.totalQuestions) {
+                    state.currentIndex = nextIndex;
+                    renderQuestion(nextIndex);
+                } else {
+                    showResults();
+                }
+            }
+
+            function showResults() {
+                screenQuiz.classList.remove('active');
+                screenResults.classList.add('active');
+
+                const total = state.totalQuestions;
+                const score = state.score;
+                resultScore.textContent = `${score}/${total}`;
+
+                const name = state.studentName || 'Estudiante';
+                resultGreeting.textContent = `¡Buen trabajo, ${name}!`;
+
+                let msg = '';
+                const pct = score / total;
+                if (pct >= 0.9) {
+                    msg = 'Excelente. Distingues claramente entre deducción e inducción, y reconoces las principales falacias de relevancia. Sigue así.';
+                } else if (pct >= 0.7) {
+                    msg = 'Buen desempeño. Tienes una base sólida, pero te sugiero repasar las diferencias entre tipos de falacias y la definición de fuerza inductiva.';
+                } else if (pct >= 0.5) {
+                    msg = 'Es necesario reforzar la identificación de falacias y la distinción entre argumentos deductivos e inductivos. Revisa los ejemplos del libro Hurley, capítulos 1 y 3.';
+                } else {
+                    msg = 'Te recomiendo estudiar nuevamente la sesión 3, prestando especial atención a la clasificación de argumentos y a los ejemplos de falacias de relevancia.';
+                }
+                resultFeedback.textContent = msg;
+            }
+
+            function resetQuiz() {
+                state.currentIndex = 0;
+                state.score = 0;
+                state.answered = false;
+                state.shuffledOptions = [];
+                state.correctShuffledIndex = -1;
+
+                screenResults.classList.remove('active');
+                screenWelcome.classList.remove('active');
+                screenQuiz.classList.add('active');
+
+                displayName.textContent = state.studentName;
+                renderQuestion(0);
+                updateProgress(0);
+            }
+
+            function startQuiz() {
+                const name = studentNameInput.value.trim();
+                if (!name) {
+                    nameError.style.display = 'block';
+                    return;
+                }
+                nameError.style.display = 'none';
+                state.studentName = name;
+
+                screenWelcome.classList.remove('active');
+                screenQuiz.classList.add('active');
+
+                displayName.textContent = name;
+                state.shuffledOptions = [];
+                state.currentIndex = 0;
+                state.score = 0;
+                renderQuestion(0);
+                updateProgress(0);
+            }
+
+            btnStart.addEventListener('click', startQuiz);
+            studentNameInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') startQuiz();
+            });
+            studentNameInput.addEventListener('input', () => {
+                nameError.style.display = 'none;
+            });
+
+            btnNext.addEventListener('click', goToNextQuestion);
+            btnRetry.addEventListener('click', () => {
+                resetQuiz();
+            });
+
+            screenWelcome.classList.add('active');
+            screenQuiz.classList.remove('active');
+            screenResults.classList.remove('active');
+
+            console.log('Cuestionario Sesión 3 cargado.');
+        })();
+    </script>
+</body>
+</html>
