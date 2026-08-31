@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario - Sesión 5: Lenguaje, Significado y Lógica Categórica</title>
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+    </script>
+    <style>
+        :root {
+            --primary-dark: #1e3a8a;
+            --primary-bright: #3b82f6;
+            --success-green: #10b981;
+            --error-red: #ef4444;
+            --bg-light: #f3f4f6;
+            --card-white: #ffffff;
+            --text-dark: #1f2937;
+            --text-muted: #6b7280;
+            --border-radius: 12px;
+            --shadow-card: 0 10px 25px rgba(0, 0, 0, 0.08);
+            --transition: 0.25s ease-in-out;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg-light);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            margin: 0;
+        }
+        .quiz-container {
+            max-width: 1000px;
+            width: 100%;
+            background: var(--card-white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-card);
+            padding: 2rem 2.5rem;
+            transition: var(--transition);
+        }
+        .screen { display: none; animation: fadeIn 0.3s ease; }
+        .screen.active { display: block; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        h1, h2, h3 {
+            color: var(--primary-dark);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+        h1 { font-size: 2.2rem; margin-bottom: 0.25rem; }
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+        .student-name-display {
+            font-weight: 500;
+            color: var(--primary-bright);
+        }
+        .progress-wrapper { margin-bottom: 2rem; }
+        .progress-bar-bg {
+            background: #e5e7eb;
+            height: 8px;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--primary-bright);
+            border-radius: 20px;
+            transition: width 0.4s ease;
+        }
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 0.3rem;
+        }
+        .question-text {
+            font-size: 1.3rem;
+            font-weight: 500;
+            color: var(--text-dark);
+            margin-bottom: 1.8rem;
+            line-height: 1.5;
+        }
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+        }
+        .option-btn {
+            background: var(--bg-light);
+            border: 2px solid transparent;
+            border-radius: 10px;
+            padding: 0.9rem 1.2rem;
+            font-size: 1rem;
+            text-align: left;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--text-dark);
+            font-weight: 450;
+            line-height: 1.4;
+        }
+        .option-btn:hover:not(.disabled) {
+            background: #e0e7ff;
+            border-color: var(--primary-bright);
+        }
+        .option-btn.disabled { cursor: default; opacity: 0.8; }
+        .option-btn.correct {
+            background: #d1fae5;
+            border-color: var(--success-green);
+            color: #065f46;
+        }
+        .option-btn.incorrect {
+            background: #fee2e2;
+            border-color: var(--error-red);
+            color: #991b1b;
+        }
+        .option-btn.show-correct {
+            background: #d1fae5;
+            border-color: var(--success-green);
+            color: #065f46;
+        }
+        .feedback-area {
+            background: #f9fafb;
+            border-left: 4px solid var(--primary-bright);
+            padding: 1rem 1.2rem;
+            border-radius: 8px;
+            margin: 1rem 0 1.5rem 0;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            min-height: 3.5rem;
+        }
+        .feedback-area.correct-fb { border-left-color: var(--success-green); }
+        .feedback-area.incorrect-fb { border-left-color: var(--error-red); }
+        .nav-buttons { display: flex; justify-content: flex-end; }
+        .btn {
+            background: var(--primary-bright);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 2rem;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
+        }
+        .btn:hover:not(:disabled) {
+            background: #2563eb;
+            transform: scale(1.02);
+        }
+        .btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+        .result-circle {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: var(--bg-light);
+            border: 6px solid var(--primary-bright);
+            margin: 1.5rem auto;
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+        .result-circle span {
+            font-size: 1rem;
+            font-weight: 400;
+            color: var(--text-muted);
+        }
+        .result-feedback {
+            text-align: center;
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0.5rem auto 1.5rem auto;
+            line-height: 1.6;
+        }
+        .result-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            color: var(--text-dark);
+            margin-bottom: 0.3rem;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-bright);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+        .form-error {
+            color: var(--error-red);
+            font-size: 0.9rem;
+            margin-top: 0.2rem;
+            display: none;
+        }
+        @media (max-width: 640px) {
+            .quiz-container { padding: 1.5rem; }
+            h1 { font-size: 1.8rem; }
+            .question-text { font-size: 1.1rem; }
+            .option-btn { padding: 0.7rem 1rem; font-size: 0.95rem; }
+            .result-circle { width: 140px; height: 140px; font-size: 2.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container" id="app">
+        <div id="screen-welcome" class="screen active">
+            <h1>📖 Sesión 5: Lenguaje, Significado y Lógica Categórica</h1>
+            <p class="subtitle">Razonamiento Matemático · Funciones del lenguaje y proposiciones categóricas</p>
+            <p style="margin-bottom: 1.8rem; color: var(--text-muted);">
+                Ingresa tu nombre para comenzar el cuestionario sobre lenguaje, significado y lógica categórica.
+            </p>
+            <div class="form-group">
+                <label for="studentName">Nombre completo</label>
+                <input type="text" id="studentName" placeholder="Ej. Adrián Cerda" autocomplete="name">
+                <div class="form-error" id="nameError">Por favor, ingresa tu nombre para continuar.</div>
+            </div>
+            <button class="btn" id="btnStart">Comenzar cuestionario</button>
+        </div>
+
+        <div id="screen-quiz" class="screen">
+            <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; margin-bottom: 0.5rem;">
+                <h2 style="font-size: 1.5rem;">Cuestionario · Sesión 5</h2>
+                <span style="color: var(--text-muted); font-size: 0.95rem;">
+                    Estudiante: <span class="student-name-display" id="displayName"></span>
+                </span>
+            </div>
+            <div class="progress-wrapper">
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="progressFill" style="width: 0%;"></div>
+                </div>
+                <div class="progress-text">
+                    <span id="progressLabel">Pregunta 1 de 12</span>
+                    <span id="scoreLabel">Aciertos: 0</span>
+                </div>
+            </div>
+
+            <div id="questionContainer">
+                <div class="question-text" id="questionText">Cargando pregunta...</div>
+                <div class="options-list" id="optionsContainer"></div>
+                <div class="feedback-area" id="feedbackArea">Selecciona una opción para ver la retroalimentación.</div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn" id="btnNext" disabled>Siguiente pregunta →</button>
+            </div>
+        </div>
+
+        <div id="screen-results" class="screen">
+            <h2 style="text-align: center;">🎉 ¡Cuestionario completado!</h2>
+            <p style="text-align: center; color: var(--text-muted);" id="resultGreeting"></p>
+            <div class="result-circle" id="resultCircle">
+                <span id="resultScore">0/12</span>
+                <span>aciertos</span>
+            </div>
+            <div class="result-feedback" id="resultFeedback">
+                Excelente trabajo. Has demostrado comprensión de lenguaje, significado y lógica categórica.
+            </div>
+            <div class="result-actions">
+                <button class="btn" id="btnRetry">🔄 Volver a intentar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            const QUESTIONS = [{
+                id: 1,
+                text: '¿Cuál de las siguientes es una <strong>función informativa</strong> del lenguaje?',
+                options: [
+                    '"¡Cierra la puerta!"',
+                    '"La IA reduce emisiones en un 30%."',
+                    '"¡Qué hermoso día!"',
+                    '"Prometo llegar a tiempo."'
+                ],
+                correct: 1,
+                feedback: {
+                    correct: 'Correcto. Es informativa: afirma algo que puede ser verdadero o falso (hecho empírico).',
+                    incorrect: 'La primera es directiva (orden). La tercera es expresiva (emoción). La cuarta es compromisiva (promesa).'
+                }
+            }, {
+                id: 2,
+                text: 'Fragmento (Nature, 2025): "Debemos regular la IA para proteger la privacidad". ¿Qué función del lenguaje predomina?',
+                options: [
+                    'Informativa.',
+                    'Directiva.',
+                    'Expresiva.',
+                    'Compromisiva.'
+                ],
+                correct: 1,
+                feedback: {
+                    correct: 'Correcto. Es directiva: busca influir en la conducta (regular la IA).',
+                    incorrect: 'No es informativa (no afirma un hecho), ni expresiva (no expresa emoción), ni compromisiva (no es una promesa).'
+                }
+            }, {
+                id: 3,
+                text: '¿Cuál de las siguientes es una <strong>proposición categórica universal afirmativa</strong> (tipo A)?',
+                options: [
+                    'Todos los sistemas de IA son éticos.',
+                    'Algunos sistemas de IA son éticos.',
+                    'Ningún sistema de IA es ético.',
+                    'Algunos sistemas de IA no son éticos.'
+                ],
+                correct: 0,
+                feedback: {
+                    correct: 'Correcto. Es tipo A: "Todos S son P" (universal afirmativa).',
+                    incorrect: 'La segunda es tipo I (particular afirmativa). La tercera es tipo E (universal negativa). La cuarta es tipo O (particular negativa).'
+                }
+            }, {
+                id: 4,
+                text: 'La proposición "Algunas smart cities no son sostenibles" es de tipo:',
+                options: [
+                    'A (universal afirmativa).',
+                    'E (universal negativa).',
+                    'I (particular afirmativa).',
+                    'O (particular negativa).',
+                ],
+                correct: 3,
+                feedback: {
+                    correct: 'Correcto. Es tipo O: "Algunos S no son P" (particular negativa).',
+                    incorrect: 'A es "Todos S son P". E es "Ningún S es P". I es "Algunos S son P".'
+                }
+            }, {
+                id: 5,
+                text: '¿Qué relación lógica existe entre "Todos los algoritmos son justos" (A) y "Ningún algoritmo es justo" (E)?',
+                options: [
+                    'Contradictorias (no pueden ser ambas verdaderas ni ambas falsas).',
+                    'Contrarias (no pueden ser ambas verdaderas, pero sí ambas falsas).',
+                    'Subcontrarias (pueden ser ambas verdaderas, pero no ambas falsas).',
+                    'Subalternas (la verdad de la universal implica la verdad de la particular).'
+                ],
+                correct: 1,
+                feedback: {
+                    correct: 'Correcto. A y E son contrarias: no pueden ser ambas verdaderas, pero sí ambas falsas.',
+                    incorrect: 'Contradictorias son A-O y E-I. Subcontrarias son I-O. Subalternas son A-I y E-O.'
+                }
+            }, {
+                id: 6,
+                text: 'Si "Todos los sensores IoT son precisos" (A) es verdadera, ¿qué se puede inferir sobre "Algunos sensores IoT son precisos" (I)?',
+                options: [
+                    'Es verdadera (subalternación).',
+                    'Es falsa.',
+                    'Es indeterminada.',
+                    'Es contradictoria.'
+                ],
+                correct: 0,
+                feedback: {
+                    correct: 'Correcto. Por subalternación, si A es verdadera, I también lo es.',
+                    incorrect: 'Por subalternación, la verdad de A implica la verdad de I. No es falsa ni indeterminada.'
+                }
+            }, {
+                id: 7,
+                text: 'Fragmento (Science, 2024): "¡La IA es increíblemente poderosa!". ¿Qué función del lenguaje predomina?',
+                options: [
+                    'Informativa.',
+                    'Directiva.',
+                    'Expresiva.',
+                    'Declarativa.'
+                ],
+                correct: 2,
+                feedback: {
+                    correct: 'Correcto. Es expresiva: expresa una actitud o emoción (asombro, admiración).',
+                    incorrect: 'No es informativa (no afirma un hecho verificable), ni directiva (no busca influir en conducta). "Declarativa" no es una función del lenguaje en la clasificación estándar.'
+                }
+            }, {
+                id: 8,
+                text: '¿Cuál es la <strong>contradictoria</strong> de "Algunos algoritmos son sesgados" (I)?',
+                options: [
+                    'Todos los algoritmos son sesgados (A).',
+                    'Ningún algoritmo es sesgado (E).',
+                    'Algunos algoritmos no son sesgados (O).',
+                    'La mayoría de los algoritmos son sesgados.'
+                ],
+                correct: 1,
+                feedback: {
+                    correct: 'Correcto. La contradictoria de I es E: no pueden ser ambas verdaderas ni ambas falsas.',
+                    incorrect: 'A es contraria de E, no contradictoria de I. O es subcontraria de I. La cuarta no es forma estándar.'
+                }
+            }, {
+                id: 9,
+                text: 'En el cuadrado de oposición, ¿qué relación existe entre "Todos los sistemas de IA son seguros" (A) y "Algunos sistemas de IA no son seguros" (O)?',
+                options: [
+                    'Contrarias.',
+                    'Subcontrarias.',
+                    'Contradictorias.',
+                    'Subalternas.'
+                ],
+                correct: 2,
+                feedback: {
+                    correct: 'Correcto. A y O son contradictorias: no pueden ser ambas verdaderas ni ambas falsas.',
+                    incorrect: 'Contrarias son A-E. Subcontrarias son I-O. Subalternas son A-I y E-O.'
+                }
+            }, {
+                id: 10,
+                text: '¿Qué tipo de definición es? "IA = sistema computacional que aprende de datos".',
+                options: [
+                    'Definición léxica (reporta uso establecido).',
+                    'Definición estipulativa (asigna significado nuevo).',
+                    'Definición precising (reduce ambigüedad).',
+                    'Definición teórica (explica naturaleza esencial).'
+                ],
+                correct: 0,
+                feedback: {
+                    correct: 'Correcto. Es léxica: reporta el uso establecido del término "IA" en la comunidad.',
+                    incorrect: 'No es estipulativa (no asigna significado nuevo), ni precising (no reduce ambigüedad de término vago), ni teórica (no explica naturaleza esencial profunda).'
+                }
+            }, {
+                id: 11,
+                text: 'Fragmento (MIT Tech Review, 2025): "Por 'IA ética' entendemos IA que respeta autonomía humana, es transparente y justa". ¿Qué tipo de definición es?',
+                options: [
+                    'Léxica.',
+                    'Estipulativa.',
+                    'Precising.',
+                    'Persuasiva.'
+                ],
+                correct: 2,
+                feedback: {
+                    correct: 'Correcto. Es precising: reduce la ambigüedad de "IA ética" especificando criterios concretos.',
+                    incorrect: 'No es léxica (no reporta uso general), ni estipulativa (no es término nuevo), ni persuasiva (no busca influir emocionalmente).'
+                }
+            }, {
+                id: 12,
+                text: '¿Cuál de las siguientes proposiciones es de tipo <strong>E (universal negativa)</strong>?',
+                options: [
+                    'Todos los gemelos digitales son útiles.',
+                    'Ningún gemelo digital es útil.',
+                    'Algunos gemelos digitales son útiles.',
+                    'Algunos gemelos digitales no son útiles.'
+                ],
+                correct: 1,
+                feedback: {
+                    correct: 'Correcto. Es tipo E: "Ningún S es P" (universal negativa).',
+                    incorrect: 'La primera es tipo A (universal afirmativa). La tercera es tipo I (particular afirmativa). La cuarta es tipo O (particular negativa).'
+                }
+            }];
+
+            let state = {
+                studentName: '',
+                currentIndex: 0,
+                score: 0,
+                totalQuestions: QUESTIONS.length,
+                answered: false,
+                shuffledOptions: [],
+                correctShuffledIndex: -1,
+            };
+
+            const $ = id => document.getElementById(id);
+            const screenWelcome = $('screen-welcome');
+            const screenQuiz = $('screen-quiz');
+            const screenResults = $('screen-results');
+            const studentNameInput = $('studentName');
+            const nameError = $('nameError');
+            const btnStart = $('btnStart');
+            const displayName = $('displayName');
+            const progressFill = $('progressFill');
+            const progressLabel = $('progressLabel');
+            const scoreLabel = $('scoreLabel');
+            const questionText = $('questionText');
+            const optionsContainer = $('optionsContainer');
+            const feedbackArea = $('feedbackArea');
+            const btnNext = $('btnNext');
+            const resultScore = $('resultScore');
+            const resultGreeting = $('resultGreeting');
+            const resultFeedback = $('resultFeedback');
+            const btnRetry = $('btnRetry');
+
+            function shuffleArray(arr) {
+                const a = [...arr];
+                for (let i = a.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [a[i], a[j]] = [a[j], a[i]];
+                }
+                return a;
+            }
+
+            function renderQuestion(index) {
+                const q = QUESTIONS[index];
+                if (!q) return;
+
+                if (!state.shuffledOptions[index]) {
+                    const shuffled = shuffleArray(q.options);
+                    state.shuffledOptions[index] = shuffled;
+                    const correctText = q.options[q.correct];
+                    state.correctShuffledIndex = shuffled.indexOf(correctText);
+                }
+                const shuffled = state.shuffledOptions[index];
+                const correctIdx = state.correctShuffledIndex;
+
+                questionText.innerHTML = q.text;
+
+                optionsContainer.innerHTML = '';
+                shuffled.forEach((opt, idx) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'option-btn';
+                    btn.textContent = String.fromCharCode(65 + idx) + '. ' + opt;
+                    btn.dataset.idx = idx;
+                    btn.addEventListener('click', () => handleOptionClick(index, idx));
+                    optionsContainer.appendChild(btn);
+                });
+
+                feedbackArea.className = 'feedback-area';
+                feedbackArea.textContent = 'Selecciona una opción para ver la retroalimentación.';
+                feedbackArea.style.borderLeftColor = 'var(--primary-bright)';
+
+                btnNext.disabled = true;
+                state.answered = false;
+
+                updateProgress(index);
+
+                if (window.MathJax && MathJax.typesetPromise) {
+                    MathJax.typesetPromise().catch(() => {});
+                }
+            }
+
+            function updateProgress(index) {
+                const total = state.totalQuestions;
+                const pct = ((index + 1) / total) * 100;
+                progressFill.style.width = pct + '%';
+                progressLabel.textContent = `Pregunta ${index + 1} de ${total}`;
+                scoreLabel.textContent = `Aciertos: ${state.score}`;
+            }
+
+            function handleOptionClick(qIndex, optIdx) {
+                if (state.answered) return;
+                const q = QUESTIONS[qIndex];
+                const correctIdx = state.correctShuffledIndex;
+                const isCorrect = (optIdx === correctIdx);
+
+                const btns = optionsContainer.querySelectorAll('.option-btn');
+                btns.forEach(btn => btn.classList.add('disabled'));
+
+                btns.forEach((btn, idx) => {
+                    if (idx === correctIdx) {
+                        btn.classList.add('show-correct');
+                    }
+                    if (idx === optIdx && !isCorrect) {
+                        btn.classList.add('incorrect');
+                    }
+                    if (idx === optIdx && isCorrect) {
+                        btn.classList.add('correct');
+                    }
+                });
+
+                feedbackArea.className = 'feedback-area';
+                if (isCorrect) {
+                    feedbackArea.classList.add('correct-fb');
+                    feedbackArea.textContent = '✅ ' + q.feedback.correct;
+                    state.score++;
+                } else {
+                    feedbackArea.classList.add('incorrect-fb');
+                    feedbackArea.textContent = '❌ ' + q.feedback.incorrect;
+                }
+                feedbackArea.style.borderLeftColor = isCorrect ? 'var(--success-green)' : 'var(--error-red)';
+
+                state.answered = true;
+                btnNext.disabled = false;
+                scoreLabel.textContent = `Aciertos: ${state.score}`;
+            }
+
+            function goToNextQuestion() {
+                if (!state.answered) return;
+                const nextIndex = state.currentIndex + 1;
+                if (nextIndex < state.totalQuestions) {
+                    state.currentIndex = nextIndex;
+                    renderQuestion(nextIndex);
+                } else {
+                    showResults();
+                }
+            }
+
+            function showResults() {
+                screenQuiz.classList.remove('active');
+                screenResults.classList.add('active');
+
+                const total = state.totalQuestions;
+                const score = state.score;
+                resultScore.textContent = `${score}/${total}`;
+
+                const name = state.studentName || 'Estudiante';
+                resultGreeting.textContent = `¡Buen trabajo, ${name}!`;
+
+                let msg = '';
+                const pct = score / total;
+                if (pct >= 0.9) {
+                    msg = 'Excelente. Dominas las funciones del lenguaje, tipos de proposiciones categóricas y el cuadrado de oposición. Sigue así.';
+                } else if (pct >= 0.7) {
+                    msg = 'Buen desempeño. Tienes una base sólida, pero te sugiero repasar las relaciones de oposición (contrarias, subcontrarias, contradictorias).';
+                } else if (pct >= 0.5) {
+                    msg = 'Es necesario reforzar la identificación de tipos de proposiciones y funciones del lenguaje. Revisa el libro Hurley, capítulo 2 y 4.';
+                } else {
+                    msg = 'Te recomiendo estudiar nuevamente la sesión 5, prestando especial atención al cuadrado de oposición y tipos de definición.';
+                }
+                resultFeedback.textContent = msg;
+            }
+
+            function resetQuiz() {
+                state.currentIndex = 0;
+                state.score = 0;
+                state.answered = false;
+                state.shuffledOptions = [];
+                state.correctShuffledIndex = -1;
+
+                screenResults.classList.remove('active');
+                screenWelcome.classList.remove('active');
+                screenQuiz.classList.add('active');
+
+                displayName.textContent = state.studentName;
+                renderQuestion(0);
+                updateProgress(0);
+            }
+
+            function startQuiz() {
+                const name = studentNameInput.value.trim();
+                if (!name) {
+                    nameError.style.display = 'block';
+                    return;
+                }
+                nameError.style.display = 'none';
+                state.studentName = name;
+
+                screenWelcome.classList.remove('active');
+                screenQuiz.classList.add('active');
+
+                displayName.textContent = name;
+                state.shuffledOptions = [];
+                state.currentIndex = 0;
+                state.score = 0;
+                renderQuestion(0);
+                updateProgress(0);
+            }
+
+            btnStart.addEventListener('click', startQuiz);
+            studentNameInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') startQuiz();
+            });
+            studentNameInput.addEventListener('input', () => {
+                nameError.style.display = 'none';
+            });
+
+            btnNext.addEventListener('click', goToNextQuestion);
+            btnRetry.addEventListener('click', () => {
+                resetQuiz();
+            });
+
+            screenWelcome.classList.add('active');
+            screenQuiz.classList.remove('active');
+            screenResults.classList.remove('active');
+
+            console.log('Cuestionario Sesión 5 cargado.');
+        })();
+    </script>
+</body>
+</html>
