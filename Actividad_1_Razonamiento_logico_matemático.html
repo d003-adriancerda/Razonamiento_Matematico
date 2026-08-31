@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario Interactivo - Razonamiento Matemático (Sesión 1)</title>
+    <!-- MathJax para notación lógica (opcional) -->
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+    </script>
+    <style>
+        /* ===== Variables CSS ===== */
+        :root {
+            --primary-dark: #1e3a8a;
+            --primary-bright: #3b82f6;
+            --success-green: #10b981;
+            --error-red: #ef4444;
+            --bg-light: #f3f4f6;
+            --card-white: #ffffff;
+            --text-dark: #1f2937;
+            --text-muted: #6b7280;
+            --border-radius: 12px;
+            --shadow-card: 0 10px 25px rgba(0, 0, 0, 0.08);
+            --transition: 0.25s ease-in-out;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg-light);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            margin: 0;
+        }
+
+        .quiz-container {
+            max-width: 1000px;
+            width: 100%;
+            background: var(--card-white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-card);
+            padding: 2rem 2.5rem;
+            transition: var(--transition);
+        }
+
+        /* ===== Pantallas ===== */
+        .screen {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== Títulos y textos ===== */
+        h1, h2, h3 {
+            color: var(--primary-dark);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 0.25rem;
+        }
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+        .student-name-display {
+            font-weight: 500;
+            color: var(--primary-bright);
+        }
+
+        /* ===== Barra de progreso ===== */
+        .progress-wrapper {
+            margin-bottom: 2rem;
+        }
+        .progress-bar-bg {
+            background: #e5e7eb;
+            height: 8px;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--primary-bright);
+            border-radius: 20px;
+            transition: width 0.4s ease;
+        }
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 0.3rem;
+        }
+
+        /* ===== Preguntas y opciones ===== */
+        .question-text {
+            font-size: 1.3rem;
+            font-weight: 500;
+            color: var(--text-dark);
+            margin-bottom: 1.8rem;
+            line-height: 1.5;
+        }
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+        }
+        .option-btn {
+            background: var(--bg-light);
+            border: 2px solid transparent;
+            border-radius: 10px;
+            padding: 0.9rem 1.2rem;
+            font-size: 1rem;
+            text-align: left;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--text-dark);
+            font-weight: 450;
+            line-height: 1.4;
+        }
+        .option-btn:hover:not(.disabled) {
+            background: #e0e7ff;
+            border-color: var(--primary-bright);
+        }
+        .option-btn.disabled {
+            cursor: default;
+            opacity: 0.8;
+        }
+        .option-btn.correct {
+            background: #d1fae5;
+            border-color: var(--success-green);
+            color: #065f46;
+        }
+        .option-btn.incorrect {
+            background: #fee2e2;
+            border-color: var(--error-red);
+            color: #991b1b;
+        }
+        .option-btn.show-correct {
+            background: #d1fae5;
+            border-color: var(--success-green);
+            color: #065f46;
+        }
+
+        /* ===== Feedback ===== */
+        .feedback-area {
+            background: #f9fafb;
+            border-left: 4px solid var(--primary-bright);
+            padding: 1rem 1.2rem;
+            border-radius: 8px;
+            margin: 1rem 0 1.5rem 0;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            min-height: 3.5rem;
+        }
+        .feedback-area.correct-fb {
+            border-left-color: var(--success-green);
+        }
+        .feedback-area.incorrect-fb {
+            border-left-color: var(--error-red);
+        }
+
+        /* ===== Botones de navegación ===== */
+        .nav-buttons {
+            display: flex;
+            justify-content: flex-end;
+        }
+        .btn {
+            background: var(--primary-bright);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 2rem;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
+        }
+        .btn:hover:not(:disabled) {
+            background: #2563eb;
+            transform: scale(1.02);
+        }
+        .btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+        .btn-secondary {
+            background: var(--card-white);
+            color: var(--primary-bright);
+            border: 2px solid var(--primary-bright);
+            box-shadow: none;
+        }
+        .btn-secondary:hover {
+            background: #e0e7ff;
+        }
+
+        /* ===== Pantalla de resultados ===== */
+        .result-circle {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: var(--bg-light);
+            border: 6px solid var(--primary-bright);
+            margin: 1.5rem auto;
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+        .result-circle span {
+            font-size: 1rem;
+            font-weight: 400;
+            color: var(--text-muted);
+        }
+        .result-feedback {
+            text-align: center;
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0.5rem auto 1.5rem auto;
+            line-height: 1.6;
+        }
+        .result-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        /* ===== Formulario de registro ===== */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            color: var(--text-dark);
+            margin-bottom: 0.3rem;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-bright);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+        .form-error {
+            color: var(--error-red);
+            font-size: 0.9rem;
+            margin-top: 0.2rem;
+            display: none;
+        }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 640px) {
+            .quiz-container {
+                padding: 1.5rem;
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
+            .question-text {
+                font-size: 1.1rem;
+            }
+            .option-btn {
+                padding: 0.7rem 1rem;
+                font-size: 0.95rem;
+            }
+            .result-circle {
+                width: 140px;
+                height: 140px;
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container" id="app">
+        <!-- ==================== PANTALLA 1: BIENVENIDA ==================== -->
+        <div id="screen-welcome" class="screen active">
+            <h1>🧠 Razonamiento Matemático</h1>
+            <p class="subtitle">Sesión 1 · Diagnóstico y anatomía del discurso</p>
+            <p style="margin-bottom: 1.8rem; color: var(--text-muted);">
+                Antes de comenzar, ingresa tu nombre completo para personalizar tu experiencia.
+            </p>
+            <div class="form-group">
+                <label for="studentName">Nombre completo</label>
+                <input type="text" id="studentName" placeholder="Ej. María Pérez Gómez" autocomplete="name">
+                <div class="form-error" id="nameError">Por favor, ingresa tu nombre para continuar.</div>
+            </div>
+            <button class="btn" id="btnStart">Comenzar cuestionario</button>
+        </div>
+
+        <!-- ==================== PANTALLA 2: CUESTIONARIO ==================== -->
+        <div id="screen-quiz" class="screen">
+            <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; margin-bottom: 0.5rem;">
+                <h2 style="font-size: 1.5rem;">Cuestionario diagnóstico</h2>
+                <span style="color: var(--text-muted); font-size: 0.95rem;">
+                    Estudiante: <span class="student-name-display" id="displayName"></span>
+                </span>
+            </div>
+            <div class="progress-wrapper">
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="progressFill" style="width: 0%;"></div>
+                </div>
+                <div class="progress-text">
+                    <span id="progressLabel">Pregunta 1 de 10</span>
+                    <span id="scoreLabel">Aciertos: 0</span>
+                </div>
+            </div>
+
+            <div id="questionContainer">
+                <div class="question-text" id="questionText">Cargando pregunta...</div>
+                <div class="options-list" id="optionsContainer"></div>
+                <div class="feedback-area" id="feedbackArea">Selecciona una opción para ver la retroalimentación.</div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn" id="btnNext" disabled>Siguiente pregunta →</button>
+            </div>
+        </div>
+
+        <!-- ==================== PANTALLA 3: RESULTADOS ==================== -->
+        <div id="screen-results" class="screen">
+            <h2 style="text-align: center;">🎉 ¡Cuestionario completado!</h2>
+            <p style="text-align: center; color: var(--text-muted);" id="resultGreeting"></p>
+            <div class="result-circle" id="resultCircle">
+                <span id="resultScore">0/10</span>
+                <span>aciertos</span>
+            </div>
+            <div class="result-feedback" id="resultFeedback">
+                Excelente trabajo. Has demostrado un buen entendimiento de la estructura de los argumentos.
+            </div>
+            <div class="result-actions">
+                <button class="btn" id="btnRetry">🔄 Volver a intentar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // ============================================================
+            //  DATOS DE PREGUNTAS (10 preguntas de opción múltiple)
+            //  Basadas en la Sesión 1: Diagnóstico, anatomía del discurso
+            // ============================================================
+            const QUESTIONS = [{
+                id: 1,
+                text: 'Lee el siguiente texto: "El tráfico en la ciudad ha aumentado un 20% este año, y las autoridades no han construido nuevas vías. Por lo tanto, la congestión vehicular seguirá empeorando." ¿Cuál es la conclusión del argumento?',
+                options: [
+                    'El tráfico en la ciudad ha aumentado un 20%.',
+                    'Las autoridades no han construido nuevas vías.',
+                    'La congestión vehicular seguirá empeorando.',
+                    'El aumento del tráfico y la falta de nuevas vías son problemas.'
+                ],
+                correct: 2, // índice 0-based
+                feedback: {
+                    correct: 'Correcto. La conclusión es la afirmación que se defiende con las premisas: "la congestión vehicular seguirá empeorando".',
+                    incorrect: 'Recuerda que la conclusión es la afirmación principal que el autor intenta probar. En este caso, la conclusión es que la congestión empeorará.'
+                }
+            }, {
+                id: 2,
+                text: 'Identifica las premisas en el siguiente argumento: "Los estudiantes que duermen menos de 6 horas tienen un rendimiento académico más bajo. María duerme solo 5 horas diarias. Por lo tanto, María probablemente tendrá un rendimiento académico bajo."',
+                options: [
+                    'Solo la primera oración es premisa.',
+                    'Solo la segunda oración es premisa.',
+                    'Las dos primeras oraciones son premisas.',
+                    'Todas las oraciones son premisas, incluida la conclusión.'
+                ],
+                correct: 2,
+                feedback: {
+                    correct: 'Correcto. Las premisas son las afirmaciones que aportan la evidencia: la relación general y el caso específico de María.',
+                    incorrect: 'Las premisas son los enunciados que ofrecen razones para creer en la conclusión. Aquí, las dos primeras oraciones proporcionan la evidencia.'
+                }
+            }, {
+                id: 3,
+                text: '¿Cuál de las siguientes palabras es un <strong>indicador de conclusión</strong>?',
+                options: [
+                    'porque',
+                    'ya que',
+                    'por lo tanto',
+                    'puesto que'
+                ],
+                correct: 2,
+                feedback: {
+                    correct: 'Correcto. "Por lo tanto" es un indicador típico de conclusión, al igual que "en consecuencia", "así que", etc.',
+                    incorrect: 'Los indicadores de premisa son "porque", "ya que", "puesto que", etc. Los de conclusión incluyen "por lo tanto", "en consecuencia", "luego".'
+                }
+            }, {
+                id: 4,
+                text: 'El siguiente pasaje, ¿contiene un argumento o una explicación?<br><br>"El cielo se ve azul porque la luz del sol se dispersa por las partículas de la atmósfera."',
+                options: [
+                    'Es un argumento, porque intenta probar que el cielo es azul.',
+                    'Es una explicación, porque da una causa para un hecho aceptado.',
+                    'Es tanto argumento como explicación.',
+                    'No es ni argumento ni explicación, es una descripción.'
+                ],
+                correct: 1,
+                feedback: {
+                    correct: 'Correcto. Es una explicación: se da una razón causal de por qué el cielo es azul, un hecho que ya se acepta como cierto.',
+                    incorrect: 'Una explicación busca aclarar por qué ocurre algo, no probar que ocurre. En este caso, el hecho (cielo azul) es aceptado, y se da una causa.'
+                }
+            }, {
+                id: 5,
+                text: 'En el argumento: "Todos los mamíferos son vertebrados. Los delfines son mamíferos. Por consiguiente, los delfines son vertebrados." ¿Cuál es la relación entre las premisas y la conclusión?',
+                options: [
+                    'Las premisas son ejemplos de la conclusión.',
+                    'La conclusión es una definición de mamífero.',
+                    'Las premisas proporcionan evidencia que hace necesaria la conclusión.',
+                    'No hay relación lógica, es una falacia.'
+                ],
+                correct: 2,
+                feedback: {
+                    correct: 'Correcto. Las premisas establecen una regla general y un caso particular, de modo que la conclusión se sigue necesariamente.',
+                    incorrect: 'La relación es deductiva: si las premisas son verdaderas, la conclusión debe serlo. No es un simple ejemplo ni una definición.'
+                }
+            }, {
+                id: 6,
+                text: '¿Cuál de los siguientes enunciados es una <strong>premisa</strong> en el argumento?<br>"Si llueve, la calle se moja. Está lloviendo. Por tanto, la calle está mojada."',
+                options: [
+                    '"La calle está mojada."',
+                    '"Si llueve, la calle se moja." y "Está lloviendo."',
+                    '"Está lloviendo."',
+                    '"Si llueve, la calle se moja."'
+                ],
+                correct: 1,
+                feedback: {
+                    correct: 'Correcto. Ambas afirmaciones son premisas: la condicional y el antecedente.',
+                    incorrect: 'La conclusión es "la calle está mojada". Las premisas son las que apoyan esa conclusión.'
+                }
+            }, {
+                id: 7,
+                text: 'Lee el siguiente texto: "Cada vez que uso este champú, mi cabello se vuelve más brillante. Además, tiene un aroma agradable. Por eso, recomiendo este champú a todos mis amigos." ¿Cuál es la conclusión principal?',
+                options: [
+                    'El cabello se vuelve más brillante.',
+                    'El champú tiene aroma agradable.',
+                    'Recomiendo este champú a todos mis amigos.',
+                    'El champú es bueno para el cabello.'
+                ],
+                correct: 2,
+                feedback: {
+                    correct: 'Correcto. La conclusión es la recomendación, que se apoya en las dos observaciones previas.',
+                    incorrect: 'Las dos primeras afirmaciones son premisas que justifican la recomendación final.'
+                }
+            }, {
+                id: 8,
+                text: 'En el siguiente argumento, ¿qué función cumple la palabra "porque"?<br>"No deberías comprar ese teléfono, porque su batería dura muy poco."',
+                options: [
+                    'Introduce la conclusión.',
+                    'Introduce una premisa.',
+                    'Introduce una explicación.',
+                    'Introduce una opinión sin evidencia.'
+                ],
+                correct: 1,
+                feedback: {
+                    correct: 'Correcto. "Porque" es un indicador de premisa; la razón de la batería es la premisa que apoya la conclusión de no comprarlo.',
+                    incorrect: '"Porque" señala la razón o evidencia, es decir, la premisa. La conclusión es la primera parte de la oración.'
+                }
+            }, {
+                id: 9,
+                text: '¿Cuál de los siguientes textos contiene un <strong>argumento</strong> (y no una mera opinión o reporte)?',
+                options: [
+                    '"Hoy hace mucho calor, probablemente superemos los 35°C."',
+                    '"La película fue aburrida, no me gustó."',
+                    '"El aumento del salario mínimo beneficia a los trabajadores, porque les permite cubrir mejor sus necesidades básicas."',
+                    '"Mañana es feriado, así que no habrá clases."'
+                ],
+                correct: 2,
+                feedback: {
+                    correct: 'Correcto. La tercera opción presenta una afirmación (beneficio) respaldada por una razón (cubrir necesidades), lo que constituye un argumento.',
+                    incorrect: 'Las otras opciones son opiniones o reportes sin una estructura de premisa-conclusión clara.'
+                }
+            }, {
+                id: 10,
+                text: 'Identifica la estructura del siguiente argumento: "El presidente debe renunciar. Ha mentido al congreso y ha violado la constitución." ¿Cuáles son premisa(s) y conclusión?',
+                options: [
+                    'Conclusión: "El presidente debe renunciar." Premisas: las dos afirmaciones posteriores.',
+                    'Conclusión: "Ha mentido al congreso y ha violado la constitución." Premisa: "El presidente debe renunciar."',
+                    'Todas las oraciones son premisas, no hay conclusión.',
+                    'La conclusión es "ha violado la constitución".'
+                ],
+                correct: 0,
+                feedback: {
+                    correct: 'Correcto. La afirmación principal es la renuncia; las razones son las dos faltas cometidas.',
+                    incorrect: 'La conclusión es la afirmación que se defiende (renuncia). Las premisas son las razones que la apoyan.'
+                }
+            }];
+
+            // ============================================================
+            //  ESTADO DE LA APLICACIÓN
+            // ============================================================
+            let state = {
+                studentName: '',
+                currentIndex: 0,
+                score: 0,
+                totalQuestions: QUESTIONS.length,
+                answered: false,
+                // Almacenamos las opciones barajadas para cada pregunta
+                shuffledOptions: [],
+                // Para saber cuál opción era la correcta (índice en el array barajado)
+                correctShuffledIndex: -1,
+                // Las preguntas se mostrarán en orden fijo (no se barajan)
+            };
+
+            // ============================================================
+            //  DOM REFERENCIAS
+            // ============================================================
+            const $ = id => document.getElementById(id);
+            const screenWelcome = $('screen-welcome');
+            const screenQuiz = $('screen-quiz');
+            const screenResults = $('screen-results');
+            const studentNameInput = $('studentName');
+            const nameError = $('nameError');
+            const btnStart = $('btnStart');
+            const displayName = $('displayName');
+            const progressFill = $('progressFill');
+            const progressLabel = $('progressLabel');
+            const scoreLabel = $('scoreLabel');
+            const questionText = $('questionText');
+            const optionsContainer = $('optionsContainer');
+            const feedbackArea = $('feedbackArea');
+            const btnNext = $('btnNext');
+            const resultScore = $('resultScore');
+            const resultGreeting = $('resultGreeting');
+            const resultFeedback = $('resultFeedback');
+            const btnRetry = $('btnRetry');
+
+            // ============================================================
+            //  FUNCIÓN DE BARAJADO (Fisher-Yates)
+            // ============================================================
+            function shuffleArray(arr) {
+                const a = [...arr];
+                for (let i = a.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [a[i], a[j]] = [a[j], a[i]];
+                }
+                return a;
+            }
+
+            // ============================================================
+            //  FUNCIONES DE RENDERIZADO
+            // ============================================================
+            function renderQuestion(index) {
+                const q = QUESTIONS[index];
+                if (!q) return;
+
+                // Barajar opciones para esta pregunta (solo si no se ha hecho antes)
+                if (!state.shuffledOptions[index]) {
+                    const shuffled = shuffleArray(q.options);
+                    state.shuffledOptions[index] = shuffled;
+                    // Encontrar el índice de la opción correcta en el array barajado
+                    const correctText = q.options[q.correct];
+                    state.correctShuffledIndex = shuffled.indexOf(correctText);
+                }
+                const shuffled = state.shuffledOptions[index];
+                const correctIdx = state.correctShuffledIndex;
+
+                // Mostrar texto de pregunta (con soporte para MathJax)
+                questionText.innerHTML = q.text;
+
+                // Generar botones de opciones
+                optionsContainer.innerHTML = '';
+                shuffled.forEach((opt, idx) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'option-btn';
+                    btn.textContent = String.fromCharCode(65 + idx) + '. ' + opt;
+                    btn.dataset.idx = idx;
+                    btn.addEventListener('click', () => handleOptionClick(index, idx));
+                    optionsContainer.appendChild(btn);
+                });
+
+                // Resetear feedback
+                feedbackArea.className = 'feedback-area';
+                feedbackArea.textContent = 'Selecciona una opción para ver la retroalimentación.';
+                feedbackArea.style.borderLeftColor = 'var(--primary-bright)';
+
+                // Deshabilitar siguiente
+                btnNext.disabled = true;
+                state.answered = false;
+
+                // Actualizar progreso
+                updateProgress(index);
+
+                // Re-renderizar MathJax si está presente
+                if (window.MathJax && MathJax.typesetPromise) {
+                    MathJax.typesetPromise().catch(() => {});
+                }
+            }
+
+            function updateProgress(index) {
+                const total = state.totalQuestions;
+                const pct = ((index + 1) / total) * 100;
+                progressFill.style.width = pct + '%';
+                progressLabel.textContent = `Pregunta ${index + 1} de ${total}`;
+                scoreLabel.textContent = `Aciertos: ${state.score}`;
+            }
+
+            function handleOptionClick(qIndex, optIdx) {
+                if (state.answered) return;
+                const q = QUESTIONS[qIndex];
+                const shuffled = state.shuffledOptions[qIndex];
+                const correctIdx = state.correctShuffledIndex;
+                const isCorrect = (optIdx === correctIdx);
+
+                // Deshabilitar todos los botones de esta pregunta
+                const btns = optionsContainer.querySelectorAll('.option-btn');
+                btns.forEach(btn => btn.classList.add('disabled'));
+
+                // Colorear según acierto
+                btns.forEach((btn, idx) => {
+                    if (idx === correctIdx) {
+                        btn.classList.add('show-correct');
+                    }
+                    if (idx === optIdx && !isCorrect) {
+                        btn.classList.add('incorrect');
+                    }
+                    if (idx === optIdx && isCorrect) {
+                        btn.classList.add('correct');
+                    }
+                });
+
+                // Mostrar feedback
+                feedbackArea.className = 'feedback-area';
+                if (isCorrect) {
+                    feedbackArea.classList.add('correct-fb');
+                    feedbackArea.textContent = '✅ ' + q.feedback.correct;
+                    state.score++;
+                } else {
+                    feedbackArea.classList.add('incorrect-fb');
+                    feedbackArea.textContent = '❌ ' + q.feedback.incorrect;
+                }
+                feedbackArea.style.borderLeftColor = isCorrect ? 'var(--success-green)' : 'var(--error-red)';
+
+                state.answered = true;
+                btnNext.disabled = false;
+                // Actualizar marcador de aciertos
+                scoreLabel.textContent = `Aciertos: ${state.score}`;
+            }
+
+            // ============================================================
+            //  NAVEGACIÓN
+            // ============================================================
+            function goToNextQuestion() {
+                if (!state.answered) return;
+                const nextIndex = state.currentIndex + 1;
+                if (nextIndex < state.totalQuestions) {
+                    state.currentIndex = nextIndex;
+                    renderQuestion(nextIndex);
+                } else {
+                    // Fin del cuestionario
+                    showResults();
+                }
+            }
+
+            // ============================================================
+            //  RESULTADOS
+            // ============================================================
+            function showResults() {
+                screenQuiz.classList.remove('active');
+                screenResults.classList.add('active');
+
+                const total = state.totalQuestions;
+                const score = state.score;
+                resultScore.textContent = `${score}/${total}`;
+
+                // Mensaje personalizado con el nombre
+                const name = state.studentName || 'Estudiante';
+                resultGreeting.textContent = `¡Buen trabajo, ${name}!`;
+
+                // Retroalimentación andragógica según desempeño
+                let msg = '';
+                const pct = score / total;
+                if (pct >= 0.9) {
+                    msg = 'Excelente dominio. Has demostrado una comprensión profunda de la estructura de los argumentos y la identificación de premisas y conclusiones. Sigue así.';
+                } else if (pct >= 0.7) {
+                    msg = 'Buen desempeño. Identificas correctamente los elementos clave de los argumentos, pero aún puedes mejorar en la distinción entre premisas y conclusiones en textos complejos. Revisa los ejemplos del libro de Hurley.';
+                } else if (pct >= 0.5) {
+                    msg = 'Has mostrado una base aceptable, pero es importante reforzar el reconocimiento de indicadores lógicos y la diferencia entre argumentos y explicaciones. Te recomiendo repasar la sección 1.1 y 1.2 del libro.';
+                } else {
+                    msg = 'Es necesario que dediques más tiempo a los conceptos fundamentales. Practica identificando premisas y conclusiones en noticias y editoriales. Utiliza los ejercicios del capítulo 1 de Hurley para afianzar.';
+                }
+                resultFeedback.textContent = msg;
+            }
+
+            // ============================================================
+            //  REINICIO
+            // ============================================================
+            function resetQuiz() {
+                state.currentIndex = 0;
+                state.score = 0;
+                state.answered = false;
+                state.shuffledOptions = [];
+                state.correctShuffledIndex = -1;
+
+                screenResults.classList.remove('active');
+                screenWelcome.classList.remove('active');
+                screenQuiz.classList.add('active');
+
+                displayName.textContent = state.studentName;
+                renderQuestion(0);
+                updateProgress(0);
+            }
+
+            // ============================================================
+            //  MANEJO DE REGISTRO
+            // ============================================================
+            function startQuiz() {
+                const name = studentNameInput.value.trim();
+                if (!name) {
+                    nameError.style.display = 'block';
+                    return;
+                }
+                nameError.style.display = 'none';
+                state.studentName = name;
+
+                // Cambiar pantallas
+                screenWelcome.classList.remove('active');
+                screenQuiz.classList.add('active');
+
+                displayName.textContent = name;
+                // Inicializar el cuestionario
+                state.shuffledOptions = [];
+                state.currentIndex = 0;
+                state.score = 0;
+                renderQuestion(0);
+                updateProgress(0);
+            }
+
+            // ============================================================
+            //  EVENT LISTENERS
+            // ============================================================
+            btnStart.addEventListener('click', startQuiz);
+            studentNameInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') startQuiz();
+            });
+            studentNameInput.addEventListener('input', () => {
+                nameError.style.display = 'none';
+            });
+
+            btnNext.addEventListener('click', goToNextQuestion);
+
+            btnRetry.addEventListener('click', () => {
+                resetQuiz();
+            });
+
+            // ============================================================
+            //  INICIALIZAR (pantalla de bienvenida activa por defecto)
+            // ============================================================
+            // Asegurar que solo welcome esté activo al cargar
+            screenWelcome.classList.add('active');
+            screenQuiz.classList.remove('active');
+            screenResults.classList.remove('active');
+
+            // Pre-cargar la primera pregunta (pero no se muestra hasta que se inicie)
+            // No es necesario.
+
+            console.log('Cuestionario interactivo cargado. ¡Buena suerte!');
+        })();
+    </script>
+
+</body>
+</html>
