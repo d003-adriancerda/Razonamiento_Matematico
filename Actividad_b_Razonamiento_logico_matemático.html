@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario Interactivo - Sesión 2: Economía Circular, Desarrollo Sostenible e IA</title>
+    <!-- MathJax para notación matemática -->
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+    </script>
+    <style>
+        /* ===== Variables CSS ===== */
+        :root {
+            --primary-dark: #1e3a8a;
+            --primary-bright: #3b82f6;
+            --success-green: #10b981;
+            --error-red: #ef4444;
+            --bg-light: #f3f4f6;
+            --card-white: #ffffff;
+            --text-dark: #1f2937;
+            --text-muted: #6b7280;
+            --border-radius: 12px;
+            --shadow-card: 0 10px 25px rgba(0, 0, 0, 0.08);
+            --transition: 0.25s ease-in-out;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg-light);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            margin: 0;
+        }
+
+        .quiz-container {
+            max-width: 1000px;
+            width: 100%;
+            background: var(--card-white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-card);
+            padding: 2rem 2.5rem;
+            transition: var(--transition);
+        }
+
+        /* ===== Pantallas ===== */
+        .screen {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== Títulos y textos ===== */
+        h1, h2, h3 {
+            color: var(--primary-dark);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 0.25rem;
+        }
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+        .student-name-display {
+            font-weight: 500;
+            color: var(--primary-bright);
+        }
+
+        /* ===== Barra de progreso ===== */
+        .progress-wrapper {
+            margin-bottom: 2rem;
+        }
+        .progress-bar-bg {
+            background: #e5e7eb;
+            height: 8px;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--primary-bright);
+            border-radius: 20px;
+            transition: width 0.4s ease;
+        }
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 0.3rem;
+        }
+
+        /* ===== Preguntas y opciones ===== */
+        .question-text {
+            font-size: 1.3rem;
+            font-weight: 500;
+            color: var(--text-dark);
+            margin-bottom: 1.8rem;
+            line-height: 1.5;
+        }
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+        }
+        .option-btn {
+            background: var(--bg-light);
+            border: 2px solid transparent;
+            border-radius: 10px;
+            padding: 0.9rem 1.2rem;
+            font-size: 1rem;
+            text-align: left;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--text-dark);
+            font-weight: 450;
+            line-height: 1.4;
+        }
+        .option-btn:hover:not(.disabled) {
+            background: #e0e7ff;
+            border-color: var(--primary-bright);
+        }
+        .option-btn.disabled {
+            cursor: default;
+            opacity: 0.8;
+        }
+        .option-btn.correct {
+            background: #d1fae5;
+            border-color: var(--success-green);
+            color: #065f46;
+        }
+        .option-btn.incorrect {
+            background: #fee2e2;
+            border-color: var(--error-red);
+            color: #991b1b;
+        }
+        .option-btn.show-correct {
+            background: #d1fae5;
+            border-color: var(--success-green);
+            color: #065f46;
+        }
+
+        /* ===== Feedback ===== */
+        .feedback-area {
+            background: #f9fafb;
+            border-left: 4px solid var(--primary-bright);
+            padding: 1rem 1.2rem;
+            border-radius: 8px;
+            margin: 1rem 0 1.5rem 0;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            min-height: 3.5rem;
+        }
+        .feedback-area.correct-fb {
+            border-left-color: var(--success-green);
+        }
+        .feedback-area.incorrect-fb {
+            border-left-color: var(--error-red);
+        }
+
+        /* ===== Botones de navegación ===== */
+        .nav-buttons {
+            display: flex;
+            justify-content: flex-end;
+        }
+        .btn {
+            background: var(--primary-bright);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 2rem;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
+        }
+        .btn:hover:not(:disabled) {
+            background: #2563eb;
+            transform: scale(1.02);
+        }
+        .btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+        .btn-secondary {
+            background: var(--card-white);
+            color: var(--primary-bright);
+            border: 2px solid var(--primary-bright);
+            box-shadow: none;
+        }
+        .btn-secondary:hover {
+            background: #e0e7ff;
+        }
+
+        /* ===== Pantalla de resultados ===== */
+        .result-circle {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: var(--bg-light);
+            border: 6px solid var(--primary-bright);
+            margin: 1.5rem auto;
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+        .result-circle span {
+            font-size: 1rem;
+            font-weight: 400;
+            color: var(--text-muted);
+        }
+        .result-feedback {
+            text-align: center;
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0.5rem auto 1.5rem auto;
+            line-height: 1.6;
+        }
+        .result-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        /* ===== Formulario de registro ===== */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            color: var(--text-dark);
+            margin-bottom: 0.3rem;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-bright);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+        .form-error {
+            color: var(--error-red);
+            font-size: 0.9rem;
+            margin-top: 0.2rem;
+            display: none;
+        }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 640px) {
+            .quiz-container {
+                padding: 1.5rem;
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
+            .question-text {
+                font-size: 1.1rem;
+            }
+            .option-btn {
+                padding: 0.7rem 1rem;
+                font-size: 0.95rem;
+            }
+            .result-circle {
+                width: 140px;
+                height: 140px;
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container" id="app">
+        <!-- ==================== PANTALLA 1: BIENVENIDA ==================== -->
+        <div id="screen-welcome" class="screen active">
+            <h1>♻️ Economía Circular, Desarrollo Sostenible e IA</h1>
+            <p class="subtitle">Sesión 2 · Análisis de fragmentos científicos (2024-2026)</p>
+            <p style="margin-bottom: 1.8rem; color: var(--text-muted);">
+                Antes de comenzar, ingresa tu nombre completo para personalizar tu experiencia.
+            </p>
+            <div class="form-group">
+                <label for="studentName">Nombre completo</label>
+                <input type="text" id="studentName" placeholder="Ej. Adrián Cerda" autocomplete="name">
+                <div class="form-error" id="nameError">Por favor, ingresa tu nombre para continuar.</div>
+            </div>
+            <button class="btn" id="btnStart">Comenzar cuestionario</button>
+        </div>
+
+        <!-- ==================== PANTALLA 2: CUESTIONARIO ==================== -->
+        <div id="screen-quiz" class="screen">
+            <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; margin-bottom: 0.5rem;">
+                <h2 style="font-size: 1.5rem;">Cuestionario diagnóstico</h2>
+                <span style="color: var(--text-muted); font-size: 0.95rem;">
+                    Estudiante: <span class="student-name-display" id="displayName"></span>
+                </span>
+            </div>
+            <div class="progress-wrapper">
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="progressFill" style="width: 0%;"></div>
+                </div>
+                <div class="progress-text">
+                    <span id="progressLabel">Pregunta 1 de 12</span>
+                    <span id="scoreLabel">Aciertos: 0</span>
+                </div>
+            </div>
+
+            <div id="questionContainer">
+                <div class="question-text" id="questionText">Cargando pregunta...</div>
+                <div class="options-list" id="optionsContainer"></div>
+                <div class="feedback-area" id="feedbackArea">Selecciona una opción para ver la retroalimentación.</div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn" id="btnNext" disabled>Siguiente pregunta →</button>
+            </div>
+        </div>
+
+        <!-- ==================== PANTALLA 3: RESULTADOS ==================== -->
+        <div id="screen-results" class="screen">
+            <h2 style="text-align: center;">🎉 ¡Cuestionario completado!</h2>
+            <p style="text-align: center; color: var(--text-muted);" id="resultGreeting"></p>
+            <div class="result-circle" id="resultCircle">
+                <span id="resultScore">0/12</span>
+                <span>aciertos</span>
+            </div>
+            <div class="result-feedback" id="resultFeedback">
+                Excelente trabajo. Has demostrado un buen entendimiento de la estructura de los argumentos.
+            </div>
+            <div class="result-actions">
+                <button class="btn" id="btnRetry">🔄 Volver a intentar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // ============================================================
+            //  DATOS DE PREGUNTAS (12 preguntas basadas en artículos 2024-2026)
+            //  Economía Circular, Desarrollo Sostenible, Inteligencia Artificial
+            // ============================================================
+            const QUESTIONS = [{
+                id: 1,
+                text: 'Fragmento (Bashynska & Prokopenko, 2024): "La IA transforma la gestión de recursos, cadenas de suministro y prácticas de manufactura mediante optimización predictiva". Según este enunciado, ¿qué mecanismo de la IA es central para la economía circular?',
+                options: [
+                    'Automatización robótica de líneas de ensamblaje sin intervención humana.',
+                    'Optimización predictiva que reduce desperdicios y mejora la eficiencia de recursos.',
+                    'Generación de contenido creativo para marketing de productos sostenibles.',
+                    'Reemplazo completo de trabajadores humanos por sistemas autónomos.'
+                ],
+                correct: 1,
+                feedback: {
+                    correct: 'Correcto. La IA habilita la optimización predictiva para reducir desperdicios y mejorar la eficiencia, mecanismos clave de la economía circular [19].',
+                    incorrect: 'El texto enfatiza la optimización predictiva para gestión de recursos, no la automatización robótica ni el reemplazo humano [19].'
+                }
+            }, {
+                id: 2,
+                text: 'Fragmento (Hernandez et al., 2025): "La IA juega un papel clave en la promoción del desarrollo sostenible dentro de la Industria 4.0 y 5.0, con enfoque en ODS 12 (producción y consumo responsables)". ¿Qué tendencia de investigación se identifica?',
+                options: [
+                    'De eficiencia operativa en cadenas tradicionales hacia digitalización con IA y sostenibilidad (economía circular).',
+                    'De sostenibilidad hacia automatización industrial sin consideraciones ambientales.',
+                    'De investigación básica en matemáticas puras hacia aplicaciones militares.',
+                    'De economía circular hacia modelos lineales de producción y consumo.'
+                ],
+                correct: 0,
+                feedback: {
+                    correct: 'Correcto. Las tendencias de palabras clave muestran un cambio de eficiencia operativa hacia digitalización (IA) y sostenibilidad (economía circular) [20].',
+                    incorrect: 'La tendencia es de eficiencia operativa hacia digitalización con IA y economía circular, no hacia modelos lineales [20].'
+                }
+            }, {
+                id: 3,
+                text: 'Fragmento (Rehman et al., 2025): "La IA ofrece soluciones poderosas para acción climática y gestión de recursos, pero su propia huella ecológica y potencial de sesgo presentan riesgos críticos". ¿Qué marco se propone?',
+                options: [
+                    'Un marco unidimensional que solo evalúa beneficios económicos de la IA.',
+                    'Un marco multidimensional que conecta aplicaciones de IA con riesgos ecológicos, algorítmicos y socioeconómicos.',
+                    'Un marco que ignora los riesgos éticos y se enfoca exclusivamente en innovación técnica.',
+                    'Un marco que prohíbe toda aplicación de IA en contextos de sostenibilidad.'
+                ],
+                correct: 1,
+                feedback: {
+                    correct: 'Correcto. El estudio propone un marco multidimensional que analiza aplicaciones de IA junto con riesgos ecológicos, algorítmicos y socioeconómicos [21].',
+                    incorrect: 'El marco es multidimensional e integra riesgos ecológicos, algorítmicos y socioeconómicos, no solo beneficios económicos [21].'
+                }
+            }, {
+                id: 4,
+                text: 'En economía circular, el principio de "cerrar el ciclo" implica:',
+                options: [
+                    'Mantener materiales y productos en uso el mayor tiempo posible mediante reutilización, reparación y reciclaje.',
+                    'Eliminar todos los procesos de producción y consumir solo productos importados.',
+                    'Incrementar la producción lineal sin considerar el fin de vida del producto.',
+                    'Sustituir todos los materiales por plásticos de un solo uso.'
+                ],
+                correct: 0,
+                feedback: {
+                    correct: 'Correcto. "Cerrar el ciclo" significa mantener materiales en uso mediante reutilización, reparación y reciclaje, minimizando residuos [18].',
+                    incorrect: 'El principio es mantener materiales en uso (reutilizar, reparar, reciclar), no eliminar producción ni usar plásticos de un solo uso [18].'
+                }
+            }, {
+                id: 5,
+                text: 'Fragmento (Pinto, 2025): "La economía circular se consolida como alternativa sostenible frente al modelo lineal, orientada a optimizar recursos y reducir residuos". ¿Qué rol tiene la IA según este autor?',
+                options: [
+                    'Medir indicadores de circularidad y facilitar trazabilidad en toda la cadena de valor.',
+                    'Reemplazar completamente la toma de decisiones humanas en la cadena de suministro.',
+                    'Generar contenido publicitario para productos no sostenibles.',
+                    'Automatizar procesos sin considerar impactos ambientales.'
+                ],
+                correct: 0,
+                feedback: {
+                    correct: 'Correcto. La IA permite medir indicadores de circularidad y facilitar trazabilidad en la cadena de valor [18].',
+                    incorrect: 'El rol de la IA es medir indicadores y facilitar trazabilidad, no reemplazar decisiones humanas ni automatizar sin considerar el ambiente [18].'
+                }
+            }, {
+                id: 6,
+                text: 'Fragmento (Bashynska & Prokopenko, 2024): "Las soluciones basadas en IA tienen el potencial de disminuir residuos en 30-45%, mejorar uso de recursos en 25-40% y aumentar precisión de decisiones en sistemas circulares hasta 60%". ¿Qué se requiere para escalar estas soluciones?',
+                options: [
+                    'Integración intersectorial, uso ético de IA y escalabilidad para PYMES.',
+                    'Prohibición de IA en países en desarrollo para evitar dependencia tecnológica.',
+                    'Centralización de datos en grandes corporaciones sin regulación.',
+                    'Eliminación de todas las regulaciones ambientales para acelerar la innovación.'
+                ],
+                correct: 0,
+                feedback: {
+                    correct: 'Correcto. Se requieren integración intersectorial, uso ético de IA y soluciones escalables para PYMES [28].',
+                    incorrect: 'Los requisitos son integración intersectorial, ética y escalabilidad para PYMES, no prohibición ni centralización sin regulación [28].'
+                }
+            }, {
+                id: 7,
+                text: 'En el contexto de ciudades inteligentes, ¿qué aplicaciones de IA para economía circular se identifican como dominantes (2024-2025)?',
+                options: [
+                    'Manufactura circular, automatización de gestión de residuos, optimización predictiva de energía, plataformas de datos urbanos y movilidad inteligente.',
+                    'Vigilancia masiva sin propósitos de sostenibilidad.',
+                    'Generación de criptomonedas para financiar proyectos no sostenibles.',
+                    'Reemplazo de gobiernos locales por sistemas autónomos de IA.'
+                ],
+                correct: 0,
+                feedback: {
+                    correct: 'Correcto. Las aplicaciones dominantes son manufactura circular, automatización de residuos, optimización energética, plataformas de datos y movilidad inteligente [22].',
+                    incorrect: 'Las aplicaciones son manufactura circular, gestión de residuos, optimización energética, plataformas de datos y movilidad, no vigilancia masiva [22].'
+                }
+            }, {
+                id: 8,
+                text: 'Fragmento (RSM, 2026): "La IA es un habilitador clave de la economía circular en la Industria 5.0, pero persisten vacíos teóricos, metodológicos y geográficos, especialmente en gobernanza ética y evidencia empírica en economías emergentes". ¿Qué se propone?',
+                options: [
+                    'Una agenda científica 2027-2035 en cinco ejes prioritarios para orientar investigación futura.',
+                    'La eliminación de toda investigación en IA y economía circular.',
+                    'La centralización de investigación en Europa y Norteamérica exclusivamente.',
+                    'La prohibición de IA en países de América Latina y África.'
+                ],
+                correct: 0,
+                feedback: {
+                    correct: 'Correcto. Se propone una agenda científica 2027-2035 en cinco ejes prioritarios para investigación futura [25].',
+                    incorrect: 'La propuesta es una agenda científica 2027-2035, no eliminar investigación ni centralizarla exclusivamente en Europa [25].'
+                }
+            }, {
+                id: 9,
+                text: 'Fragmento (Dimuke et al., 2026): "La IA juega un rol ambivalente: puede mejorar coordinación, innovación y toma de decisiones, pero también genera riesgos de sesgo algorítmico, concentración de poder y captura de gobernanza". ¿Qué se requiere para superar estas tensiones?',
+                options: [
+                    'Ecosistemas de innovación que integren gobernanza multinivel, financiamiento combinado con esquemas de riesgo compartido y métricas de impacto verificables.',
+                    'Prohibición total de IA en contextos de sostenibilidad.',
+                    'Centralización de poder en grandes corporaciones tecnológicas.',
+                    'Eliminación de todas las regulaciones ambientales y sociales.'
+                ],
+                correct: 0,
+                feedback: {
+                    correct: 'Correcto. Se requieren ecosistemas de innovación con gobernanza multinivel, financiamiento combinado y métricas de impacto verificables [26].',
+                    incorrect: 'La solución es gobernanza multinivel, financiamiento combinado y métricas verificables, no prohibición ni centralización [26].'
+                }
+            }, {
+                id: 10,
+                text: 'Fragmento (Bashynska & Prokopenko, 2024): "Los sensores IoT junto con algoritmos de aprendizaje de alto rendimiento permiten monitoreo y control adaptativo en tiempo real de procesos de economía circular". ¿Qué desafío persiste?',
+                options: [
+                    'Calidad de datos, sesgo en algoritmos, consumo de modelos de IA y falta de implementación en economías en desarrollo.',
+                    'Exceso de datos que colapsa los sistemas de almacenamiento.',
+                    'Falta de interés de las empresas en sostenibilidad.',
+                    'Sobrefinanciamiento que distorsiona los principios de economía circular.'
+                ],
+                correct: 0,
+                feedback: {
+                    correct: 'Correcto. Los desafíos son calidad de datos, sesgo algorítmico, consumo de modelos de IA y falta de implementación en economías en desarrollo [28].',
+                    incorrect: 'Los desafíos son calidad de datos, sesgo, consumo de modelos y falta de implementación en economías en desarrollo, no exceso de datos [28].'
+                }
+            }, {
+                id: 11,
+                text: 'En eco-diseño, ¿qué hallazgo se reporta sobre la aplicación de IA (revisión sistemática 2014-2024)?',
+                options: [
+                    'Enfoque desbalanceado en ciertas etapas del ciclo de vida, prácticas comunes de eco-diseño y subutilización de métodos avanzados de IA.',
+                    'Uso equilibrado de IA en todas las etapas del ciclo de vida sin brechas.',
+                    'Eliminación completa de métodos tradicionales de eco-diseño.',
+                    'Prohibición de IA en contextos de diseño sostenible.'
+                ],
+                correct: 0,
+                feedback: {
+                    correct: 'Correcto. Se reporta un enfoque desbalanceado en ciertas etapas del ciclo de vida y subutilización de métodos avanzados de IA [29].',
+                    incorrect: 'El hallazgo es un enfoque desbalanceado y subutilización de métodos avanzados, no uso equilibrado ni eliminación de métodos tradicionales [29].'
+                }
+            }, {
+                id: 12,
+                text: 'Fragmento (RSM, 2025): "La IA se posiciona como catalizador fiable para transición hacia economía circular, impulsando modelos como producto-como-servicio (PaaS) y remanufactura, pero surgen desafíos: aumento de consumo energético, huella de carbono y riesgos éticos de sesgos algorítmicos". ¿Qué enfoque se propone?',
+                options: [
+                    'Un enfoque de gestión integral que anticipe riesgos, fortalezca colaboración entre actores y cultive liderazgo adaptativo.',
+                    'Un enfoque que ignore los riesgos energéticos y éticos de la IA.',
+                    'Un enfoque que centralice el poder en grandes corporaciones tecnológicas.',
+                    'Un enfoque que elimine toda regulación ambiental para acelerar la innovación.'
+                ],
+                correct: 0,
+                feedback: {
+                    correct: 'Correcto. Se propone un enfoque de gestión integral que anticipe riesgos, fortalezca colaboración y cultive liderazgo adaptativo [30].',
+                    incorrect: 'El enfoque es de gestión integral que anticipe riesgos y fortalezca colaboración, no ignorar riesgos ni centralizar poder [30].'
+                }
+            }];
+
+            // ============================================================
+            //  ESTADO DE LA APLICACIÓN
+            // ============================================================
+            let state = {
+                studentName: '',
+                currentIndex: 0,
+                score: 0,
+                totalQuestions: QUESTIONS.length,
+                answered: false,
+                shuffledOptions: [],
+                correctShuffledIndex: -1,
+            };
+
+            // ============================================================
+            //  DOM REFERENCIAS
+            // ============================================================
+            const $ = id => document.getElementById(id);
+            const screenWelcome = $('screen-welcome');
+            const screenQuiz = $('screen-quiz');
+            const screenResults = $('screen-results');
+            const studentNameInput = $('studentName');
+            const nameError = $('nameError');
+            const btnStart = $('btnStart');
+            const displayName = $('displayName');
+            const progressFill = $('progressFill');
+            const progressLabel = $('progressLabel');
+            const scoreLabel = $('scoreLabel');
+            const questionText = $('questionText');
+            const optionsContainer = $('optionsContainer');
+            const feedbackArea = $('feedbackArea');
+            const btnNext = $('btnNext');
+            const resultScore = $('resultScore');
+            const resultGreeting = $('resultGreeting');
+            const resultFeedback = $('resultFeedback');
+            const btnRetry = $('btnRetry');
+
+            // ============================================================
+            //  FUNCIÓN DE BARAJADO (Fisher-Yates)
+            // ============================================================
+            function shuffleArray(arr) {
+                const a = [...arr];
+                for (let i = a.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [a[i], a[j]] = [a[j], a[i]];
+                }
+                return a;
+            }
+
+            // ============================================================
+            //  FUNCIONES DE RENDERIZADO
+            // ============================================================
+            function renderQuestion(index) {
+                const q = QUESTIONS[index];
+                if (!q) return;
+
+                if (!state.shuffledOptions[index]) {
+                    const shuffled = shuffleArray(q.options);
+                    state.shuffledOptions[index] = shuffled;
+                    const correctText = q.options[q.correct];
+                    state.correctShuffledIndex = shuffled.indexOf(correctText);
+                }
+                const shuffled = state.shuffledOptions[index];
+                const correctIdx = state.correctShuffledIndex;
+
+                questionText.innerHTML = q.text;
+
+                optionsContainer.innerHTML = '';
+                shuffled.forEach((opt, idx) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'option-btn';
+                    btn.textContent = String.fromCharCode(65 + idx) + '. ' + opt;
+                    btn.dataset.idx = idx;
+                    btn.addEventListener('click', () => handleOptionClick(index, idx));
+                    optionsContainer.appendChild(btn);
+                });
+
+                feedbackArea.className = 'feedback-area';
+                feedbackArea.textContent = 'Selecciona una opción para ver la retroalimentación.';
+                feedbackArea.style.borderLeftColor = 'var(--primary-bright)';
+
+                btnNext.disabled = true;
+                state.answered = false;
+
+                updateProgress(index);
+
+                if (window.MathJax && MathJax.typesetPromise) {
+                    MathJax.typesetPromise().catch(() => {});
+                }
+            }
+
+            function updateProgress(index) {
+                const total = state.totalQuestions;
+                const pct = ((index + 1) / total) * 100;
+                progressFill.style.width = pct + '%';
+                progressLabel.textContent = `Pregunta ${index + 1} de ${total}`;
+                scoreLabel.textContent = `Aciertos: ${state.score}`;
+            }
+
+            function handleOptionClick(qIndex, optIdx) {
+                if (state.answered) return;
+                const q = QUESTIONS[qIndex];
+                const shuffled = state.shuffledOptions[qIndex];
+                const correctIdx = state.correctShuffledIndex;
+                const isCorrect = (optIdx === correctIdx);
+
+                const btns = optionsContainer.querySelectorAll('.option-btn');
+                btns.forEach(btn => btn.classList.add('disabled'));
+
+                btns.forEach((btn, idx) => {
+                    if (idx === correctIdx) {
+                        btn.classList.add('show-correct');
+                    }
+                    if (idx === optIdx && !isCorrect) {
+                        btn.classList.add('incorrect');
+                    }
+                    if (idx === optIdx && isCorrect) {
+                        btn.classList.add('correct');
+                    }
+                });
+
+                feedbackArea.className = 'feedback-area';
+                if (isCorrect) {
+                    feedbackArea.classList.add('correct-fb');
+                    feedbackArea.textContent = '✅ ' + q.feedback.correct;
+                    state.score++;
+                } else {
+                    feedbackArea.classList.add('incorrect-fb');
+                    feedbackArea.textContent = '❌ ' + q.feedback.incorrect;
+                }
+                feedbackArea.style.borderLeftColor = isCorrect ? 'var(--success-green)' : 'var(--error-red)';
+
+                state.answered = true;
+                btnNext.disabled = false;
+                scoreLabel.textContent = `Aciertos: ${state.score}`;
+            }
+
+            // ============================================================
+            //  NAVEGACIÓN
+            // ============================================================
+            function goToNextQuestion() {
+                if (!state.answered) return;
+                const nextIndex = state.currentIndex + 1;
+                if (nextIndex < state.totalQuestions) {
+                    state.currentIndex = nextIndex;
+                    renderQuestion(nextIndex);
+                } else {
+                    showResults();
+                }
+            }
+
+            // ============================================================
+            //  RESULTADOS
+            // ============================================================
+            function showResults() {
+                screenQuiz.classList.remove('active');
+                screenResults.classList.add('active');
+
+                const total = state.totalQuestions;
+                const score = state.score;
+                resultScore.textContent = `${score}/${total}`;
+
+                const name = state.studentName || 'Estudiante';
+                resultGreeting.textContent = `¡Buen trabajo, ${name}!`;
+
+                let msg = '';
+                const pct = score / total;
+                if (pct >= 0.9) {
+                    msg = 'Excelente dominio. Has demostrado una comprensión profunda de los fragmentos científicos sobre economía circular, desarrollo sostenible e IA. Sigue así.';
+                } else if (pct >= 0.7) {
+                    msg = 'Buen desempeño. Identificas correctamente los conceptos clave, pero aún puedes mejorar en la distinción de matices en textos complejos. Revisa los artículos de referencia.';
+                } else if (pct >= 0.5) {
+                    msg = 'Has mostrado una base aceptable, pero es importante reforzar el reconocimiento de conceptos como optimización predictiva, gobernanza ética y riesgos de IA. Te recomiendo repasar los fragmentos.';
+                } else {
+                    msg = 'Es necesario que dediques más tiempo a los conceptos fundamentales. Practica identificando premisas, conclusiones y conceptos clave en artículos científicos sobre economía circular e IA. Utiliza las referencias proporcionadas.';
+                }
+                resultFeedback.textContent = msg;
+            }
+
+            // ============================================================
+            //  REINICIO
+            // ============================================================
+            function resetQuiz() {
+                state.currentIndex = 0;
+                state.score = 0;
+                state.answered = false;
+                state.shuffledOptions = [];
+                state.correctShuffledIndex = -1;
+
+                screenResults.classList.remove('active');
+                screenWelcome.classList.remove('active');
+                screenQuiz.classList.add('active');
+
+                displayName.textContent = state.studentName;
+                renderQuestion(0);
+                updateProgress(0);
+            }
+
+            // ============================================================
+            //  MANEJO DE REGISTRO
+            // ============================================================
+            function startQuiz() {
+                const name = studentNameInput.value.trim();
+                if (!name) {
+                    nameError.style.display = 'block';
+                    return;
+                }
+                nameError.style.display = 'none';
+                state.studentName = name;
+
+                screenWelcome.classList.remove('active');
+                screenQuiz.classList.add('active');
+
+                displayName.textContent = name;
+                state.shuffledOptions = [];
+                state.currentIndex = 0;
+                state.score = 0;
+                renderQuestion(0);
+                updateProgress(0);
+            }
+
+            // ============================================================
+            //  EVENT LISTENERS
+            // ============================================================
+            btnStart.addEventListener('click', startQuiz);
+            studentNameInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') startQuiz();
+            });
+            studentNameInput.addEventListener('input', () => {
+                nameError.style.display = 'none';
+            });
+
+            btnNext.addEventListener('click', goToNextQuestion);
+
+            btnRetry.addEventListener('click', () => {
+                resetQuiz();
+            });
+
+            // ============================================================
+            //  INICIALIZAR
+            // ============================================================
+            screenWelcome.classList.add('active');
+            screenQuiz.classList.remove('active');
+            screenResults.classList.remove('active');
+
+            console.log('Cuestionario Sesión 2 cargado. ¡Buena suerte!');
+        })();
+    </script>
+
+</body>
+</html>
