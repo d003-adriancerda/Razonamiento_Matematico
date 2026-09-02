@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sesión 8 - Silogismos categóricos</title>
+
+<script>
+MathJax = {
+    tex: { inlineMath: [['\\(', '\\)'], ['$', '$']] },
+    svg: { fontCache: 'global' }
+};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+<style>
+:root{
+--primary-dark:#1e3a8a;
+--primary-bright:#3b82f6;
+--success-green:#10b981;
+--error-red:#ef4444;
+--bg-light:#f3f4f6;
+--card-white:#fff;
+--text-dark:#1f2937;
+--text-muted:#6b7280;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg-light);
+min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1.5rem
+}
+.quiz-container{
+max-width:1000px;width:100%;background:var(--card-white);border-radius:12px;
+box-shadow:0 10px 25px rgba(0,0,0,.08);padding:2rem 2.5rem
+}
+.screen{display:none;animation:fadeIn .3s ease}.screen.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+h1,h2{color:var(--primary-dark)}h1{font-size:2.2rem;margin-bottom:.3rem}
+.subtitle{color:var(--text-muted);font-size:1.1rem;margin-bottom:1.5rem}
+.student-name-display{color:var(--primary-bright);font-weight:600}
+.progress-wrapper{margin:1.5rem 0 2rem}
+.progress-bar-bg{height:8px;background:#e5e7eb;border-radius:20px;overflow:hidden}
+.progress-bar-fill{height:100%;width:0;background:var(--primary-bright);transition:width .4s ease}
+.progress-text{display:flex;justify-content:space-between;color:var(--text-muted);font-size:.9rem;margin-top:.35rem}
+.question-text{font-size:1.25rem;line-height:1.55;color:var(--text-dark);margin-bottom:1.5rem}
+.options-list{display:flex;flex-direction:column;gap:.75rem;margin-bottom:1.5rem}
+.option-btn{
+background:var(--bg-light);border:2px solid transparent;border-radius:10px;
+padding:.9rem 1.1rem;font-size:1rem;text-align:left;cursor:pointer;color:var(--text-dark);transition:.25s
+}
+.option-btn:hover:not(.disabled){background:#dbeafe;border-color:var(--primary-bright)}
+.option-btn.disabled{cursor:default;opacity:.82}
+.option-btn.correct,.option-btn.show-correct{background:#d1fae5;border-color:var(--success-green);color:#065f46}
+.option-btn.incorrect{background:#fee2e2;border-color:var(--error-red);color:#991b1b}
+.feedback-area{
+min-height:4rem;padding:1rem 1.2rem;border-left:4px solid var(--primary-bright);
+border-radius:8px;background:#f9fafb;line-height:1.5;color:var(--text-dark)
+}
+.feedback-area.correct-fb{border-left-color:var(--success-green)}
+.feedback-area.incorrect-fb{border-left-color:var(--error-red)}
+.nav-buttons{display:flex;justify-content:flex-end;margin-top:1.5rem}
+.btn{
+background:var(--primary-bright);border:0;border-radius:8px;color:#fff;
+padding:.8rem 1.8rem;font-size:1rem;cursor:pointer;transition:.25s
+}
+.btn:hover:not(:disabled){background:#2563eb;transform:scale(1.02)}
+.btn:disabled{background:#9ca3af;cursor:not-allowed}
+.form-group{margin:1.5rem 0}
+.form-group label{display:block;font-weight:600;color:var(--text-dark);margin-bottom:.4rem}
+.form-group input{width:100%;padding:.85rem 1rem;font-size:1rem;border:2px solid #d1d5db;border-radius:8px}
+.form-error{display:none;color:var(--error-red);font-size:.9rem;margin-top:.3rem}
+.result-circle{
+width:180px;height:180px;border-radius:50%;border:6px solid var(--primary-bright);
+background:var(--bg-light);display:flex;flex-direction:column;align-items:center;justify-content:center;
+margin:1.5rem auto;font-size:2.8rem;font-weight:700;color:var(--primary-dark)
+}
+.result-circle span:last-child{font-size:1rem;font-weight:400;color:var(--text-muted)}
+.result-feedback{max-width:650px;text-align:center;margin:0 auto 1.5rem;line-height:1.6}
+.result-actions{text-align:center}
+@media(max-width:640px){.quiz-container{padding:1.5rem}h1{font-size:1.8rem}.question-text{font-size:1.1rem}.result-circle{width:145px;height:145px;font-size:2.2rem}}
+</style>
+</head>
+
+<body>
+<div class="quiz-container">
+
+<div id="screen-welcome" class="screen active">
+<h1>⭕ Sesión 8: Silogismos categóricos</h1>
+<p class="subtitle">Reglas de validez · Diagramas de Venn de tres círculos · Falacias formales</p>
+<p style="color:var(--text-muted);line-height:1.6">
+Evaluarás silogismos usando las seis reglas de validez y reconocerás falacias como término medio no distribuido o premisas exclusivas.
+</p>
+<div class="form-group">
+<label for="studentName">Nombre completo</label>
+<input id="studentName" type="text" placeholder="Ej. Adrián Cerda">
+<div id="nameError" class="form-error">Por favor, escribe tu nombre para continuar.</div>
+</div>
+<button class="btn" id="btnStart">Comenzar cuestionario</button>
+</div>
+
+<div id="screen-quiz" class="screen">
+<div style="display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+<h2>Cuestionario · Sesión 8</h2>
+<span style="color:var(--text-muted)">Estudiante: <span id="displayName" class="student-name-display"></span></span>
+</div>
+<div class="progress-wrapper">
+<div class="progress-bar-bg"><div id="progressFill" class="progress-bar-fill"></div></div>
+<div class="progress-text">
+<span id="progressLabel">Pregunta 1 de 12</span>
+<span id="scoreLabel">Aciertos: 0</span>
+</div>
+</div>
+<div id="questionText" class="question-text"></div>
+<div id="optionsContainer" class="options-list"></div>
+<div id="feedbackArea" class="feedback-area">Selecciona una opción para recibir retroalimentación.</div>
+<div class="nav-buttons"><button id="btnNext" class="btn" disabled>Siguiente pregunta →</button></div>
+</div>
+
+<div id="screen-results" class="screen">
+<h2 style="text-align:center">🎉 Cuestionario completado</h2>
+<p id="resultGreeting" style="text-align:center;color:var(--text-muted)"></p>
+<div class="result-circle"><span id="resultScore">0/12</span><span>aciertos</span></div>
+<p id="resultFeedback" class="result-feedback"></p>
+<div class="result-actions"><button id="btnRetry" class="btn">🔄 Volver a intentar</button></div>
+</div>
+
+</div>
+
+<script>
+(() => {
+'use strict';
+
+const QUESTIONS=[
+{
+text:'“Todos los M son P. Todos los S son M. Por tanto, todos los S son P”. ¿Qué regla de validez se cumple al distribuir M en la premisa mayor?',
+options:['Regla 1: tres términos únicos','Regla 2: término medio distribuido al menos una vez','Regla 4: no dos premisas negativas','Regla 6: no conclusión particular de dos universales'],
+correct:1,
+feedback:{
+correct:'Correcto. El término medio M está distribuido en “Todos los M son P”.',
+incorrect:'La regla 2 exige que el término medio esté distribuido al menos una vez.'
+}
+},
+{
+text:'“Todos los desarrolladores de backend usan Git. Todos los desarrolladores de frontend usan Git. Por tanto, todos los desarrolladores de frontend son desarrolladores de backend”. ¿Qué regla se viola?',
+options:['Regla 1: tres términos únicos','Regla 2: término medio no distribuido','Regla 3: término mayor ilícito','Regla 5: premisa negativa y conclusión afirmativa'],
+correct:1,
+feedback:{
+correct:'Correcto. “Usan Git” nunca está distribuido; es falacia del término medio no distribuido.',
+incorrect:'El término medio aparece como predicado de dos proposiciones A, donde no se distribuye.'
+}
+},
+{
+text:'¿Cuál es el término medio en: “Todos los tickets críticos afectan a un servidor de producción. Todos los tickets que afectan a un servidor de producción se escalan al equipo de guardia. Por tanto, todos los tickets críticos se escalan al equipo de guardia”?',
+options:['Tickets críticos','Servidor de producción','Equipo de guardia','Tickets no críticos'],
+correct:1,
+feedback:{
+correct:'Correcto. “Afectar a un servidor de producción” conecta las dos premisas y no aparece en la conclusión.',
+incorrect:'El término medio aparece en ambas premisas pero no en la conclusión.'
+}
+},
+{
+text:'Un silogismo con dos premisas negativas comete la falacia de:',
+options:['Término medio no distribuido','Premisas exclusivas','Término mayor ilícito','Equívoco'],
+correct:1,
+feedback:{
+correct:'Correcto. Dos premisas negativas violan la regla 4: premisas exclusivas.',
+incorrect:'La regla 4 prohíbe explícitamente dos premisas negativas.'
+}
+},
+{
+text:'“Todos los lenguajes compilados son rápidos. C++ es un lenguaje compilado. Por tanto, C++ es rápido”. ¿Es válido?',
+options:['Sí, cumple las seis reglas (Barbara).','No, tiene cuatro términos.','No, viola la regla 3.','No, es inductivo.'],
+correct:0,
+feedback:{
+correct:'Correcto. Es un silogismo AAA-1 válido (Barbara).',
+incorrect:'La forma es válida; la evaluación de verdad de las premisas es otra cuestión.'
+}
+},
+{
+text:'“Ningún lenguaje interpretado es tan rápido como uno compilado. Python es un lenguaje interpretado. Por tanto, Python no es tan rápido como uno compilado”. ¿Qué forma tiene?',
+options:['AAA-1','EAE-1 (Celarent)','AII-3','EIO-2'],
+correct:1,
+feedback:{
+correct:'Correcto. Es EAE-1: universal negativa, universal afirmativa, universal negativa.',
+incorrect:'La primera premisa es E, la segunda A y la conclusión E; corresponde a Celarent.'
+}
+},
+{
+text:'“Todos los administradores tienen acceso root. Todos los administradores son responsables del servidor. Por tanto, todos los responsables del servidor tienen acceso root”. ¿Qué regla se viola?',
+options:['Regla 1: tres términos','Regla 2: término medio','Regla 3: término menor ilícito','Regla 6: conclusión particular'],
+correct:2,
+feedback:{
+correct:'Correcto. “Responsables del servidor” no está distribuido en su premisa, pero sí en la conclusión.',
+incorrect:'El término menor aparece distribuido en la conclusión pero no en su premisa.'
+}
+},
+{
+text:'¿Qué regla prohíbe concluir “Algunos S son P” a partir de dos premisas universales bajo la interpretación booleana estándar?',
+options:['Regla 2','Regla 3','Regla 5','Regla 6'],
+correct:3,
+feedback:{
+correct:'Correcto. La regla 6 evita la falacia existencial: de dos universales no se infiere existencia.',
+incorrect:'La regla 6 trata específicamente sobre conclusiones particulares a partir de premisas universales.'
+}
+},
+{
+text:'“Algunos frameworks de JavaScript son ligeros. Ningún framework pesado es ideal para móviles. Por tanto, algunos frameworks ligeros son ideales para móviles”. ¿Qué problema principal puede tener?',
+options:['Tiene solo dos términos.','Puede tener más de tres términos si “ligeros” y “pesados” no están conectados.','Es siempre válido.','Es una explicación causal.'],
+correct:1,
+feedback:{
+correct:'Correcto. Si “ligeros” y “pesados” no están definidos como complementarios, pueden aparecer más de tres términos.',
+incorrect:'Un silogismo estándar requiere exactamente tres términos con el mismo significado.'
+}
+},
+{
+text:'En un diagrama de Venn de tres círculos (S, M, P), ¿qué se hace con una premisa universal como “Todos los M son P”?',
+options:['Se marca con una X la región donde hay M sin P.','Se sombrea la región donde hay M sin P.','Se sombrea la región donde hay P sin M.','Se deja sin sombrear ninguna región.'],
+correct:1,
+feedback:{
+correct:'Correcto. Las premisas universales se representan sombreando regiones vacías.',
+incorrect:'“Todos los M son P” declara vacía la región de M que no está en P.'
+}
+},
+{
+text:'En el mismo diagrama, ¿qué se hace con una premisa particular como “Algunos S son M”?',
+options:['Se sombrea la región de S sin M.','Se marca con una X la región de intersección S y M.','Se sombrea toda la región de S.','Se marca con una X fuera de S y M.'],
+correct:1,
+feedback:{
+correct:'Correcto. Las premisas particulares se representan con una X en la región afirmada.',
+incorrect:'“Algunos S son M” afirma que hay al menos un elemento en la intersección.'
+}
+},
+{
+text:'Un silogismo es válido según el método de Venn cuando:',
+options:['El diagrama tiene al menos una X.','Lo que afirma la conclusión ya está garantizado por el sombreado y las X de las premisas.','Todas las regiones están sombreadas.','Hay tres círculos y dos premisas.'],
+correct:1,
+feedback:{
+correct:'Correcto. La conclusión no debe requerir información nueva; debe estar ya garantizada por el diagrama.',
+incorrect:'La validez se verifica cuando el diagrama de las premisas implica automáticamente la conclusión.'
+}
+}
+];
+
+let state={studentName:'',currentIndex:0,score:0,answered:false,correctShuffledIndex:-1};
+
+const $=id=>document.getElementById(id);
+const welcome=$('screen-welcome');
+const quiz=$('screen-quiz');
+const results=$('screen-results');
+const nameInput=$('studentName');
+const nameError=$('nameError');
+const btnStart=$('btnStart');
+const btnNext=$('btnNext');
+const btnRetry=$('btnRetry');
+const displayName=$('displayName');
+const questionText=$('questionText');
+const optionsContainer=$('optionsContainer');
+const feedbackArea=$('feedbackArea');
+const progressFill=$('progressFill');
+const progressLabel=$('progressLabel');
+const scoreLabel=$('scoreLabel');
+
+function shuffleArray(array){
+const copy=[...array];
+for(let i=copy.length-1;i>0;i--){
+const j=Math.floor(Math.random()*(i+1));
+[copy[i],copy[j]]=[copy[j],copy[i]];
+}
+return copy;
+}
+
+function renderQuestion(index){
+const q=QUESTIONS[index];
+state.answered=false;
+btnNext.disabled=true;
+questionText.innerHTML=q.text;
+feedbackArea.className='feedback-area';
+feedbackArea.textContent='Selecciona una opción para recibir retroalimentación.';
+optionsContainer.innerHTML='';
+
+const options=shuffleArray(q.options);
+state.correctShuffledIndex=options.indexOf(q.options[q.correct]);
+
+options.forEach((option,i)=>{
+const button=document.createElement('button');
+button.className='option-btn';
+button.innerHTML=`${String.fromCharCode(65+i)}. ${option}`;
+button.addEventListener('click',()=>handleAnswer(i));
+optionsContainer.appendChild(button);
+});
+
+progressFill.style.width=`${((index+1)/QUESTIONS.length)*100}%`;
+progressLabel.textContent=`Pregunta ${index+1} de ${QUESTIONS.length}`;
+scoreLabel.textContent=`Aciertos: ${state.score}`;
+
+if(window.MathJax&&MathJax.typesetPromise)MathJax.typesetPromise().catch(()=>{});
+}
+
+function handleAnswer(index){
+if(state.answered)return;
+state.answered=true;
+const q=QUESTIONS[state.currentIndex];
+const correct=state.correctShuffledIndex;
+const isCorrect=index===correct;
+const buttons=optionsContainer.querySelectorAll('.option-btn');
+
+buttons.forEach(button=>button.classList.add('disabled'));
+buttons.forEach((button,i)=>{
+if(i===correct)button.classList.add('show-correct');
+if(i===index&&!isCorrect)button.classList.add('incorrect');
+if(i===index&&isCorrect)button.classList.add('correct');
+});
+
+if(isCorrect){
+state.score++;
+feedbackArea.className='feedback-area correct-fb';
+feedbackArea.innerHTML='✅ '+q.feedback.correct;
+}else{
+feedbackArea.className='feedback-area incorrect-fb';
+feedbackArea.innerHTML='❌ '+q.feedback.incorrect;
+}
+scoreLabel.textContent=`Aciertos: ${state.score}`;
+btnNext.disabled=false;
+if(window.MathJax&&MathJax.typesetPromise)MathJax.typesetPromise().catch(()=>{});
+}
+
+function showResults(){
+quiz.classList.remove('active');
+results.classList.add('active');
+$('resultScore').textContent=`${state.score}/${QUESTIONS.length}`;
+$('resultGreeting').textContent=`¡Buen trabajo, ${state.studentName}!`;
+
+const p=state.score/QUESTIONS.length;
+let message;
+if(p>=.9)message=`${state.studentName}, evalúas silogismos con precisión usando reglas y diagramas de Venn.`;
+else if(p>=.7)message=`${state.studentName}, tienes buen desempeño; refuerza las seis reglas y la interpretación de sombreados y X.`;
+else if(p>=.5)message=`${state.studentName}, conviene practicar identificación de términos y aplicación de las reglas de validez.`;
+else message=`${state.studentName}, te recomendamos repasar silogismos, reglas de validez y método de Venn.`;
+$('resultFeedback').textContent=message;
+}
+
+function startQuiz(){
+const name=nameInput.value.trim();
+if(!name){nameError.style.display='block';return}
+nameError.style.display='none';
+state.studentName=name;
+state.currentIndex=0;
+state.score=0;
+displayName.textContent=name;
+welcome.classList.remove('active');
+quiz.classList.add('active');
+renderQuestion(0);
+}
+
+btnStart.addEventListener('click',startQuiz);
+nameInput.addEventListener('keydown',e=>{if(e.key==='Enter')startQuiz()});
+nameInput.addEventListener('input',()=>nameError.style.display='none');
+btnNext.addEventListener('click',()=>{
+if(!state.answered)return;
+state.currentIndex++;
+if(state.currentIndex<QUESTIONS.length)renderQuestion(state.currentIndex);
+else showResults();
+});
+btnRetry.addEventListener('click',()=>{
+results.classList.remove('active');
+welcome.classList.add('active');
+nameInput.value=state.studentName;
+});
+
+})();
+</script>
+</body>
+</html>
