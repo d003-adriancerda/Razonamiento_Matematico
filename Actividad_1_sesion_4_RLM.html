@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sesión 4 - Porcentajes y regla de tres</title>
+
+<script>
+MathJax = {
+    tex: { inlineMath: [['\\(', '\\)'], ['$', '$']] },
+    svg: { fontCache: 'global' }
+};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+<style>
+:root{
+--primary-dark:#1e3a8a;
+--primary-bright:#3b82f6;
+--success-green:#10b981;
+--error-red:#ef4444;
+--bg-light:#f3f4f6;
+--card-white:#fff;
+--text-dark:#1f2937;
+--text-muted:#6b7280;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg-light);
+min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1.5rem
+}
+.quiz-container{
+max-width:1000px;width:100%;background:var(--card-white);border-radius:12px;
+box-shadow:0 10px 25px rgba(0,0,0,.08);padding:2rem 2.5rem
+}
+.screen{display:none;animation:fadeIn .3s ease}.screen.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+h1,h2{color:var(--primary-dark)}h1{font-size:2.2rem;margin-bottom:.3rem}
+.subtitle{color:var(--text-muted);font-size:1.1rem;margin-bottom:1.5rem}
+.student-name-display{color:var(--primary-bright);font-weight:600}
+.progress-wrapper{margin:1.5rem 0 2rem}
+.progress-bar-bg{height:8px;background:#e5e7eb;border-radius:20px;overflow:hidden}
+.progress-bar-fill{height:100%;width:0;background:var(--primary-bright);transition:width .4s ease}
+.progress-text{display:flex;justify-content:space-between;color:var(--text-muted);font-size:.9rem;margin-top:.35rem}
+.question-text{font-size:1.25rem;line-height:1.55;color:var(--text-dark);margin-bottom:1.5rem}
+.options-list{display:flex;flex-direction:column;gap:.75rem;margin-bottom:1.5rem}
+.option-btn{
+background:var(--bg-light);border:2px solid transparent;border-radius:10px;
+padding:.9rem 1.1rem;font-size:1rem;text-align:left;cursor:pointer;color:var(--text-dark);transition:.25s
+}
+.option-btn:hover:not(.disabled){background:#dbeafe;border-color:var(--primary-bright)}
+.option-btn.disabled{cursor:default;opacity:.82}
+.option-btn.correct,.option-btn.show-correct{background:#d1fae5;border-color:var(--success-green);color:#065f46}
+.option-btn.incorrect{background:#fee2e2;border-color:var(--error-red);color:#991b1b}
+.feedback-area{
+min-height:4rem;padding:1rem 1.2rem;border-left:4px solid var(--primary-bright);
+border-radius:8px;background:#f9fafb;line-height:1.5;color:var(--text-dark)
+}
+.feedback-area.correct-fb{border-left-color:var(--success-green)}
+.feedback-area.incorrect-fb{border-left-color:var(--error-red)}
+.nav-buttons{display:flex;justify-content:flex-end;margin-top:1.5rem}
+.btn{
+background:var(--primary-bright);border:0;border-radius:8px;color:#fff;
+padding:.8rem 1.8rem;font-size:1rem;cursor:pointer;transition:.25s
+}
+.btn:hover:not(:disabled){background:#2563eb;transform:scale(1.02)}
+.btn:disabled{background:#9ca3af;cursor:not-allowed}
+.form-group{margin:1.5rem 0}
+.form-group label{display:block;font-weight:600;color:var(--text-dark);margin-bottom:.4rem}
+.form-group input{width:100%;padding:.85rem 1rem;font-size:1rem;border:2px solid #d1d5db;border-radius:8px}
+.form-error{display:none;color:var(--error-red);font-size:.9rem;margin-top:.3rem}
+.result-circle{
+width:180px;height:180px;border-radius:50%;border:6px solid var(--primary-bright);
+background:var(--bg-light);display:flex;flex-direction:column;align-items:center;justify-content:center;
+margin:1.5rem auto;font-size:2.8rem;font-weight:700;color:var(--primary-dark)
+}
+.result-circle span:last-child{font-size:1rem;font-weight:400;color:var(--text-muted)}
+.result-feedback{max-width:650px;text-align:center;margin:0 auto 1.5rem;line-height:1.6}
+.result-actions{text-align:center}
+@media(max-width:640px){.quiz-container{padding:1.5rem}h1{font-size:1.8rem}.question-text{font-size:1.1rem}.result-circle{width:145px;height:145px;font-size:2.2rem}}
+</style>
+</head>
+
+<body>
+<div class="quiz-container">
+
+<div id="screen-welcome" class="screen active">
+<h1>📊 Sesión 4: Proporcionalidad y porcentajes</h1>
+<p class="subtitle">Razonamiento Cuantitativo I · Regla de tres y lectura crítica de datos</p>
+<p style="color:var(--text-muted);line-height:1.6">
+Resolverás problemas de porcentajes, razones y proporciones en contextos de conectividad, programación, energía y servicios digitales.
+</p>
+<div class="form-group">
+<label for="studentName">Nombre completo</label>
+<input id="studentName" type="text" placeholder="Ej. Adrián Cerda">
+<div id="nameError" class="form-error">Por favor, escribe tu nombre para continuar.</div>
+</div>
+<button class="btn" id="btnStart">Comenzar cuestionario</button>
+</div>
+
+<div id="screen-quiz" class="screen">
+<div style="display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+<h2>Cuestionario · Sesión 4</h2>
+<span style="color:var(--text-muted)">Estudiante: <span id="displayName" class="student-name-display"></span></span>
+</div>
+<div class="progress-wrapper">
+<div class="progress-bar-bg"><div id="progressFill" class="progress-bar-fill"></div></div>
+<div class="progress-text">
+<span id="progressLabel">Pregunta 1 de 12</span>
+<span id="scoreLabel">Aciertos: 0</span>
+</div>
+</div>
+<div id="questionText" class="question-text"></div>
+<div id="optionsContainer" class="options-list"></div>
+<div id="feedbackArea" class="feedback-area">Selecciona una opción para recibir retroalimentación.</div>
+<div class="nav-buttons"><button id="btnNext" class="btn" disabled>Siguiente pregunta →</button></div>
+</div>
+
+<div id="screen-results" class="screen">
+<h2 style="text-align:center">🎉 Cuestionario completado</h2>
+<p id="resultGreeting" style="text-align:center;color:var(--text-muted)"></p>
+<div class="result-circle"><span id="resultScore">0/12</span><span>aciertos</span></div>
+<p id="resultFeedback" class="result-feedback"></p>
+<div class="result-actions"><button id="btnRetry" class="btn">🔄 Volver a intentar</button></div>
+</div>
+
+</div>
+
+<script>
+(() => {
+'use strict';
+
+const QUESTIONS=[
+{
+text:'Una encuesta indica que 85% de 40 estudiantes utiliza internet diariamente. ¿Cuántos estudiantes representan ese porcentaje?',
+options:['24','30','34','38'],
+correct:2,
+feedback:{
+correct:'Correcto. \(40\\times0.85=34\) estudiantes.',
+incorrect:'Convierte 85% a decimal: \(0.85\). Después calcula \(40\\times0.85=34\).'
+}
+},
+{
+text:'Una colonia tiene 4,500 habitantes y se desea estimar cuántos son usuarios de internet usando una tasa de 83.1%. ¿Cuál es la estimación?',
+options:['3,100.5','3,739.5','3,870','4,416'],
+correct:1,
+feedback:{
+correct:'Correcto. \(4500\\times0.831=3739.5\), aproximadamente 3,740 personas.',
+incorrect:'La operación es \(4500\\times0.831\), no \(4500\\times83.1\).'
+}
+},
+{
+text:'Un servicio de almacenamiento cuesta $200 y aumenta 25%. ¿Cuál es el nuevo precio?',
+options:['$225','$240','$250','$275'],
+correct:2,
+feedback:{
+correct:'Correcto. El aumento es \(200\\times0.25=50\), así que el precio final es $250.',
+incorrect:'Calcula primero el aumento y súmalo al precio original: \(200+50=250\).'
+}
+},
+{
+text:'Un servidor procesa 240 solicitudes en 3 minutos. Manteniendo el mismo ritmo, ¿cuántas procesará en 7 minutos?',
+options:['420','480','560','720'],
+correct:2,
+feedback:{
+correct:'Correcto. La tasa es 80 solicitudes por minuto; \(80\\times7=560\).',
+incorrect:'Primero calcula \(240/3=80\) solicitudes por minuto y luego multiplica por 7.'
+}
+},
+{
+text:'Cinco laptops cuestan $60,000. Si el precio unitario es constante, ¿cuánto cuestan ocho laptops?',
+options:['$72,000','$84,000','$96,000','$120,000'],
+correct:2,
+feedback:{
+correct:'Correcto. \(60000/5=12000\) por laptop y \(12000\\times8=96000\).',
+incorrect:'La relación es directa: \(x=(8\\times60000)/5=96000\).'
+}
+},
+{
+text:'Una aplicación tiene 37,500 usuarios activos de un total de 50,000. ¿Qué porcentaje está activo?',
+options:['50%','65%','75%','85%'],
+correct:2,
+feedback:{
+correct:'Correcto. \((37500/50000)\\times100=75\\%\).',
+incorrect:'Divide usuarios activos entre usuarios totales y multiplica por 100.'
+}
+},
+{
+text:'Un producto sube 20% desde un precio base de $100 y después baja 20% sobre el nuevo precio. ¿Cuál es el precio final?',
+options:['$96','$100','$104','$80'],
+correct:0,
+feedback:{
+correct:'Correcto. Sube a $120 y luego baja \(120\\times0.20=24\); termina en $96.',
+incorrect:'El segundo 20% se calcula sobre $120, no sobre el precio original.'
+}
+},
+{
+text:'En una muestra, 18 de 30 usuarios prefieren una interfaz. ¿Qué porcentaje representa?',
+options:['40%','50%','60%','75%'],
+correct:2,
+feedback:{
+correct:'Correcto. \((18/30)\\times100=60\\%\).',
+incorrect:'La razón es \(18/30=0.6\), equivalente a 60%.'
+}
+},
+{
+text:'Un artículo afirma: “El 90% de 10 personas prefiere el producto; por tanto, el 90% de la ciudad lo prefiere”. ¿Cuál es el problema principal?',
+options:[
+'El porcentaje nunca puede calcularse.',
+'La muestra puede ser demasiado pequeña para representar a la ciudad.',
+'90% siempre equivale a 10 personas.',
+'La regla de tres no aplica a porcentajes.'
+],
+correct:1,
+feedback:{
+correct:'Correcto. La magnitud y representatividad de la muestra son esenciales para generalizar.',
+incorrect:'El cálculo puede ser correcto dentro de la muestra, pero la conclusión sobre toda la ciudad necesita justificar representatividad.'
+}
+},
+{
+text:'Una empresa ofrece 15% de descuento sobre un servicio de $800. ¿Cuál es el precio final?',
+options:['$680','$700','$720','$785'],
+correct:0,
+feedback:{
+correct:'Correcto. El descuento es $120; \(800-120=680\).',
+incorrect:'Calcula \(800\\times0.15=120\) y resta esa cantidad al precio original.'
+}
+},
+{
+text:'La razón entre sensores operativos y sensores instalados es 45:60. ¿Cuál es su forma simplificada?',
+options:['2:3','3:4','4:5','5:6'],
+correct:1,
+feedback:{
+correct:'Correcto. Divide ambos términos entre 15: \(45:60=3:4\).',
+incorrect:'El máximo común divisor de 45 y 60 es 15.'
+}
+},
+{
+text:'Un consumo energético baja de 1,200 kWh a 900 kWh. ¿Cuál es el porcentaje de reducción respecto al consumo inicial?',
+options:['15%','20%','25%','30%'],
+correct:2,
+feedback:{
+correct:'Correcto. La reducción es 300 kWh; \(300/1200=0.25=25\\%\).',
+incorrect:'La base es el consumo inicial: \(300/1200\\times100=25\\%\).'
+}
+}
+];
+
+let state={studentName:'',currentIndex:0,score:0,answered:false,correctShuffledIndex:-1};
+
+const $=id=>document.getElementById(id);
+const welcome=$('screen-welcome');
+const quiz=$('screen-quiz');
+const results=$('screen-results');
+const nameInput=$('studentName');
+const nameError=$('nameError');
+const btnStart=$('btnStart');
+const btnNext=$('btnNext');
+const btnRetry=$('btnRetry');
+const displayName=$('displayName');
+const questionText=$('questionText');
+const optionsContainer=$('optionsContainer');
+const feedbackArea=$('feedbackArea');
+const progressFill=$('progressFill');
+const progressLabel=$('progressLabel');
+const scoreLabel=$('scoreLabel');
+
+function shuffleArray(array){
+const copy=[...array];
+for(let i=copy.length-1;i>0;i--){
+const j=Math.floor(Math.random()*(i+1));
+[copy[i],copy[j]]=[copy[j],copy[i]];
+}
+return copy;
+}
+
+function renderQuestion(index){
+const q=QUESTIONS[index];
+state.answered=false;
+btnNext.disabled=true;
+questionText.innerHTML=q.text;
+feedbackArea.className='feedback-area';
+feedbackArea.textContent='Selecciona una opción para recibir retroalimentación.';
+optionsContainer.innerHTML='';
+
+const options=shuffleArray(q.options);
+state.correctShuffledIndex=options.indexOf(q.options[q.correct]);
+
+options.forEach((option,i)=>{
+const button=document.createElement('button');
+button.className='option-btn';
+button.innerHTML=`${String.fromCharCode(65+i)}. ${option}`;
+button.addEventListener('click',()=>handleAnswer(i));
+optionsContainer.appendChild(button);
+});
+
+progressFill.style.width=`${((index+1)/QUESTIONS.length)*100}%`;
+progressLabel.textContent=`Pregunta ${index+1} de ${QUESTIONS.length}`;
+scoreLabel.textContent=`Aciertos: ${state.score}`;
+
+if(window.MathJax&&MathJax.typesetPromise)MathJax.typesetPromise().catch(()=>{});
+}
+
+function handleAnswer(index){
+if(state.answered)return;
+state.answered=true;
+const q=QUESTIONS[state.currentIndex];
+const correct=state.correctShuffledIndex;
+const isCorrect=index===correct;
+const buttons=optionsContainer.querySelectorAll('.option-btn');
+
+buttons.forEach(button=>button.classList.add('disabled'));
+buttons.forEach((button,i)=>{
+if(i===correct)button.classList.add('show-correct');
+if(i===index&&!isCorrect)button.classList.add('incorrect');
+if(i===index&&isCorrect)button.classList.add('correct');
+});
+
+if(isCorrect){
+state.score++;
+feedbackArea.className='feedback-area correct-fb';
+feedbackArea.innerHTML='✅ '+q.feedback.correct;
+}else{
+feedbackArea.className='feedback-area incorrect-fb';
+feedbackArea.innerHTML='❌ '+q.feedback.incorrect;
+}
+scoreLabel.textContent=`Aciertos: ${state.score}`;
+btnNext.disabled=false;
+if(window.MathJax&&MathJax.typesetPromise)MathJax.typesetPromise().catch(()=>{});
+}
+
+function showResults(){
+quiz.classList.remove('active');
+results.classList.add('active');
+$('resultScore').textContent=`${state.score}/${QUESTIONS.length}`;
+$('resultGreeting').textContent=`¡Buen trabajo, ${state.studentName}!`;
+
+const p=state.score/QUESTIONS.length;
+let message;
+if(p>=.9)message=`${state.studentName}, manejas con precisión porcentajes, razones y proporcionalidad.`;
+else if(p>=.7)message=`${state.studentName}, tienes buen desempeño; revisa especialmente porcentajes sucesivos y representatividad de muestras.`;
+else if(p>=.5)message=`${state.studentName}, conviene practicar conversión de porcentajes, regla de tres e interpretación de bases.`;
+else message=`${state.studentName}, te recomendamos repasar razón, proporción, porcentaje y regla de tres antes de avanzar.`;
+$('resultFeedback').textContent=message;
+}
+
+function startQuiz(){
+const name=nameInput.value.trim();
+if(!name){nameError.style.display='block';return}
+nameError.style.display='none';
+state.studentName=name;
+state.currentIndex=0;
+state.score=0;
+displayName.textContent=name;
+welcome.classList.remove('active');
+quiz.classList.add('active');
+renderQuestion(0);
+}
+
+btnStart.addEventListener('click',startQuiz);
+nameInput.addEventListener('keydown',e=>{if(e.key==='Enter')startQuiz()});
+nameInput.addEventListener('input',()=>nameError.style.display='none');
+btnNext.addEventListener('click',()=>{
+if(!state.answered)return;
+state.currentIndex++;
+if(state.currentIndex<QUESTIONS.length)renderQuestion(state.currentIndex);
+else showResults();
+});
+btnRetry.addEventListener('click',()=>{
+results.classList.remove('active');
+welcome.classList.add('active');
+nameInput.value=state.studentName;
+});
+
+})();
+</script>
+</body>
+</html>
