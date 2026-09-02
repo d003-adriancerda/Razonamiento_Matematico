@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sesión 7 - Lógica categórica y conjuntos</title>
+
+<script>
+MathJax = {
+    tex: { inlineMath: [['\\(', '\\)'], ['$', '$']] },
+    svg: { fontCache: 'global' }
+};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+<style>
+:root{
+--primary-dark:#1e3a8a;
+--primary-bright:#3b82f6;
+--success-green:#10b981;
+--error-red:#ef4444;
+--bg-light:#f3f4f6;
+--card-white:#fff;
+--text-dark:#1f2937;
+--text-muted:#6b7280;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg-light);
+min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1.5rem
+}
+.quiz-container{
+max-width:1000px;width:100%;background:var(--card-white);border-radius:12px;
+box-shadow:0 10px 25px rgba(0,0,0,.08);padding:2rem 2.5rem
+}
+.screen{display:none;animation:fadeIn .3s ease}.screen.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+h1,h2{color:var(--primary-dark)}h1{font-size:2.2rem;margin-bottom:.3rem}
+.subtitle{color:var(--text-muted);font-size:1.1rem;margin-bottom:1.5rem}
+.student-name-display{color:var(--primary-bright);font-weight:600}
+.progress-wrapper{margin:1.5rem 0 2rem}
+.progress-bar-bg{height:8px;background:#e5e7eb;border-radius:20px;overflow:hidden}
+.progress-bar-fill{height:100%;width:0;background:var(--primary-bright);transition:width .4s ease}
+.progress-text{display:flex;justify-content:space-between;color:var(--text-muted);font-size:.9rem;margin-top:.35rem}
+.question-text{font-size:1.25rem;line-height:1.55;color:var(--text-dark);margin-bottom:1.5rem}
+.options-list{display:flex;flex-direction:column;gap:.75rem;margin-bottom:1.5rem}
+.option-btn{
+background:var(--bg-light);border:2px solid transparent;border-radius:10px;
+padding:.9rem 1.1rem;font-size:1rem;text-align:left;cursor:pointer;color:var(--text-dark);transition:.25s
+}
+.option-btn:hover:not(.disabled){background:#dbeafe;border-color:var(--primary-bright)}
+.option-btn.disabled{cursor:default;opacity:.82}
+.option-btn.correct,.option-btn.show-correct{background:#d1fae5;border-color:var(--success-green);color:#065f46}
+.option-btn.incorrect{background:#fee2e2;border-color:var(--error-red);color:#991b1b}
+.feedback-area{
+min-height:4rem;padding:1rem 1.2rem;border-left:4px solid var(--primary-bright);
+border-radius:8px;background:#f9fafb;line-height:1.5;color:var(--text-dark)
+}
+.feedback-area.correct-fb{border-left-color:var(--success-green)}
+.feedback-area.incorrect-fb{border-left-color:var(--error-red)}
+.nav-buttons{display:flex;justify-content:flex-end;margin-top:1.5rem}
+.btn{
+background:var(--primary-bright);border:0;border-radius:8px;color:#fff;
+padding:.8rem 1.8rem;font-size:1rem;cursor:pointer;transition:.25s
+}
+.btn:hover:not(:disabled){background:#2563eb;transform:scale(1.02)}
+.btn:disabled{background:#9ca3af;cursor:not-allowed}
+.form-group{margin:1.5rem 0}
+.form-group label{display:block;font-weight:600;color:var(--text-dark);margin-bottom:.4rem}
+.form-group input{width:100%;padding:.85rem 1rem;font-size:1rem;border:2px solid #d1d5db;border-radius:8px}
+.form-error{display:none;color:var(--error-red);font-size:.9rem;margin-top:.3rem}
+.result-circle{
+width:180px;height:180px;border-radius:50%;border:6px solid var(--primary-bright);
+background:var(--bg-light);display:flex;flex-direction:column;align-items:center;justify-content:center;
+margin:1.5rem auto;font-size:2.8rem;font-weight:700;color:var(--primary-dark)
+}
+.result-circle span:last-child{font-size:1rem;font-weight:400;color:var(--text-muted)}
+.result-feedback{max-width:650px;text-align:center;margin:0 auto 1.5rem;line-height:1.6}
+.result-actions{text-align:center}
+@media(max-width:640px){.quiz-container{padding:1.5rem}h1{font-size:1.8rem}.question-text{font-size:1.1rem}.result-circle{width:145px;height:145px;font-size:2.2rem}}
+</style>
+</head>
+
+<body>
+<div class="quiz-container">
+
+<div id="screen-welcome" class="screen active">
+<h1>🔷 Sesión 7: Lógica categórica y conjuntos</h1>
+<p class="subtitle">Proposiciones A, E, I, O · Cuadrado de Oposición · Operaciones de conjuntos</p>
+<p style="color:var(--text-muted);line-height:1.6">
+Analizarás proposiciones categóricas, usarás el Cuadrado de Oposición y trabajarás con uniones, intersecciones, complementos y diferencias.
+</p>
+<div class="form-group">
+<label for="studentName">Nombre completo</label>
+<input id="studentName" type="text" placeholder="Ej. Adrián Cerda">
+<div id="nameError" class="form-error">Por favor, escribe tu nombre para continuar.</div>
+</div>
+<button class="btn" id="btnStart">Comenzar cuestionario</button>
+</div>
+
+<div id="screen-quiz" class="screen">
+<div style="display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+<h2>Cuestionario · Sesión 7</h2>
+<span style="color:var(--text-muted)">Estudiante: <span id="displayName" class="student-name-display"></span></span>
+</div>
+<div class="progress-wrapper">
+<div class="progress-bar-bg"><div id="progressFill" class="progress-bar-fill"></div></div>
+<div class="progress-text">
+<span id="progressLabel">Pregunta 1 de 12</span>
+<span id="scoreLabel">Aciertos: 0</span>
+</div>
+</div>
+<div id="questionText" class="question-text"></div>
+<div id="optionsContainer" class="options-list"></div>
+<div id="feedbackArea" class="feedback-area">Selecciona una opción para recibir retroalimentación.</div>
+<div class="nav-buttons"><button id="btnNext" class="btn" disabled>Siguiente pregunta →</button></div>
+</div>
+
+<div id="screen-results" class="screen">
+<h2 style="text-align:center">🎉 Cuestionario completado</h2>
+<p id="resultGreeting" style="text-align:center;color:var(--text-muted)"></p>
+<div class="result-circle"><span id="resultScore">0/12</span><span>aciertos</span></div>
+<p id="resultFeedback" class="result-feedback"></p>
+<div class="result-actions"><button id="btnRetry" class="btn">🔄 Volver a intentar</button></div>
+</div>
+
+</div>
+
+<script>
+(() => {
+'use strict';
+
+const QUESTIONS=[
+{
+text:'Traduce a forma estándar: “Algunos estudiantes no son responsables”.',
+options:[
+'Proposición A: Todos los estudiantes son responsables.',
+'Proposición E: Ningún estudiante es responsable.',
+'Proposición I: Algunos estudiantes son responsables.',
+'Proposición O: Algunos estudiantes no son responsables.'
+],
+correct:3,
+feedback:{
+correct:'Correcto. Es una proposición O (particular negativa).',
+incorrect:'La forma “Algunos S no son P” corresponde a una proposición O.'
+}
+},
+{
+text:'¿Qué tipo de proposición es “Ningún algoritmo es justo”?',
+options:['A (universal afirmativa)','E (universal negativa)','I (particular afirmativa)','O (particular negativa)'],
+correct:1,
+feedback:{
+correct:'Correcto. “Ningún S es P” es una proposición E.',
+incorrect:'La forma universal negativa es “Ningún S es P”.'
+}
+},
+{
+text:'Si la proposición A “Todos los S son P” es verdadera, ¿qué valor tiene la proposición O “Algunos S no son P” según el Cuadrado de Oposición?',
+options:['Verdadera','Falsa','Indeterminada','Necesariamente verdadera'],
+correct:1,
+feedback:{
+correct:'Correcto. A y O son contradictorias; si A es verdadera, O es falsa.',
+incorrect:'Las contradictorias nunca tienen el mismo valor de verdad.'
+}
+},
+{
+text:'Si la proposición E “Ningún S es P” es falsa, ¿qué se puede concluir con certeza sobre la proposición I “Algunos S son P”?',
+options:['Es falsa','Es verdadera','Es indeterminada','Es necesariamente falsa'],
+correct:1,
+feedback:{
+correct:'Correcto. E e I son contradictorias; si E es falsa, I es verdadera.',
+incorrect:'Las contradictorias tienen valores opuestos: una verdadera implica la otra falsa.'
+}
+},
+{
+text:'Sean \(C=\\{1,2,3,4\\}\) y \(D=\\{3,4,5,6\\}\). ¿Cuál es \(C\\cup D\)?',
+options:['\\{3,4\\}','\\{1,2,3,4,5,6\\}','\\{1,2,5,6\\}','\\{1,2,3,4,3,4,5,6\\}'],
+correct:1,
+feedback:{
+correct:'Correcto. La unión incluye todos los elementos sin repetir.',
+incorrect:'La unión contiene cada elemento que está en al menos uno de los conjuntos.'
+}
+},
+{
+text:'Con los mismos conjuntos, ¿cuál es \(C\\cap D\)?',
+options:['\\{1,2,3,4,5,6\\}','\\{3,4\\}','\\{1,2\\}','\\{5,6\\}'],
+correct:1,
+feedback:{
+correct:'Correcto. La intersección contiene solo los elementos comunes.',
+incorrect:'La intersección incluye únicamente lo que está en ambos conjuntos.'
+}
+},
+{
+text:'Con \(U=\\{1,2,3,4,5,6\\}\) y \(C=\\{1,2,3,4\\}\), ¿cuál es el complemento \(C^{c}\)?',
+options:['\\{1,2,3,4\\}','\\{5,6\\}','\\{3,4,5,6\\}','\\{1,2\\}'],
+correct:1,
+feedback:{
+correct:'Correcto. El complemento son los elementos de \(U\) que no están en \(C\).',
+incorrect:'El complemento se calcula respecto al universo dado.'
+}
+},
+{
+text:'¿Cuál es la diferencia \(C-D\) si \(C=\\{1,2,3,4\\}\) y \(D=\\{3,4,5,6\\}\)?',
+options:['\\{1,2\\}','\\{3,4\\}','\\{5,6\\}','\\{1,2,5,6\\}'],
+correct:0,
+feedback:{
+correct:'Correcto. Se eliminan de \(C\) los elementos que también están en \(D\).',
+incorrect:'La diferencia \(C-D\) conserva solo los elementos de \(C\) que no están en \(D\).'
+}
+},
+{
+text:'En una app de transporte, \(A\) son usuarios con tarjeta registrada y \(B\) son usuarios con más de 10 viajes. ¿Qué operación describe a los usuarios que tienen tarjeta pero no más de 10 viajes?',
+options:['\(A\\cup B\)','\(A\\cap B\)','\(A-B\)','\(B-A\)'],
+correct:2,
+feedback:{
+correct:'Correcto. \(A-B\) son los elementos de \(A\) que no están en \(B\).',
+incorrect:'Se busca quienes están en \(A\) pero no en \(B\); eso es \(A-B\).'
+}
+},
+{
+text:'Si \(A=\\{2,4,6,8,10\\}\) y \(B=\\{3,6,9\\}\), ¿cuál es \(A\\cap B\)?',
+options:['\\{6\\}','\\{2,3,4,6,8,9,10\\}','\\{2,4,8,10\\}','\\{3,9\\}'],
+correct:0,
+feedback:{
+correct:'Correcto. El único elemento común es 6.',
+incorrect:'La intersección contiene solo los elementos que aparecen en ambos conjuntos.'
+}
+},
+{
+text:'¿Qué relación del Cuadrado de Oposición conecta a las proposiciones A y E?',
+options:['Contradictorias','Contrarias','Subcontrarias','Subalternación'],
+correct:1,
+feedback:{
+correct:'Correcto. A y E son contrarias: no pueden ser ambas verdaderas, pero sí ambas falsas.',
+incorrect:'Las contrarias son las dos universales: A y E.'
+}
+},
+{
+text:'Si la proposición I “Algunos S son P” es falsa, ¿qué valor tiene la proposición O “Algunos S no son P” según el Cuadrado de Oposición?',
+options:['Verdadera','Falsa','Indeterminada','Necesariamente falsa'],
+correct:0,
+feedback:{
+correct:'Correcto. I y O son subcontrarias: no pueden ser ambas falsas; si I es falsa, O es verdadera.',
+incorrect:'Las subcontrarias son las dos particulares: I y O.'
+}
+}
+];
+
+let state={studentName:'',currentIndex:0,score:0,answered:false,correctShuffledIndex:-1};
+
+const $=id=>document.getElementById(id);
+const welcome=$('screen-welcome');
+const quiz=$('screen-quiz');
+const results=$('screen-results');
+const nameInput=$('studentName');
+const nameError=$('nameError');
+const btnStart=$('btnStart');
+const btnNext=$('btnNext');
+const btnRetry=$('btnRetry');
+const displayName=$('displayName');
+const questionText=$('questionText');
+const optionsContainer=$('optionsContainer');
+const feedbackArea=$('feedbackArea');
+const progressFill=$('progressFill');
+const progressLabel=$('progressLabel');
+const scoreLabel=$('scoreLabel');
+
+function shuffleArray(array){
+const copy=[...array];
+for(let i=copy.length-1;i>0;i--){
+const j=Math.floor(Math.random()*(i+1));
+[copy[i],copy[j]]=[copy[j],copy[i]];
+}
+return copy;
+}
+
+function renderQuestion(index){
+const q=QUESTIONS[index];
+state.answered=false;
+btnNext.disabled=true;
+questionText.innerHTML=q.text;
+feedbackArea.className='feedback-area';
+feedbackArea.textContent='Selecciona una opción para recibir retroalimentación.';
+optionsContainer.innerHTML='';
+
+const options=shuffleArray(q.options);
+state.correctShuffledIndex=options.indexOf(q.options[q.correct]);
+
+options.forEach((option,i)=>{
+const button=document.createElement('button');
+button.className='option-btn';
+button.innerHTML=`${String.fromCharCode(65+i)}. ${option}`;
+button.addEventListener('click',()=>handleAnswer(i));
+optionsContainer.appendChild(button);
+});
+
+progressFill.style.width=`${((index+1)/QUESTIONS.length)*100}%`;
+progressLabel.textContent=`Pregunta ${index+1} de ${QUESTIONS.length}`;
+scoreLabel.textContent=`Aciertos: ${state.score}`;
+
+if(window.MathJax&&MathJax.typesetPromise)MathJax.typesetPromise().catch(()=>{});
+}
+
+function handleAnswer(index){
+if(state.answered)return;
+state.answered=true;
+const q=QUESTIONS[state.currentIndex];
+const correct=state.correctShuffledIndex;
+const isCorrect=index===correct;
+const buttons=optionsContainer.querySelectorAll('.option-btn');
+
+buttons.forEach(button=>button.classList.add('disabled'));
+buttons.forEach((button,i)=>{
+if(i===correct)button.classList.add('show-correct');
+if(i===index&&!isCorrect)button.classList.add('incorrect');
+if(i===index&&isCorrect)button.classList.add('correct');
+});
+
+if(isCorrect){
+state.score++;
+feedbackArea.className='feedback-area correct-fb';
+feedbackArea.innerHTML='✅ '+q.feedback.correct;
+}else{
+feedbackArea.className='feedback-area incorrect-fb';
+feedbackArea.innerHTML='❌ '+q.feedback.incorrect;
+}
+scoreLabel.textContent=`Aciertos: ${state.score}`;
+btnNext.disabled=false;
+if(window.MathJax&&MathJax.typesetPromise)MathJax.typesetPromise().catch(()=>{});
+}
+
+function showResults(){
+quiz.classList.remove('active');
+results.classList.add('active');
+$('resultScore').textContent=`${state.score}/${QUESTIONS.length}`;
+$('resultGreeting').textContent=`¡Buen trabajo, ${state.studentName}!`;
+
+const p=state.score/QUESTIONS.length;
+let message;
+if(p>=.9)message=`${state.studentName}, manejas con precisión proposiciones categóricas, Cuadrado de Oposición y operaciones de conjuntos.`;
+else if(p>=.7)message=`${state.studentName}, tienes buen desempeño; refuerza las relaciones del cuadrado y la interpretación de uniones e intersecciones.`;
+else if(p>=.5)message=`${state.studentName}, conviene practicar la traducción a forma estándar y el cálculo de complementos y diferencias.`;
+else message=`${state.studentName}, te recomendamos repasar AEIO, Cuadrado de Oposición y operaciones básicas de conjuntos.`;
+$('resultFeedback').textContent=message;
+}
+
+function startQuiz(){
+const name=nameInput.value.trim();
+if(!name){nameError.style.display='block';return}
+nameError.style.display='none';
+state.studentName=name;
+state.currentIndex=0;
+state.score=0;
+displayName.textContent=name;
+welcome.classList.remove('active');
+quiz.classList.add('active');
+renderQuestion(0);
+}
+
+btnStart.addEventListener('click',startQuiz);
+nameInput.addEventListener('keydown',e=>{if(e.key==='Enter')startQuiz()});
+nameInput.addEventListener('input',()=>nameError.style.display='none');
+btnNext.addEventListener('click',()=>{
+if(!state.answered)return;
+state.currentIndex++;
+if(state.currentIndex<QUESTIONS.length)renderQuestion(state.currentIndex);
+else showResults();
+});
+btnRetry.addEventListener('click',()=>{
+results.classList.remove('active');
+welcome.classList.add('active');
+nameInput.value=state.studentName;
+});
+
+})();
+</script>
+</body>
+</html>
