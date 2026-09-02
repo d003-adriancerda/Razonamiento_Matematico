@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sesión 1 - Anatomía del discurso</title>
+
+<script>
+MathJax = {
+    tex: { inlineMath: [['\\(', '\\)'], ['$', '$']] },
+    svg: { fontCache: 'global' }
+};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+<style>
+:root {
+    --primary-dark:#1e3a8a;
+    --primary-bright:#3b82f6;
+    --success-green:#10b981;
+    --error-red:#ef4444;
+    --bg-light:#f3f4f6;
+    --card-white:#ffffff;
+    --text-dark:#1f2937;
+    --text-muted:#6b7280;
+    --border-radius:12px;
+    --shadow-card:0 10px 25px rgba(0,0,0,.08);
+    --transition:.25s ease-in-out;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+    font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+    background:var(--bg-light);
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:1.5rem;
+}
+.quiz-container{
+    max-width:1000px;
+    width:100%;
+    background:var(--card-white);
+    border-radius:var(--border-radius);
+    box-shadow:var(--shadow-card);
+    padding:2rem 2.5rem;
+}
+.screen{display:none;animation:fadeIn .3s ease}
+.screen.active{display:block}
+@keyframes fadeIn{
+    from{opacity:0;transform:translateY(10px)}
+    to{opacity:1;transform:translateY(0)}
+}
+h1,h2{color:var(--primary-dark)}
+h1{font-size:2.2rem;margin-bottom:.3rem}
+.subtitle{color:var(--text-muted);font-size:1.1rem;margin-bottom:1.5rem}
+.student-name-display{color:var(--primary-bright);font-weight:600}
+.progress-wrapper{margin:1.5rem 0 2rem}
+.progress-bar-bg{
+    height:8px;
+    border-radius:20px;
+    background:#e5e7eb;
+    overflow:hidden;
+}
+.progress-bar-fill{
+    height:100%;
+    width:0;
+    background:var(--primary-bright);
+    transition:width .4s ease;
+}
+.progress-text{
+    display:flex;
+    justify-content:space-between;
+    color:var(--text-muted);
+    font-size:.9rem;
+    margin-top:.35rem;
+}
+.question-text{
+    color:var(--text-dark);
+    font-size:1.25rem;
+    line-height:1.55;
+    margin-bottom:1.5rem;
+}
+.options-list{
+    display:flex;
+    flex-direction:column;
+    gap:.75rem;
+    margin-bottom:1.5rem;
+}
+.option-btn{
+    border:2px solid transparent;
+    border-radius:10px;
+    background:var(--bg-light);
+    color:var(--text-dark);
+    padding:.9rem 1.1rem;
+    text-align:left;
+    font-size:1rem;
+    cursor:pointer;
+    transition:var(--transition);
+}
+.option-btn:hover:not(.disabled){
+    background:#dbeafe;
+    border-color:var(--primary-bright);
+}
+.option-btn.disabled{cursor:default;opacity:.82}
+.option-btn.correct,.option-btn.show-correct{
+    background:#d1fae5;
+    border-color:var(--success-green);
+    color:#065f46;
+}
+.option-btn.incorrect{
+    background:#fee2e2;
+    border-color:var(--error-red);
+    color:#991b1b;
+}
+.feedback-area{
+    min-height:4rem;
+    padding:1rem 1.2rem;
+    border-left:4px solid var(--primary-bright);
+    border-radius:8px;
+    background:#f9fafb;
+    color:var(--text-dark);
+    line-height:1.5;
+}
+.feedback-area.correct-fb{border-left-color:var(--success-green)}
+.feedback-area.incorrect-fb{border-left-color:var(--error-red)}
+.nav-buttons{display:flex;justify-content:flex-end;margin-top:1.5rem}
+.btn{
+    border:0;
+    border-radius:8px;
+    background:var(--primary-bright);
+    color:white;
+    padding:.8rem 1.8rem;
+    font-size:1rem;
+    cursor:pointer;
+    transition:var(--transition);
+}
+.btn:hover:not(:disabled){background:#2563eb;transform:scale(1.02)}
+.btn:disabled{background:#9ca3af;cursor:not-allowed}
+.form-group{margin:1.5rem 0}
+.form-group label{display:block;margin-bottom:.4rem;font-weight:600;color:var(--text-dark)}
+.form-group input{
+    width:100%;
+    padding:.85rem 1rem;
+    border:2px solid #d1d5db;
+    border-radius:8px;
+    font-size:1rem;
+}
+.form-group input:focus{
+    outline:none;
+    border-color:var(--primary-bright);
+    box-shadow:0 0 0 3px rgba(59,130,246,.18);
+}
+.form-error{display:none;color:var(--error-red);font-size:.9rem;margin-top:.35rem}
+.result-circle{
+    width:180px;
+    height:180px;
+    border-radius:50%;
+    border:6px solid var(--primary-bright);
+    background:var(--bg-light);
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    margin:1.5rem auto;
+    color:var(--primary-dark);
+    font-size:2.8rem;
+    font-weight:700;
+}
+.result-circle span:last-child{font-size:1rem;font-weight:400;color:var(--text-muted)}
+.result-feedback{
+    max-width:650px;
+    margin:0 auto 1.5rem;
+    text-align:center;
+    line-height:1.6;
+    font-size:1.05rem;
+}
+.result-actions{text-align:center}
+@media(max-width:640px){
+    .quiz-container{padding:1.5rem}
+    h1{font-size:1.8rem}
+    .question-text{font-size:1.1rem}
+    .result-circle{width:145px;height:145px;font-size:2.2rem}
+}
+</style>
+</head>
+
+<body>
+<div class="quiz-container">
+
+<div id="screen-welcome" class="screen active">
+    <h1>🧠 Sesión 1: Anatomía del discurso</h1>
+    <p class="subtitle">Razonamiento Lógico-Matemático · Diagnóstico y encuadre</p>
+    <p style="color:var(--text-muted);line-height:1.6">
+        Analizarás argumentos relacionados con tecnología, programación, datos y problemas sociales.
+    </p>
+
+    <div class="form-group">
+        <label for="studentName">Nombre completo</label>
+        <input id="studentName" type="text" placeholder="Ej. Adrián Cerda">
+        <div id="nameError" class="form-error">
+            Por favor, escribe tu nombre para continuar.
+        </div>
+    </div>
+
+    <button class="btn" id="btnStart">Comenzar cuestionario</button>
+</div>
+
+<div id="screen-quiz" class="screen">
+    <div style="display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+        <h2>Cuestionario · Sesión 1</h2>
+        <span style="color:var(--text-muted)">
+            Estudiante: <span id="displayName" class="student-name-display"></span>
+        </span>
+    </div>
+
+    <div class="progress-wrapper">
+        <div class="progress-bar-bg">
+            <div id="progressFill" class="progress-bar-fill"></div>
+        </div>
+        <div class="progress-text">
+            <span id="progressLabel">Pregunta 1 de 12</span>
+            <span id="scoreLabel">Aciertos: 0</span>
+        </div>
+    </div>
+
+    <div id="questionText" class="question-text"></div>
+    <div id="optionsContainer" class="options-list"></div>
+    <div id="feedbackArea" class="feedback-area">
+        Selecciona una opción para recibir retroalimentación.
+    </div>
+
+    <div class="nav-buttons">
+        <button id="btnNext" class="btn" disabled>Siguiente pregunta →</button>
+    </div>
+</div>
+
+<div id="screen-results" class="screen">
+    <h2 style="text-align:center">🎉 Cuestionario completado</h2>
+    <p id="resultGreeting" style="text-align:center;color:var(--text-muted)"></p>
+
+    <div class="result-circle">
+        <span id="resultScore">0/12</span>
+        <span>aciertos</span>
+    </div>
+
+    <p id="resultFeedback" class="result-feedback"></p>
+
+    <div class="result-actions">
+        <button id="btnRetry" class="btn">🔄 Volver a intentar</button>
+    </div>
+</div>
+
+</div>
+
+<script>
+(() => {
+'use strict';
+
+const QUESTIONS = [
+{
+text:'Fragmento contextual: “La temperatura global aumenta y los eventos extremos son cada vez más frecuentes. Por lo tanto, las ciudades deben fortalecer sus planes de adaptación”. ¿Cuál es la conclusión?',
+options:[
+'La temperatura global aumenta.',
+'Los eventos extremos son frecuentes.',
+'Las ciudades deben fortalecer sus planes de adaptación.',
+'Las ciudades ya tienen planes suficientes.'
+],
+correct:2,
+feedback:{
+correct:'Correcto. La conclusión es la propuesta que el argumento intenta defender.',
+incorrect:'La conclusión aparece después de “por lo tanto”: las ciudades deben fortalecer sus planes de adaptación.'
+}
+},
+{
+text:'“Todos los programas de inteligencia artificial requieren datos. Los sistemas de recomendación son programas de inteligencia artificial. Por tanto, los sistemas de recomendación requieren datos”. ¿Cuáles son las premisas?',
+options:[
+'Solo la primera oración.',
+'Solo la segunda oración.',
+'Las dos primeras oraciones.',
+'La conclusión y la primera oración.'
+],
+correct:2,
+feedback:{
+correct:'Correcto. Las dos primeras oraciones proporcionan las razones del argumento.',
+incorrect:'Las premisas son los enunciados que apoyan la conclusión; aquí son las dos primeras oraciones.'
+}
+},
+{
+text:'¿Cuál de las siguientes expresiones funciona normalmente como indicador de conclusión?',
+options:['Porque','Ya que','Puesto que','En consecuencia'],
+correct:3,
+feedback:{
+correct:'Correcto. “En consecuencia” anuncia normalmente la conclusión.',
+incorrect:'“Porque”, “ya que” y “puesto que” suelen introducir premisas.'
+}
+},
+{
+text:'“El servidor dejó de responder porque recibió más solicitudes de las que podía procesar”. Si el hecho de que el servidor dejó de responder ya está aceptado, el pasaje funciona principalmente como:',
+options:['Argumento deductivo','Explicación causal','Silogismo categórico','Opinión sin contenido'],
+correct:1,
+feedback:{
+correct:'Correcto. Se ofrece una causa para explicar un hecho que ya se acepta.',
+incorrect:'Cuando el hecho ya se acepta y se aclara por qué ocurrió, se trata principalmente de una explicación.'
+}
+},
+{
+text:'“Si se actualiza el sistema, se instalarán parches de seguridad. El sistema se actualizó. Por tanto, se instalaron parches”. La estructura es:',
+options:['Una explicación sin conclusión','Un argumento con una conclusión apoyada por premisas','Una opinión personal','Una pregunta retórica'],
+correct:1,
+feedback:{
+correct:'Correcto. El texto presenta dos premisas y una conclusión derivada.',
+incorrect:'La expresión “por tanto” y la relación entre los enunciados muestran una estructura argumentativa.'
+}
+},
+{
+text:'“No deberías aceptar el informe, porque la muestra utilizada fue demasiado pequeña”. ¿Qué función cumple “porque”?',
+options:[
+'Introduce la conclusión.',
+'Introduce una premisa.',
+'Indica una definición.',
+'Elimina la relación lógica.'
+],
+correct:1,
+feedback:{
+correct:'Correcto. “Porque” introduce la razón: la muestra fue demasiado pequeña.',
+incorrect:'La conclusión es “no deberías aceptar el informe”; “porque” introduce la premisa.'
+}
+},
+{
+text:'¿Cuál de los siguientes textos es una opinión sin apoyo argumentativo suficiente?',
+options:[
+'“El sistema debe auditarse porque sus decisiones afectan a usuarios”.',
+'“La aplicación es excelente; simplemente lo sé”.',
+'“La muestra tiene 200 observaciones, por lo que permite una estimación”.',
+'“El costo aumentó debido al consumo adicional registrado”.'
+],
+correct:1,
+feedback:{
+correct:'Correcto. La afirmación “simplemente lo sé” no ofrece una razón verificable.',
+incorrect:'Las demás opciones contienen alguna razón o evidencia que apoya la afirmación principal.'
+}
+},
+{
+text:'Un texto afirma: “La aplicación tiene 10 millones de descargas. Por consiguiente, es la aplicación más segura del mercado”. ¿Qué información falta para evaluar mejor el argumento?',
+options:[
+'El color del logotipo.',
+'Datos sobre seguridad y comparación con otras aplicaciones.',
+'El nombre del programador.',
+'La cantidad de líneas de código.'
+],
+correct:1,
+feedback:{
+correct:'Correcto. Las descargas no prueban por sí solas la seguridad; se necesitan datos relevantes.',
+incorrect:'La cantidad de descargas no basta para concluir que una aplicación es segura.'
+}
+},
+{
+text:'En un argumento, la afirmación “la conclusión debe seguirse de las premisas” se refiere principalmente a:',
+options:['La estructura de apoyo','El estilo literario','La extensión del texto','La opinión del lector'],
+correct:0,
+feedback:{
+correct:'Correcto. La relación de apoyo entre premisas y conclusión constituye la estructura argumentativa.',
+incorrect:'La cuestión central es cómo las premisas apoyan la conclusión, no el estilo ni la opinión del lector.'
+}
+},
+{
+text:'“Debemos instalar sensores porque permitirán detectar fallas antes de que ocurran”. En forma estándar, la conclusión es:',
+options:[
+'Los sensores detectan fallas.',
+'Las fallas ocurren.',
+'Debemos instalar sensores.',
+'Las fallas son imposibles.'
+],
+correct:2,
+feedback:{
+correct:'Correcto. La conclusión es la recomendación; la razón aparece después de “porque”.',
+incorrect:'La conclusión es la acción recomendada: debemos instalar sensores.'
+}
+},
+{
+text:'¿Cuál es la mejor estrategia inicial para analizar un texto argumentativo?',
+options:[
+'Buscar primero si estamos de acuerdo.',
+'Identificar qué afirmación se intenta defender y qué razones se ofrecen.',
+'Contar el número de palabras.',
+'Leer únicamente el título.'
+],
+correct:1,
+feedback:{
+correct:'Correcto. Primero se identifican conclusión y premisas; después se evalúa el argumento.',
+incorrect:'El análisis lógico comienza con la estructura: qué se afirma y con qué razones se apoya.'
+}
+},
+{
+text:'“El programa falló durante la demostración; por eso, debemos revisar el manejo de excepciones”. ¿Qué elemento funciona como premisa?',
+options:[
+'El programa falló durante la demostración.',
+'Debemos revisar el manejo de excepciones.',
+'La palabra “por eso”.',
+'La demostración futura.'
+],
+correct:0,
+feedback:{
+correct:'Correcto. El fallo observado funciona como razón para recomendar la revisión.',
+incorrect:'La recomendación es la conclusión; el fallo observado es la premisa.'
+}
+}
+];
+
+let state={
+studentName:'',
+currentIndex:0,
+score:0,
+answered:false,
+shuffledOptions:[],
+correctShuffledIndex:-1
+};
+
+const $=id=>document.getElementById(id);
+const welcome=$('screen-welcome');
+const quiz=$('screen-quiz');
+const results=$('screen-results');
+const nameInput=$('studentName');
+const nameError=$('nameError');
+const displayName=$('displayName');
+const questionText=$('questionText');
+const optionsContainer=$('optionsContainer');
+const feedbackArea=$('feedbackArea');
+const progressFill=$('progressFill');
+const progressLabel=$('progressLabel');
+const scoreLabel=$('scoreLabel');
+const btnStart=$('btnStart');
+const btnNext=$('btnNext');
+const btnRetry=$('btnRetry');
+
+function shuffleArray(array){
+    const copy=[...array];
+    for(let i=copy.length-1;i>0;i--){
+        const j=Math.floor(Math.random()*(i+1));
+        [copy[i],copy[j]]=[copy[j],copy[i]];
+    }
+    return copy;
+}
+
+function renderQuestion(index){
+    const q=QUESTIONS[index];
+    state.answered=false;
+    btnNext.disabled=true;
+    questionText.innerHTML=q.text;
+    feedbackArea.className='feedback-area';
+    feedbackArea.textContent='Selecciona una opción para recibir retroalimentación.';
+    optionsContainer.innerHTML='';
+
+    const shuffled=shuffleArray(q.options);
+    state.shuffledOptions[index]=shuffled;
+    state.correctShuffledIndex=shuffled.indexOf(q.options[q.correct]);
+
+    shuffled.forEach((option,indexOption)=>{
+        const button=document.createElement('button');
+        button.className='option-btn';
+        button.innerHTML=`${String.fromCharCode(65+indexOption)}. ${option}`;
+        button.addEventListener('click',()=>handleAnswer(indexOption));
+        optionsContainer.appendChild(button);
+    });
+
+    const percent=((index+1)/QUESTIONS.length)*100;
+    progressFill.style.width=`${percent}%`;
+    progressLabel.textContent=`Pregunta ${index+1} de ${QUESTIONS.length}`;
+    scoreLabel.textContent=`Aciertos: ${state.score}`;
+
+    if(window.MathJax && MathJax.typesetPromise){
+        MathJax.typesetPromise().catch(()=>{});
+    }
+}
+
+function handleAnswer(selectedIndex){
+    if(state.answered) return;
+
+    state.answered=true;
+    const q=QUESTIONS[state.currentIndex];
+    const correctIndex=state.correctShuffledIndex;
+    const isCorrect=selectedIndex===correctIndex;
+    const buttons=optionsContainer.querySelectorAll('.option-btn');
+
+    buttons.forEach(button=>button.classList.add('disabled'));
+
+    buttons.forEach((button,index)=>{
+        if(index===correctIndex) button.classList.add('show-correct');
+        if(index===selectedIndex && !isCorrect) button.classList.add('incorrect');
+        if(index===selectedIndex && isCorrect) button.classList.add('correct');
+    });
+
+    if(isCorrect){
+        state.score++;
+        feedbackArea.className='feedback-area correct-fb';
+        feedbackArea.innerHTML='✅ '+q.feedback.correct;
+    }else{
+        feedbackArea.className='feedback-area incorrect-fb';
+        feedbackArea.innerHTML='❌ '+q.feedback.incorrect;
+    }
+
+    scoreLabel.textContent=`Aciertos: ${state.score}`;
+    btnNext.disabled=false;
+
+    if(window.MathJax && MathJax.typesetPromise){
+        MathJax.typesetPromise().catch(()=>{});
+    }
+}
+
+function showResults(){
+    quiz.classList.remove('active');
+    results.classList.add('active');
+
+    const total=QUESTIONS.length;
+    const percentage=state.score/total;
+    $('resultScore').textContent=`${state.score}/${total}`;
+    $('resultGreeting').textContent=`¡Buen trabajo, ${state.studentName}!`;
+
+    let message='';
+    if(percentage>=.9){
+        message=`${state.studentName}, demostraste un dominio excelente de la identificación de premisas, conclusiones y tipos de discurso.`;
+    }else if(percentage>=.7){
+        message=`${state.studentName}, tienes una base sólida. Refuerza la diferencia entre argumento, explicación y opinión.`;
+    }else if(percentage>=.5){
+        message=`${state.studentName}, conviene practicar la localización de indicadores y la reconstrucción en forma estándar.`;
+    }else{
+        message=`${state.studentName}, te recomendamos repasar la anatomía del argumento y resolver nuevamente los ejercicios con procedimiento.`;
+    }
+    $('resultFeedback').textContent=message;
+}
+
+function startQuiz(){
+    const name=nameInput.value.trim();
+    if(!name){
+        nameError.style.display='block';
+        return;
+    }
+    nameError.style.display='none';
+    state.studentName=name;
+    state.currentIndex=0;
+    state.score=0;
+    state.shuffledOptions=[];
+    displayName.textContent=name;
+    welcome.classList.remove('active');
+    quiz.classList.add('active');
+    renderQuestion(0);
+}
+
+btnStart.addEventListener('click',startQuiz);
+nameInput.addEventListener('keydown',e=>{
+    if(e.key==='Enter') startQuiz();
+});
+nameInput.addEventListener('input',()=>{
+    nameError.style.display='none';
+});
+btnNext.addEventListener('click',()=>{
+    if(!state.answered) return;
+    state.currentIndex++;
+    if(state.currentIndex<QUESTIONS.length){
+        renderQuestion(state.currentIndex);
+    }else{
+        showResults();
+    }
+});
+btnRetry.addEventListener('click',()=>{
+    state.currentIndex=0;
+    state.score=0;
+    state.shuffledOptions=[];
+    results.classList.remove('active');
+    welcome.classList.add('active');
+    nameInput.value=state.studentName;
+});
+
+})();
+</script>
+</body>
+</html>
