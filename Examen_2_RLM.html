@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Examen Parcial 2 - Sesiones 7-11</title>
+
+<script>
+MathJax = {
+    tex: { inlineMath: [['\\(', '\\)'], ['$', '$']] },
+    svg: { fontCache: 'global' }
+};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+<style>
+:root{
+--primary-dark:#1e3a8a;
+--primary-bright:#3b82f6;
+--success-green:#10b981;
+--error-red:#ef4444;
+--bg-light:#f3f4f6;
+--card-white:#fff;
+--text-dark:#1f2937;
+--text-muted:#6b7280;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg-light);
+min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1.5rem
+}
+.quiz-container{
+max-width:1000px;width:100%;background:var(--card-white);border-radius:12px;
+box-shadow:0 10px 25px rgba(0,0,0,.08);padding:2rem 2.5rem
+}
+.screen{display:none;animation:fadeIn .3s ease}.screen.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+h1,h2{color:var(--primary-dark)}h1{font-size:2.2rem;margin-bottom:.3rem}
+.subtitle{color:var(--text-muted);font-size:1.1rem;margin-bottom:1.5rem}
+.student-name-display{color:var(--primary-bright);font-weight:600}
+.progress-wrapper{margin:1.5rem 0 2rem}
+.progress-bar-bg{height:8px;background:#e5e7eb;border-radius:20px;overflow:hidden}
+.progress-bar-fill{height:100%;width:0;background:var(--primary-bright);transition:width .4s ease}
+.progress-text{display:flex;justify-content:space-between;color:var(--text-muted);font-size:.9rem;margin-top:.35rem}
+.question-text{font-size:1.25rem;line-height:1.55;color:var(--text-dark);margin-bottom:1.5rem}
+.options-list{display:flex;flex-direction:column;gap:.75rem;margin-bottom:1.5rem}
+.option-btn{
+background:var(--bg-light);border:2px solid transparent;border-radius:10px;
+padding:.9rem 1.1rem;font-size:1rem;text-align:left;cursor:pointer;color:var(--text-dark);transition:.25s
+}
+.option-btn:hover:not(.disabled){background:#dbeafe;border-color:var(--primary-bright)}
+.option-btn.disabled{cursor:default;opacity:.82}
+.option-btn.correct,.option-btn.show-correct{background:#d1fae5;border-color:var(--success-green);color:#065f46}
+.option-btn.incorrect{background:#fee2e2;border-color:var(--error-red);color:#991b1b}
+.feedback-area{
+min-height:4rem;padding:1rem 1.2rem;border-left:4px solid var(--primary-bright);
+border-radius:8px;background:#f9fafb;line-height:1.5;color:var(--text-dark)
+}
+.feedback-area.correct-fb{border-left-color:var(--success-green)}
+.feedback-area.incorrect-fb{border-left-color:var(--error-red)}
+.nav-buttons{display:flex;justify-content:flex-end;margin-top:1.5rem}
+.btn{
+background:var(--primary-bright);border:0;border-radius:8px;color:#fff;
+padding:.8rem 1.8rem;font-size:1rem;cursor:pointer;transition:.25s
+}
+.btn:hover:not(:disabled){background:#2563eb;transform:scale(1.02)}
+.btn:disabled{background:#9ca3af;cursor:not-allowed}
+.form-group{margin:1.5rem 0}
+.form-group label{display:block;font-weight:600;color:var(--text-dark);margin-bottom:.4rem}
+.form-group input{width:100%;padding:.85rem 1rem;font-size:1rem;border:2px solid #d1d5db;border-radius:8px}
+.form-error{display:none;color:var(--error-red);font-size:.9rem;margin-top:.3rem}
+.result-circle{
+width:180px;height:180px;border-radius:50%;border:6px solid var(--primary-bright);
+background:var(--bg-light);display:flex;flex-direction:column;align-items:center;justify-content:center;
+margin:1.5rem auto;font-size:2.8rem;font-weight:700;color:var(--primary-dark)
+}
+.result-circle span:last-child{font-size:1rem;font-weight:400;color:var(--text-muted)}
+.result-feedback{max-width:650px;text-align:center;margin:0 auto 1.5rem;line-height:1.6}
+.result-actions{text-align:center}
+@media(max-width:640px){.quiz-container{padding:1.5rem}h1{font-size:1.8rem}.question-text{font-size:1.1rem}.result-circle{width:145px;height:145px;font-size:2.2rem}}
+</style>
+</head>
+
+<body>
+<div class="quiz-container">
+
+<div id="screen-welcome" class="screen active">
+<h1>📝 Examen Parcial 2</h1>
+<p class="subtitle">Razonamiento Lógico-Matemático · Sesiones 7-11</p>
+<p style="color:var(--text-muted);line-height:1.6">
+Este examen acumulativo evalúa: lógica categórica, silogismos, lógica proposicional, reglas de inferencia, y proyecto integrador.
+</p>
+<div class="form-group">
+<label for="studentName">Nombre completo</label>
+<input id="studentName" type="text" placeholder="Ej. Adrián Cerda">
+<div id="nameError" class="form-error">Por favor, escribe tu nombre para continuar.</div>
+</div>
+<p style="color:var(--text-muted);margin:1rem 0"><strong>20 preguntas · 60 minutos</strong></p>
+<button class="btn" id="btnStart">Comenzar examen</button>
+</div>
+
+<div id="screen-quiz" class="screen">
+<div style="display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+<h2>Examen Parcial 2</h2>
+<span style="color:var(--text-muted)">Estudiante: <span id="displayName" class="student-name-display"></span></span>
+</div>
+<div class="progress-wrapper">
+<div class="progress-bar-bg"><div id="progressFill" class="progress-bar-fill"></div></div>
+<div class="progress-text">
+<span id="progressLabel">Pregunta 1 de 20</span>
+<span id="scoreLabel">Aciertos: 0</span>
+</div>
+</div>
+<div id="questionText" class="question-text"></div>
+<div id="optionsContainer" class="options-list"></div>
+<div id="feedbackArea" class="feedback-area">Selecciona una opción para recibir retroalimentación.</div>
+<div class="nav-buttons"><button id="btnNext" class="btn" disabled>Siguiente pregunta →</button></div>
+</div>
+
+<div id="screen-results" class="screen">
+<h2 style="text-align:center">🎉 Examen completado</h2>
+<p id="resultGreeting" style="text-align:center;color:var(--text-muted)"></p>
+<div class="result-circle"><span id="resultScore">0/20</span><span>aciertos</span></div>
+<p id="resultFeedback" class="result-feedback"></p>
+<div class="result-actions"><button id="btnRetry" class="btn">🔄 Volver a intentar</button></div>
+</div>
+
+</div>
+
+<script>
+(() => {
+'use strict';
+
+const QUESTIONS=[
+{text:'Traduce: "Algunos estudiantes no son responsables".',
+options:['Proposición A','Proposición E','Proposición I','Proposición O'],
+correct:3,
+feedback:{correct:'Correcto. Es una proposición O (particular negativa).',incorrect:'La forma "Algunos S no son P" es proposición O.'}},
+{text:'Si "Todos los S son P" (A) es verdadera, ¿qué valor tiene "Algunos S no son P" (O)?',
+options:['Verdadera','Falsa','Indeterminada','Necesariamente verdadera'],
+correct:1,
+feedback:{correct:'Correcto. A y O son contradictorias.',incorrect:'Las contradictorias tienen valores opuestos.'}},
+{text:'Sean \(C=\\{1,2,3,4\\}\) y \(D=\\{3,4,5,6\\}\). ¿Cuál es \(C\\cap D\)?',
+options:['\\{1,2,3,4,5,6\\}','\\{3,4\\}','\\{1,2\\}','\\{5,6\\}'],
+correct:1,
+feedback:{correct:'Correcto. La intersección contiene solo elementos comunes.',incorrect:'La intersección incluye únicamente lo que está en ambos conjuntos.'}},
+{text:'"Todos los M son P. Todos los S son M. Por tanto, todos los S son P". ¿Qué regla se cumple?',
+options:['Regla 1: tres términos','Regla 2: término medio distribuido','Regla 4: no dos negativas','Regla 6: no conclusión particular'],
+correct:1,
+feedback:{correct:'Correcto. M está distribuido en "Todos los M son P".',incorrect:'El término medio debe estar distribuido al menos una vez.'}},
+{text:'¿Qué falacia comete un silogismo con dos premisas negativas?',
+options:['Término medio no distribuido','Premisas exclusivas','Término mayor ilícito','Equívoco'],
+correct:1,
+feedback:{correct:'Correcto. Viola la regla 4.',incorrect:'Dos premisas negativas son premisas exclusivas.'}},
+{text:'Traduce: "Solo entraré si la temperatura es menor a 30°C".',
+options:['\(T \\to E\)','\(E \\to T\)','\(E \\to (T<30)\)','\((T<30) \\to E\)'],
+correct:2,
+feedback:{correct:'Correcto. "P solo si Q" es \(P \\to Q\).',incorrect:'La entrada es el antecedente; la condición es el consecuente.'}},
+{text:'Clasifica \(P \\lor \\neg P\).',
+options:['Tautología','Contradicción','Contingencia','Indeterminada'],
+correct:0,
+feedback:{correct:'Correcto. Es siempre verdadera.',incorrect:'En todas las filas de la tabla es verdadera.'}},
+{text:'¿Qué regla es \(P \\to Q,\\; P \\;\\therefore Q\)?',
+options:['Modus Tollens','Modus Ponens','Silogismo Hipotético','Silogismo Disyuntivo'],
+correct:1,
+feedback:{correct:'Correcto. Es Modus Ponens.',incorrect:'MP concluye Q a partir de \(P \\to Q\) y P.'}},
+{text:'Simplifica \(\\neg(P \\lor Q)\) usando De Morgan.',
+options:['\(\\neg P \\land \\neg Q\)','\(\\neg P \\lor \\neg Q\)','\(P \\land Q\)','\(P \\lor Q\)'],
+correct:0,
+feedback:{correct:'Correcto. De Morgan: \(\\neg(P \\lor Q) \\equiv \\neg P \\land \\neg Q\).',incorrect:'La negación de una disyunción es la conjunción de negaciones.'}},
+{text:'Un proyecto integrador debe combinar al menos:',
+options:['Una herramienta','Tres herramientas: argumentación, formalización y cálculo','Solo tablas','Solo porcentajes'],
+correct:1,
+feedback:{correct:'Correcto. Integra múltiples herramientas del curso.',incorrect:'Se espera combinar al menos tres herramientas.'}},
+{text:'¿Qué tipo de proposición es "Ningún algoritmo es justo"?',
+options:['A','E','I','O'],
+correct:1,
+feedback:{correct:'Correcto. Es universal negativa (E).',incorrect:'"Ningún S es P" es proposición E.'}},
+{text:'Con \(U=\\{1,2,3,4,5,6\\}\) y \(C=\\{1,2,3,4\\}\), ¿cuál es \(C^{c}\)?',
+options:['\\{1,2,3,4\\}','\\{5,6\\}','\\{3,4,5,6\\}','\\{1,2\\}'],
+correct:1,
+feedback:{correct:'Correcto. El complemento son elementos de U no en C.',incorrect:'El complemento se calcula respecto al universo.'}},
+{text:'"Todos los desarrolladores de backend usan Git. Todos los desarrolladores de frontend usan Git. Por tanto, todos los frontend son backend". ¿Qué regla se viola?',
+options:['Regla 1','Regla 2: término medio no distribuido','Regla 3','Regla 6'],
+correct:1,
+feedback:{correct:'Correcto. "Usan Git" nunca está distribuido.',incorrect:'El término medio aparece como predicado de dos proposiciones A.'}},
+{text:'¿Cuántas filas tiene una tabla con tres variables?',
+options:['4','6','8','16'],
+correct:2,
+feedback:{correct:'Correcto. \(2^{3}=8\).',incorrect:'Cada variable duplica el número de filas.'}},
+{text:'¿Qué regla permite inferir \(P \\lor Q\) a partir de \(P\)?',
+options:['Simplificación','Adición','Conjunción','Absorción'],
+correct:1,
+feedback:{correct:'Correcto. Adición permite agregar cualquier disyunto.',incorrect:'Add transforma P en \(P \\lor Q\).'}},
+{text:'En \(C(h)=10h+50\), ¿qué representa 50?',
+options:['La pendiente','El costo fijo','Las horas máximas','Los usuarios'],
+correct:1,
+feedback:{correct:'Correcto. Es la ordenada al origen.',incorrect:'Cuando h=0, C(0)=50.'}},
+{text:'Clasifica \((P \\to Q) \\lor (Q \\to P)\).',
+options:['Tautología','Contradicción','Contingencia','Falacia'],
+correct:0,
+feedback:{correct:'Correcto. Es siempre verdadera.',incorrect:'La tabla muestra que siempre es verdadera.'}},
+{text:'¿Qué regla es \(P \\to Q,\\; \\neg Q \\;\\therefore \\neg P\)?',
+options:['Modus Ponens','Modus Tollens','Adición','Conjunción'],
+correct:1,
+feedback:{correct:'Correcto. Es Modus Tollens.',incorrect:'MT usa la negación del consecuente.'}},
+{text:'Evalúa \(3x+2\) para \(x=4\).',
+options:['10','12','14','16'],
+correct:2,
+feedback:{correct:'Correcto. \(3(4)+2=14\).',incorrect:'Sustituye x=4.'}},
+{text:'Un equipo modela costos con funciones y argumenta cuál conviene. ¿Qué integra?',
+options:['Solo álgebra','Álgebra y argumentación','Solo falacias','Solo silogismos'],
+correct:1,
+feedback:{correct:'Correcto. Combina modelado y argumentación.',incorrect:'El proyecto usa funciones y argumentos.'}}
+];
+
+let state={studentName:'',currentIndex:0,score:0,answered:false,correctShuffledIndex:-1};
+
+const $=id=>document.getElementById(id);
+const welcome=$('screen-welcome');
+const quiz=$('screen-quiz');
+const results=$('screen-results');
+const nameInput=$('studentName');
+const nameError=$('nameError');
+const btnStart=$('btnStart');
+const btnNext=$('btnNext');
+const btnRetry=$('btnRetry');
+const displayName=$('displayName');
+const questionText=$('questionText');
+const optionsContainer=$('optionsContainer');
+const feedbackArea=$('feedbackArea');
+const progressFill=$('progressFill');
+const progressLabel=$('progressLabel');
+const scoreLabel=$('scoreLabel');
+
+function shuffleArray(array){
+const copy=[...array];
+for(let i=copy.length-1;i>0;i--){
+const j=Math.floor(Math.random()*(i+1));
+[copy[i],copy[j]]=[copy[j],copy[i]];
+}
+return copy;
+}
+
+function renderQuestion(index){
+const q=QUESTIONS[index];
+state.answered=false;
+btnNext.disabled=true;
+questionText.innerHTML=q.text;
+feedbackArea.className='feedback-area';
+feedbackArea.textContent='Selecciona una opción para recibir retroalimentación.';
+optionsContainer.innerHTML='';
+
+const options=shuffleArray(q.options);
+state.correctShuffledIndex=options.indexOf(q.options[q.correct]);
+
+options.forEach((option,i)=>{
+const button=document.createElement('button');
+button.className='option-btn';
+button.innerHTML=`${String.fromCharCode(65+i)}. ${option}`;
+button.addEventListener('click',()=>handleAnswer(i));
+optionsContainer.appendChild(button);
+});
+
+progressFill.style.width=`${((index+1)/QUESTIONS.length)*100}%`;
+progressLabel.textContent=`Pregunta ${index+1} de ${QUESTIONS.length}`;
+scoreLabel.textContent=`Aciertos: ${state.score}`;
+
+if(window.MathJax&&MathJax.typesetPromise)MathJax.typesetPromise().catch(()=>{});
+}
+
+function handleAnswer(index){
+if(state.answered)return;
+state.answered=true;
+const q=QUESTIONS[state.currentIndex];
+const correct=state.correctShuffledIndex;
+const isCorrect=index===correct;
+const buttons=optionsContainer.querySelectorAll('.option-btn');
+
+buttons.forEach(button=>button.classList.add('disabled'));
+buttons.forEach((button,i)=>{
+if(i===correct)button.classList.add('show-correct');
+if(i===index&&!isCorrect)button.classList.add('incorrect');
+if(i===index&&isCorrect)button.classList.add('correct');
+});
+
+if(isCorrect){
+state.score++;
+feedbackArea.className='feedback-area correct-fb';
+feedbackArea.innerHTML='✅ '+q.feedback.correct;
+}else{
+feedbackArea.className='feedback-area incorrect-fb';
+feedbackArea.innerHTML='❌ '+q.feedback.incorrect;
+}
+scoreLabel.textContent=`Aciertos: ${state.score}`;
+btnNext.disabled=false;
+if(window.MathJax&&MathJax.typesetPromise)MathJax.typesetPromise().catch(()=>{});
+}
+
+function showResults(){
+quiz.classList.remove('active');
+results.classList.add('active');
+$('resultScore').textContent=`${state.score}/${QUESTIONS.length}`;
+$('resultGreeting').textContent=`¡Buen trabajo, ${state.studentName}!`;
+
+const p=state.score/QUESTIONS.length;
+let message;
+if(p>=.9)message=`${state.studentName}, dominas los contenidos de las sesiones 7-11.`;
+else if(p>=.7)message=`${state.studentName}, tienes buen desempeño; repasa los temas con menor puntaje.`;
+else if(p>=.5)message=`${state.studentName}, necesitas reforzar varios conceptos antes del examen final.`;
+else message=`${state.studentName}, te recomendamos estudiar nuevamente las sesiones 7-11.`;
+$('resultFeedback').textContent=message;
+}
+
+function startQuiz(){
+const name=nameInput.value.trim();
+if(!name){nameError.style.display='block';return}
+nameError.style.display='none';
+state.studentName=name;
+state.currentIndex=0;
+state.score=0;
+displayName.textContent=name;
+welcome.classList.remove('active');
+quiz.classList.add('active');
+renderQuestion(0);
+}
+
+btnStart.addEventListener('click',startQuiz);
+nameInput.addEventListener('keydown',e=>{if(e.key==='Enter')startQuiz()});
+nameInput.addEventListener('input',()=>nameError.style.display='none');
+btnNext.addEventListener('click',()=>{
+if(!state.answered)return;
+state.currentIndex++;
+if(state.currentIndex<QUESTIONS.length)renderQuestion(state.currentIndex);
+else showResults();
+});
+btnRetry.addEventListener('click',()=>{
+results.classList.remove('active');
+welcome.classList.add('active');
+nameInput.value=state.studentName;
+});
+
+})();
+</script>
+</body>
+</html>
