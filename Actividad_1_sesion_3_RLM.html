@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sesión 3 - Deducción, inducción y falacias</title>
+
+<script>
+MathJax = {
+    tex: { inlineMath: [['\\(', '\\)'], ['$', '$']] },
+    svg: { fontCache: 'global' }
+};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+<style>
+:root{
+--primary-dark:#1e3a8a;
+--primary-bright:#3b82f6;
+--success-green:#10b981;
+--error-red:#ef4444;
+--bg-light:#f3f4f6;
+--card-white:#fff;
+--text-dark:#1f2937;
+--text-muted:#6b7280;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+font-family:'Segoe UI',system-ui,sans-serif;
+background:var(--bg-light);
+min-height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+padding:1.5rem;
+}
+.quiz-container{
+max-width:1000px;width:100%;
+background:var(--card-white);
+border-radius:12px;
+box-shadow:0 10px 25px rgba(0,0,0,.08);
+padding:2rem 2.5rem;
+}
+.screen{display:none;animation:fadeIn .3s ease}
+.screen.active{display:block}
+@keyframes fadeIn{
+from{opacity:0;transform:translateY(10px)}
+to{opacity:1;transform:translateY(0)}
+}
+h1,h2{color:var(--primary-dark)}
+h1{font-size:2.2rem;margin-bottom:.3rem}
+.subtitle{color:var(--text-muted);font-size:1.1rem;margin-bottom:1.5rem}
+.student-name-display{color:var(--primary-bright);font-weight:600}
+.progress-wrapper{margin:1.5rem 0 2rem}
+.progress-bar-bg{height:8px;background:#e5e7eb;border-radius:20px;overflow:hidden}
+.progress-bar-fill{height:100%;width:0;background:var(--primary-bright);transition:width .4s ease}
+.progress-text{display:flex;justify-content:space-between;color:var(--text-muted);font-size:.9rem;margin-top:.35rem}
+.question-text{font-size:1.25rem;line-height:1.55;color:var(--text-dark);margin-bottom:1.5rem}
+.options-list{display:flex;flex-direction:column;gap:.75rem;margin-bottom:1.5rem}
+.option-btn{
+background:var(--bg-light);
+border:2px solid transparent;
+border-radius:10px;
+padding:.9rem 1.1rem;
+font-size:1rem;
+text-align:left;
+cursor:pointer;
+color:var(--text-dark);
+transition:.25s ease-in-out;
+}
+.option-btn:hover:not(.disabled){background:#dbeafe;border-color:var(--primary-bright)}
+.option-btn.disabled{cursor:default;opacity:.82}
+.option-btn.correct,.option-btn.show-correct{background:#d1fae5;border-color:var(--success-green);color:#065f46}
+.option-btn.incorrect{background:#fee2e2;border-color:var(--error-red);color:#991b1b}
+.feedback-area{
+min-height:4rem;padding:1rem 1.2rem;
+border-left:4px solid var(--primary-bright);
+border-radius:8px;background:#f9fafb;
+line-height:1.5;color:var(--text-dark);
+}
+.feedback-area.correct-fb{border-left-color:var(--success-green)}
+.feedback-area.incorrect-fb{border-left-color:var(--error-red)}
+.nav-buttons{display:flex;justify-content:flex-end;margin-top:1.5rem}
+.btn{
+background:var(--primary-bright);border:0;border-radius:8px;color:#fff;
+padding:.8rem 1.8rem;font-size:1rem;cursor:pointer;transition:.25s;
+}
+.btn:hover:not(:disabled){background:#2563eb;transform:scale(1.02)}
+.btn:disabled{background:#9ca3af;cursor:not-allowed}
+.form-group{margin:1.5rem 0}
+.form-group label{display:block;font-weight:600;color:var(--text-dark);margin-bottom:.4rem}
+.form-group input{width:100%;padding:.85rem 1rem;font-size:1rem;border:2px solid #d1d5db;border-radius:8px}
+.form-error{display:none;color:var(--error-red);font-size:.9rem;margin-top:.3rem}
+.result-circle{
+width:180px;height:180px;border-radius:50%;border:6px solid var(--primary-bright);
+background:var(--bg-light);display:flex;flex-direction:column;align-items:center;justify-content:center;
+margin:1.5rem auto;font-size:2.8rem;font-weight:700;color:var(--primary-dark);
+}
+.result-circle span:last-child{font-size:1rem;font-weight:400;color:var(--text-muted)}
+.result-feedback{max-width:650px;text-align:center;margin:0 auto 1.5rem;line-height:1.6}
+.result-actions{text-align:center}
+@media(max-width:640px){
+.quiz-container{padding:1.5rem}
+h1{font-size:1.8rem}
+.question-text{font-size:1.1rem}
+.result-circle{width:145px;height:145px;font-size:2.2rem}
+}
+</style>
+</head>
+
+<body>
+<div class="quiz-container">
+
+<div id="screen-welcome" class="screen active">
+<h1>⚖️ Sesión 3: Deducción, inducción y falacias</h1>
+<p class="subtitle">Razonamiento Lógico-Matemático · Pensamiento crítico</p>
+<p style="color:var(--text-muted);line-height:1.6">
+Clasificarás argumentos y analizarás falacias en contextos de tecnología, inteligencia artificial, ciencia y sociedad.
+</p>
+<div class="form-group">
+<label for="studentName">Nombre completo</label>
+<input id="studentName" type="text" placeholder="Ej. Adrián Cerda">
+<div id="nameError" class="form-error">Por favor, escribe tu nombre para continuar.</div>
+</div>
+<button class="btn" id="btnStart">Comenzar cuestionario</button>
+</div>
+
+<div id="screen-quiz" class="screen">
+<div style="display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+<h2>Cuestionario · Sesión 3</h2>
+<span style="color:var(--text-muted)">Estudiante: <span id="displayName" class="student-name-display"></span></span>
+</div>
+<div class="progress-wrapper">
+<div class="progress-bar-bg"><div id="progressFill" class="progress-bar-fill"></div></div>
+<div class="progress-text">
+<span id="progressLabel">Pregunta 1 de 12</span>
+<span id="scoreLabel">Aciertos: 0</span>
+</div>
+</div>
+<div id="questionText" class="question-text"></div>
+<div id="optionsContainer" class="options-list"></div>
+<div id="feedbackArea" class="feedback-area">Selecciona una opción para recibir retroalimentación.</div>
+<div class="nav-buttons"><button id="btnNext" class="btn" disabled>Siguiente pregunta →</button></div>
+</div>
+
+<div id="screen-results" class="screen">
+<h2 style="text-align:center">🎉 Cuestionario completado</h2>
+<p id="resultGreeting" style="text-align:center;color:var(--text-muted)"></p>
+<div class="result-circle"><span id="resultScore">0/12</span><span>aciertos</span></div>
+<p id="resultFeedback" class="result-feedback"></p>
+<div class="result-actions"><button id="btnRetry" class="btn">🔄 Volver a intentar</button></div>
+</div>
+
+</div>
+
+<script>
+(() => {
+'use strict';
+
+const QUESTIONS=[
+{
+text:'“Todos los mamíferos son vertebrados. Los delfines son mamíferos. Por lo tanto, los delfines son vertebrados”. ¿Qué tipo de razonamiento es?',
+options:['Deductivo','Inductivo','Analógico débil','Falacia de relevancia'],
+correct:0,
+feedback:{
+correct:'Correcto. Si las premisas son verdaderas, la conclusión se sigue necesariamente.',
+incorrect:'La conclusión se deriva con necesidad de una regla general y un caso particular; por eso es deductivo.'
+}
+},
+{
+text:'“He probado tres aplicaciones de inteligencia artificial y todas cometieron errores. Por tanto, ninguna aplicación de IA es confiable”. ¿Qué problema presenta?',
+options:['Modus Ponens','Generalización apresurada','Ad hominem','Petición de principio'],
+correct:1,
+feedback:{
+correct:'Correcto. Se generaliza a partir de una muestra demasiado pequeña.',
+incorrect:'El argumento usa pocos casos para establecer una conclusión universal: es generalización apresurada.'
+}
+},
+{
+text:'“No escuches el análisis de Laura sobre seguridad informática; ella no tiene un título de ingeniería”. ¿Qué falacia es?',
+options:['Ad hominem','Falso dilema','Falsa causa','Apelación a la ignorancia'],
+correct:0,
+feedback:{
+correct:'Correcto. Se ataca a la persona en lugar de evaluar las razones de su análisis.',
+incorrect:'La falta de título no refuta por sí sola el contenido del análisis; se trata de un ataque personal.'
+}
+},
+{
+text:'“El 95% de los usuarios encuestados está satisfecho. Por tanto, todas las personas estarán satisfechas”. ¿Qué tipo de error aparece?',
+options:['Inducción débil por muestra no necesariamente representativa','Modus Tollens','Ad hominem','Equívoco'],
+correct:0,
+feedback:{
+correct:'Correcto. Se extiende una conclusión más allá de lo que permite la muestra.',
+incorrect:'El problema consiste en generalizar desde los encuestados a toda la población sin justificar representatividad.'
+}
+},
+{
+text:'“O prohibimos completamente la IA o las máquinas dominarán a la humanidad. Como no queremos ser dominados, debemos prohibirla”. ¿Qué falacia aparece?',
+options:['Falso dilema','Ad hominem','Composición','Petición de principio'],
+correct:0,
+feedback:{
+correct:'Correcto. Se presentan únicamente dos opciones extremas, ignorando alternativas intermedias.',
+incorrect:'El texto reduce artificialmente las posibilidades a dos opciones: eso es falso dilema.'
+}
+},
+{
+text:'“Después de instalar el nuevo software, la empresa tuvo menos ventas. Por lo tanto, el software causó la disminución”. ¿Qué falacia puede cometerse?',
+options:['Falsa causa','Ad populum','Hombre de paja','División'],
+correct:0,
+feedback:{
+correct:'Correcto. La coincidencia temporal no demuestra por sí sola causalidad.',
+incorrect:'Que un hecho ocurra después de otro no prueba automáticamente que el primero haya causado el segundo.'
+}
+},
+{
+text:'“Todo el mundo dice que esta aplicación es segura; por tanto, es segura”. ¿Qué falacia es?',
+options:['Ad populum','Ad hominem','Analogía débil','Pregunta compleja'],
+correct:0,
+feedback:{
+correct:'Correcto. La popularidad de una creencia no demuestra su verdad.',
+incorrect:'El argumento apela a la opinión mayoritaria en lugar de ofrecer evidencia de seguridad.'
+}
+},
+{
+text:'“No has probado que el algoritmo sea injusto; por tanto, es justo”. ¿Qué falacia aparece?',
+options:['Apelación a la ignorancia','Falsa causa','Generalización apresurada','Falso dilema'],
+correct:0,
+feedback:{
+correct:'Correcto. Se concluye que algo es verdadero solo porque no se ha probado lo contrario.',
+incorrect:'La ausencia de prueba de injusticia no constituye prueba de justicia.'
+}
+},
+{
+text:'“Mi oponente propone regular los datos personales, pero en realidad quiere eliminar toda la tecnología”. ¿Qué falacia puede aparecer?',
+options:['Hombre de paja','Modus Ponens','Ad populum','Analogía válida'],
+correct:0,
+feedback:{
+correct:'Correcto. Se distorsiona la posición original para atacarla más fácilmente.',
+incorrect:'Presentar una versión exagerada o deformada del argumento contrario es hombre de paja.'
+}
+},
+{
+text:'“La IA es inteligente. Todo lo inteligente comprende emociones humanas. Por tanto, la IA comprende emociones humanas”. ¿Qué problema puede existir?',
+options:['Equívoco en el significado de “inteligente”','Modus Tollens','Silogismo disyuntivo','Generalización estadística'],
+correct:0,
+feedback:{
+correct:'Correcto. “Inteligente” puede significar capacidad computacional o comprensión humana; cambiar el sentido produce equívoco.',
+incorrect:'La palabra central cambia de significado entre las premisas, lo que genera una falacia de ambigüedad.'
+}
+},
+{
+text:'Un argumento inductivo fuerte es aquel en el que:',
+options:[
+'La conclusión se sigue necesariamente.',
+'Las premisas hacen muy probable la conclusión.',
+'La conclusión es verdadera por definición.',
+'No existe ninguna posibilidad de error.'
+],
+correct:1,
+feedback:{
+correct:'Correcto. La inducción ofrece probabilidad, no necesidad lógica.',
+incorrect:'La fuerza inductiva se refiere al grado de apoyo probable que las premisas brindan a la conclusión.'
+}
+},
+{
+text:'Un argumento inductivo cogente debe ser:',
+options:[
+'Válido y tener premisas verdaderas.',
+'Fuerte y tener premisas verdaderas.',
+'Deductivo y necesariamente verdadero.',
+'Una explicación causal.'
+],
+correct:1,
+feedback:{
+correct:'Correcto. La cogencia combina fuerza inductiva y premisas verdaderas.',
+incorrect:'“Válido” y “sólido” son términos propios de la evaluación deductiva; en inducción se habla de fuerza y cogencia.'
+}
+}
+];
+
+let state={studentName:'',currentIndex:0,score:0,answered:false,correctShuffledIndex:-1};
+
+const $=id=>document.getElementById(id);
+const welcome=$('screen-welcome');
+const quiz=$('screen-quiz');
+const results=$('screen-results');
+const nameInput=$('studentName');
+const nameError=$('nameError');
+const btnStart=$('btnStart');
+const btnNext=$('btnNext');
+const btnRetry=$('btnRetry');
+const displayName=$('displayName');
+const questionText=$('questionText');
+const optionsContainer=$('optionsContainer');
+const feedbackArea=$('feedbackArea');
+const progressFill=$('progressFill');
+const progressLabel=$('progressLabel');
+const scoreLabel=$('scoreLabel');
+
+function shuffleArray(array){
+const copy=[...array];
+for(let i=copy.length-1;i>0;i--){
+const j=Math.floor(Math.random()*(i+1));
+[copy[i],copy[j]]=[copy[j],copy[i]];
+}
+return copy;
+}
+
+function renderQuestion(index){
+const q=QUESTIONS[index];
+state.answered=false;
+btnNext.disabled=true;
+questionText.innerHTML=q.text;
+feedbackArea.className='feedback-area';
+feedbackArea.textContent='Selecciona una opción para recibir retroalimentación.';
+optionsContainer.innerHTML='';
+
+const options=shuffleArray(q.options);
+state.correctShuffledIndex=options.indexOf(q.options[q.correct]);
+
+options.forEach((option,i)=>{
+const button=document.createElement('button');
+button.className='option-btn';
+button.innerHTML=`${String.fromCharCode(65+i)}. ${option}`;
+button.addEventListener('click',()=>handleAnswer(i));
+optionsContainer.appendChild(button);
+});
+
+progressFill.style.width=`${((index+1)/QUESTIONS.length)*100}%`;
+progressLabel.textContent=`Pregunta ${index+1} de ${QUESTIONS.length}`;
+scoreLabel.textContent=`Aciertos: ${state.score}`;
+
+if(window.MathJax&&MathJax.typesetPromise)MathJax.typesetPromise().catch(()=>{});
+}
+
+function handleAnswer(index){
+if(state.answered)return;
+state.answered=true;
+const q=QUESTIONS[state.currentIndex];
+const correct=state.correctShuffledIndex;
+const isCorrect=index===correct;
+const buttons=optionsContainer.querySelectorAll('.option-btn');
+
+buttons.forEach(button=>button.classList.add('disabled'));
+buttons.forEach((button,i)=>{
+if(i===correct)button.classList.add('show-correct');
+if(i===index&&!isCorrect)button.classList.add('incorrect');
+if(i===index&&isCorrect)button.classList.add('correct');
+});
+
+if(isCorrect){
+state.score++;
+feedbackArea.className='feedback-area correct-fb';
+feedbackArea.innerHTML='✅ '+q.feedback.correct;
+}else{
+feedbackArea.className='feedback-area incorrect-fb';
+feedbackArea.innerHTML='❌ '+q.feedback.incorrect;
+}
+scoreLabel.textContent=`Aciertos: ${state.score}`;
+btnNext.disabled=false;
+if(window.MathJax&&MathJax.typesetPromise)MathJax.typesetPromise().catch(()=>{});
+}
+
+function showResults(){
+quiz.classList.remove('active');
+results.classList.add('active');
+$('resultScore').textContent=`${state.score}/${QUESTIONS.length}`;
+$('resultGreeting').textContent=`¡Buen trabajo, ${state.studentName}!`;
+
+const p=state.score/QUESTIONS.length;
+let message;
+if(p>=.9)message=`${state.studentName}, distingues con claridad deducción, inducción y falacias frecuentes.`;
+else if(p>=.7)message=`${state.studentName}, tienes buen desempeño; refuerza la diferencia entre relevancia, inducción débil y ambigüedad.`;
+else if(p>=.5)message=`${state.studentName}, conviene practicar la clasificación de falacias usando premisas y conclusiones explícitas.`;
+else message=`${state.studentName}, te recomendamos repasar las cuatro familias de falacias y resolver nuevamente los casos.`;
+$('resultFeedback').textContent=message;
+}
+
+function startQuiz(){
+const name=nameInput.value.trim();
+if(!name){nameError.style.display='block';return}
+nameError.style.display='none';
+state.studentName=name;
+state.currentIndex=0;
+state.score=0;
+displayName.textContent=name;
+welcome.classList.remove('active');
+quiz.classList.add('active');
+renderQuestion(0);
+}
+
+btnStart.addEventListener('click',startQuiz);
+nameInput.addEventListener('keydown',e=>{if(e.key==='Enter')startQuiz()});
+nameInput.addEventListener('input',()=>nameError.style.display='none');
+btnNext.addEventListener('click',()=>{
+if(!state.answered)return;
+state.currentIndex++;
+if(state.currentIndex<QUESTIONS.length)renderQuestion(state.currentIndex);
+else showResults();
+});
+btnRetry.addEventListener('click',()=>{
+results.classList.remove('active');
+welcome.classList.add('active');
+nameInput.value=state.studentName;
+});
+
+})();
+</script>
+</body>
+</html>
