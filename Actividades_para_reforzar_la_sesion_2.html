@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulador de práctica — Verdad, validez y solidez (Sesión 2)</title>
+<style>
+  :root{
+    --bg:#eff0f1; --card:#ffffff; --ink:#1a1b1c; --muted:#6f7378;
+    --accent:#366ea6; --accent-dark:#334250; --accent-soft:#eaf1f8;
+    --stripe:#ebedee; --border:#c7d0da; --ok:#46875c; --ok-soft:#eaf4ed;
+    --bad:#92453e; --bad-soft:#f7ecea; --warn:#a18347;
+    --r:14px; --shadow:0 1px 3px rgba(26,27,28,.08),0 6px 18px rgba(26,27,28,.06);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    background:var(--bg); color:var(--ink); line-height:1.55; font-size:16px;
+  }
+  .wrap{max-width:860px; margin:0 auto; padding:0 18px;}
+
+  /* ---------- Header ---------- */
+  header{
+    background:linear-gradient(160deg,var(--accent-dark) 0%, #3a5a7d 70%, var(--accent) 130%);
+    color:#fff; padding:34px 0 30px;
+  }
+  .kicker{
+    font-size:12px; letter-spacing:2.5px; text-transform:uppercase;
+    opacity:.75; margin-bottom:10px; font-weight:600;
+  }
+  header h1{font-size:clamp(22px,4vw,31px); line-height:1.2; font-weight:800; max-width:640px;}
+  header .sub{margin-top:10px; max-width:620px; font-size:15px; opacity:.88;}
+  .badges{display:flex; flex-wrap:wrap; gap:8px; margin-top:16px;}
+  .badge{
+    background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.25);
+    padding:5px 12px; border-radius:999px; font-size:12.5px; font-weight:600;
+  }
+
+  /* ---------- Teoría ---------- */
+  details.teoria{
+    background:var(--card); border:1px solid var(--border); border-radius:var(--r);
+    margin:22px 0 0; box-shadow:var(--shadow); overflow:hidden;
+  }
+  details.teoria summary{
+    cursor:pointer; padding:16px 20px; font-weight:700; font-size:15.5px;
+    color:var(--accent-dark); list-style:none; display:flex; align-items:center; gap:10px;
+    user-select:none;
+  }
+  details.teoria summary::-webkit-details-marker{display:none;}
+  details.teoria summary .chev{transition:transform .2s; color:var(--accent); font-size:13px;}
+  details.teoria[open] summary .chev{transform:rotate(90deg);}
+  .teoria-body{padding:4px 20px 22px; border-top:1px solid var(--stripe);}
+  .teoria-body p.intro{margin:14px 0 4px; font-size:14.5px; color:var(--muted);}
+  .tgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:12px; margin-top:14px;}
+  .tcard{
+    border:1px solid var(--border); border-radius:10px; padding:14px 15px;
+    background:#fbfcfd; font-size:13.8px;
+  }
+  .tcard h3{font-size:13.5px; color:var(--accent-dark); margin-bottom:7px; letter-spacing:.3px;}
+  .tcard ul{padding-left:17px;}
+  .tcard li{margin:3px 0;}
+  .tcard.pill-list li{
+    list-style:none; display:inline-block; background:var(--accent-soft); color:var(--accent-dark);
+    border:1px solid var(--border); border-radius:999px; padding:2px 10px; margin:3px 3px 3px 0; font-weight:600;
+  }
+  .tcard .def{margin-top:6px;}
+  .tcard .def b{color:var(--accent-dark);}
+  table.tt{border-collapse:collapse; margin:8px auto 0; font-size:13.5px;}
+  table.tt th, table.tt td{border:1px solid var(--border); padding:5px 13px; text-align:center;}
+  table.tt th{background:var(--accent-dark); color:#fff; font-weight:700;}
+  table.tt tr.bad td{background:var(--bad-soft); font-weight:700; color:var(--bad);}
+  .metodo{counter-reset:paso; margin-top:14px;}
+  .metodo .paso{
+    display:flex; gap:12px; align-items:flex-start; padding:9px 0; border-top:1px dashed var(--border);
+    font-size:14px;
+  }
+  .metodo .paso::before{
+    counter-increment:paso; content:counter(paso);
+    flex:0 0 26px; height:26px; border-radius:50%; background:var(--accent); color:#fff;
+    display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13.5px; margin-top:1px;
+  }
+  .simb{font-family:"SF Mono",Consolas,Menlo,monospace; background:var(--stripe); padding:1px 6px; border-radius:5px; font-size:13px;}
+
+  /* ---------- Controles ---------- */
+  .controls{
+    background:var(--card); border:1px solid var(--border); border-radius:var(--r);
+    box-shadow:var(--shadow); margin-top:18px; padding:16px 18px;
+  }
+  .ctl-row{display:flex; flex-wrap:wrap; gap:10px; align-items:center;}
+  .ctl-label{font-size:12px; text-transform:uppercase; letter-spacing:1.2px; color:var(--muted); font-weight:700; margin-right:2px;}
+  .seg{display:flex; border:1.5px solid var(--accent); border-radius:10px; overflow:hidden;}
+  .seg button{
+    border:0; background:#fff; color:var(--accent); padding:9px 18px; font-size:14px; font-weight:700; cursor:pointer;
+    transition:background .15s,color .15s;
+  }
+  .seg button.on{background:var(--accent); color:#fff;}
+  .chips{display:flex; flex-wrap:wrap; gap:7px;}
+  .chip{
+    border:1.5px solid var(--border); background:#fff; color:var(--accent-dark);
+    border-radius:999px; padding:6px 13px; font-size:13px; font-weight:600; cursor:pointer; transition:all .15s;
+  }
+  .chip:hover{border-color:var(--accent);}
+  .chip.on{background:var(--accent-dark); border-color:var(--accent-dark); color:#fff;}
+  select.sel{
+    border:1.5px solid var(--border); border-radius:10px; padding:8px 12px; font-size:14px;
+    background:#fff; color:var(--ink); cursor:pointer; font-family:inherit;
+  }
+  .btn{
+    border:0; border-radius:10px; padding:11px 20px; font-size:14.5px; font-weight:700; cursor:pointer;
+    transition:transform .08s, box-shadow .15s; font-family:inherit;
+  }
+  .btn:active{transform:translateY(1px);}
+  .btn-primary{background:var(--accent); color:#fff; box-shadow:0 3px 10px rgba(54,110,166,.35);}
+  .btn-primary:hover{background:#2f6096;}
+  .btn-ghost{background:#fff; color:var(--accent-dark); border:1.5px solid var(--border);}
+  .btn-ghost:hover{border-color:var(--accent); color:var(--accent);}
+  .btn:disabled{opacity:.45; cursor:not-allowed; box-shadow:none;}
+  .ctl-actions{display:flex; flex-wrap:wrap; gap:10px; margin-top:14px; padding-top:14px; border-top:1px solid var(--stripe);}
+
+  /* ---------- Estadísticas ---------- */
+  .statsbar{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:18px;
+  }
+  .stat{
+    background:var(--card); border:1px solid var(--border); border-radius:12px; padding:12px 8px; text-align:center;
+    box-shadow:var(--shadow);
+  }
+  .stat .n{font-size:22px; font-weight:800; color:var(--accent-dark); line-height:1.1;}
+  .stat .l{font-size:11px; text-transform:uppercase; letter-spacing:1px; color:var(--muted); margin-top:3px; font-weight:600;}
+  .progress{height:7px; background:var(--stripe); border-radius:99px; margin-top:12px; overflow:hidden;}
+  .progress > div{height:100%; width:0%; background:linear-gradient(90deg,var(--accent),#5b93c4); border-radius:99px; transition:width .3s;}
+
+  /* ---------- Tarjeta de pregunta ---------- */
+  .qcard{
+    background:var(--card); border:1px solid var(--border); border-radius:var(--r);
+    box-shadow:var(--shadow); margin-top:18px; padding:22px 24px;
+  }
+  .qtop{display:flex; flex-wrap:wrap; gap:7px; align-items:center; margin-bottom:14px;}
+  .tag{font-size:11.5px; font-weight:700; padding:4px 11px; border-radius:999px; letter-spacing:.4px;}
+  .tag.tema{background:var(--accent-soft); color:var(--accent-dark); border:1px solid var(--border);}
+  .tag.ctx{background:#fff; color:var(--muted); border:1px solid var(--border);}
+  .qnum{margin-left:auto; font-size:12.5px; color:var(--muted); font-weight:600;}
+  .qtext{font-size:16.5px; line-height:1.6; margin-bottom:18px;}
+  .qtext .arg{
+    background:#fbfcfd; border-left:3px solid var(--accent); border-radius:0 9px 9px 0;
+    padding:10px 14px; margin:10px 0; display:block; white-space:pre-line; font-size:15.5px;
+  }
+  .opts{display:grid; gap:9px;}
+  .opt{
+    display:flex; gap:12px; align-items:flex-start; width:100%; text-align:left;
+    border:1.5px solid var(--border); background:#fff; border-radius:11px;
+    padding:12px 14px; font-size:15px; line-height:1.5; cursor:pointer; font-family:inherit; color:var(--ink);
+    transition:border-color .15s, background .15s;
+  }
+  .opt:hover:not(:disabled){border-color:var(--accent); background:var(--accent-soft);}
+  .opt:disabled{cursor:default;}
+  .opt .letter{
+    flex:0 0 27px; height:27px; border-radius:8px; border:1.5px solid var(--border);
+    display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13.5px; color:var(--accent-dark);
+    background:#fff;
+  }
+  .opt.correct{border-color:var(--ok); background:var(--ok-soft);}
+  .opt.correct .letter{background:var(--ok); border-color:var(--ok); color:#fff;}
+  .opt.wrong{border-color:var(--bad); background:var(--bad-soft);}
+  .opt.wrong .letter{background:var(--bad); border-color:var(--bad); color:#fff;}
+  .opt.selected{border-color:var(--accent); background:var(--accent-soft);}
+  .opt.selected .letter{background:var(--accent); border-color:var(--accent); color:#fff;}
+  .feedback{
+    margin-top:16px; border-radius:11px; padding:14px 16px; font-size:14.5px; line-height:1.6; display:none;
+  }
+  .feedback.show{display:block;}
+  .feedback.ok{background:var(--ok-soft); border-left:4px solid var(--ok);}
+  .feedback.bad{background:var(--bad-soft); border-left:4px solid var(--bad);}
+  .feedback .verdict{font-weight:800; margin-bottom:5px; display:flex; align-items:center; gap:8px;}
+  .feedback.ok .verdict{color:var(--ok);}
+  .feedback.bad .verdict{color:var(--bad);}
+  .qnav{display:flex; flex-wrap:wrap; gap:10px; margin-top:18px; align-items:center;}
+  .qnav .spacer{flex:1;}
+  .kbd-hint{font-size:12px; color:var(--muted);}
+  .kbd-hint kbd{
+    border:1px solid var(--border); border-bottom-width:2px; border-radius:5px; padding:1px 6px;
+    font-size:11px; background:#fff; font-family:inherit;
+  }
+
+  /* ---------- Resultados ---------- */
+  .result{display:none;}
+  .result .score-box{
+    text-align:center; padding:28px 20px; border-radius:var(--r);
+    background:linear-gradient(160deg,var(--accent-dark),var(--accent)); color:#fff;
+    box-shadow:var(--shadow);
+  }
+  .result .score-box .big{font-size:52px; font-weight:900; line-height:1;}
+  .result .score-box .msg{margin-top:10px; font-size:16px; font-weight:600;}
+  .result .score-box .sub{opacity:.85; font-size:13.5px; margin-top:6px;}
+  .review-list{margin-top:18px; display:grid; gap:12px;}
+  .rev{
+    background:var(--card); border:1px solid var(--border); border-left:4px solid var(--border);
+    border-radius:12px; padding:15px 17px; box-shadow:var(--shadow);
+  }
+  .rev.ok{border-left-color:var(--ok);}
+  .rev.bad{border-left-color:var(--bad);}
+  .rev .rev-head{display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:8px;}
+  .rev .rev-num{font-size:12px; font-weight:800; color:var(--muted);}
+  .rev .rev-state{font-size:11.5px; font-weight:800; padding:3px 10px; border-radius:999px;}
+  .rev.ok .rev-state{background:var(--ok-soft); color:var(--ok);}
+  .rev.bad .rev-state{background:var(--bad-soft); color:var(--bad);}
+  .rev .rev-q{font-size:14.5px; margin-bottom:9px;}
+  .rev .rev-ans{font-size:13.8px; margin:4px 0;}
+  .rev .rev-ans b{font-weight:700;}
+  .rev .rev-ans.yours.ok-c{color:var(--ok);}
+  .rev .rev-ans.yours.bad-c{color:var(--bad);}
+  .rev .rev-exp{
+    margin-top:9px; font-size:13.5px; background:#fbfcfd; border-radius:9px; padding:10px 13px; color:var(--ink);
+    border:1px dashed var(--border);
+  }
+
+  .empty{
+    background:var(--card); border:1.5px dashed var(--border); border-radius:var(--r);
+    padding:34px 24px; text-align:center; color:var(--muted); margin-top:18px; display:none;
+  }
+  footer{margin:34px 0 26px; text-align:center; font-size:12.5px; color:var(--muted); line-height:1.7;}
+
+  @media (max-width:640px){
+    .statsbar{grid-template-columns:repeat(2,1fr);}
+    .qcard{padding:18px 16px;}
+    .qnum{margin-left:0; width:100%;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="kicker">LPID · Sesión 2 · Indicadores lógicos, verdad y validez</div>
+    <h1>Simulador de práctica: verdad, validez y solidez de argumentos</h1>
+    <p class="sub">Ejercicios de opción múltiple para quien nunca ha llevado lógica proposicional. Las opciones se mezclan en cada intento: la respuesta correcta no siempre está en el mismo inciso.</p>
+    <div class="badges">
+      <span class="badge" id="badgeTotal">115 ejercicios</span>
+      <span class="badge">6 temas de la sesión</span>
+      <span class="badge">4 contextos</span>
+      <span class="badge">Modo práctica y modo examen</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ================= TEORIA ================= -->
+  <details class="teoria" id="teoriaBox">
+    <summary><span class="chev">▶</span> Repaso rápido de la sesión (ábreme antes de empezar)</summary>
+    <div class="teoria-body">
+      <p class="intro">En lógica, <b>«válido» y «verdadero» no son sinónimos</b>. Antes de responder, recuerda el vocabulario clave y las dos preguntas que se evalúan por separado.</p>
+      <div class="tgrid">
+        <div class="tcard">
+          <h3>Indicadores de PREMISA</h3>
+          <ul class="pill-list">
+            <li>porque</li><li>ya que</li><li>puesto que</li><li>dado que</li><li>debido a que</li><li>pues</li>
+          </ul>
+          <p class="def">Anuncian la <b>razón</b>: el enunciado que apoya.</p>
+        </div>
+        <div class="tcard">
+          <h3>Indicadores de CONCLUSIÓN</h3>
+          <ul class="pill-list">
+            <li>por lo tanto</li><li>por consiguiente</li><li>luego</li><li>en consecuencia</li><li>así que</li><li>de modo que</li>
+          </ul>
+          <p class="def">Anuncian la <b>idea que se defiende</b>. Pueden aparecer al inicio: el orden escrito no siempre coincide con el orden lógico.</p>
+        </div>
+        <div class="tcard">
+          <h3>Verdad</h3>
+          <p class="def">Propiedad de un <b>enunciado individual</b>: corresponde o no con los hechos. Se aplica a premisas y conclusiones <b>por separado</b>.</p>
+        </div>
+        <div class="tcard">
+          <h3>Validez</h3>
+          <p class="def">Propiedad de la <b>forma</b> del argumento deductivo: si las premisas <b>fueran</b> verdaderas, la conclusión <b>tendría que</b> serlo también. No depende de las premisas reales.</p>
+        </div>
+        <div class="tcard">
+          <h3>Solidez (soundness)</h3>
+          <p class="def">El argumento es <b>válido</b> Y además <b>todas</b> sus premisas son de hecho verdaderas. «Sólido pero inválido» es imposible.</p>
+        </div>
+        <div class="tcard">
+          <h3>Dos formas clave</h3>
+          <p class="def"><span class="simb">P → Q; P; ∴ Q</span> = <b>Modus Ponens</b> (válido)<br>
+          <span class="simb">P → Q; Q; ∴ P</span> = <b>Afirmación del consecuente</b> (inválida)</p>
+          <p class="def" style="margin-top:7px">Para refutar una forma busca un <b>contraejemplo</b>: premisas verdaderas con conclusión falsa.</p>
+        </div>
+      </div>
+      <div class="tcard" style="margin-top:12px">
+        <h3>Tabla de verdad del condicional P → Q</h3>
+        <table class="tt">
+          <tr><th>P</th><th>Q</th><th>P → Q</th></tr>
+          <tr><td>V</td><td>V</td><td>V</td></tr>
+          <tr class="bad"><td>V</td><td>F</td><td>F</td></tr>
+          <tr><td>F</td><td>V</td><td>V</td></tr>
+          <tr><td>F</td><td>F</td><td>V</td></tr>
+        </table>
+        <p class="def" style="text-align:center; margin-top:8px">Solo una fila lo hace falso: <b>P verdadera y Q falsa</b>. Con esa tabla se prueba que Modus Ponens no tiene fila refutatoria y que la afirmación del consecuente sí la tiene.</p>
+      </div>
+      <div class="metodo">
+        <div class="paso">Localiza premisas y conclusión con los indicadores (aunque el orden escrito esté invertido).</div>
+        <div class="paso">Pregunta de contenido: ¿las premisas, de hecho, son verdaderas?</div>
+        <div class="paso">Pregunta de forma: si las premisas fueran verdaderas, ¿la conclusión se seguiría necesariamente?</div>
+        <div class="paso">Clasifica: <b>sólido</b> (válido + premisas verdaderas), <b>válido pero no sólido</b>, o <b>inválido</b> — aunque su conclusión resulte cierta por casualidad.</div>
+      </div>
+    </div>
+  </details>
+
+  <!-- ================= CONTROLES ================= -->
+  <section class="controls" id="controls">
+    <div class="ctl-row">
+      <span class="ctl-label">Modo</span>
+      <div class="seg" role="group" aria-label="Modo de práctica">
+        <button id="mPractica" class="on" type="button">Práctica</button>
+        <button id="mExamen" type="button">Examen</button>
+      </div>
+      <span style="flex:1"></span>
+      <span class="ctl-label">Contexto</span>
+      <select id="selCtx" class="sel">
+        <option value="all">Todos los contextos</option>
+        <option value="prog">Programación</option>
+        <option value="innov">Innovación</option>
+        <option value="ess">Economía social solidaria</option>
+        <option value="mat">Matemáticas</option>
+      </select>
+    </div>
+    <div class="ctl-row" style="margin-top:12px">
+      <span class="ctl-label">Tema</span>
+      <div class="chips" id="chipsTema"></div>
+    </div>
+    <div class="ctl-actions">
+      <button class="btn btn-primary" id="btnStart">Mezclar y practicar</button>
+      <button class="btn btn-ghost" id="btnReset">Borrar mi progreso</button>
+      <span class="kbd-hint" id="countInfo"></span>
+    </div>
+  </section>
+
+  <!-- ================= ESTADISTICAS ================= -->
+  <div class="statsbar">
+    <div class="stat"><div class="n" id="stResp">0</div><div class="l">Respondidas</div></div>
+    <div class="stat"><div class="n" id="stOk">0</div><div class="l">Correctas</div></div>
+    <div class="stat"><div class="n" id="stRacha">0</div><div class="l">Racha actual</div></div>
+    <div class="stat"><div class="n" id="stPrec">—</div><div class="l">Precisión</div></div>
+  </div>
+  <div class="progress"><div id="progFill"></div></div>
+
+  <!-- ================= QUIZ ================= -->
+  <section id="quizZone">
+    <div class="empty" id="emptyMsg">
+      <p style="font-size:16px; font-weight:700; margin-bottom:6px">Elige tus filtros y pulsa «Mezclar y practicar»</p>
+      <p style="font-size:14px">Puedes practicar todos los temas o concentrarte en uno, en cualquiera de los cuatro contextos.</p>
+    </div>
+    <div class="qcard" id="qcard" style="display:none">
+      <div class="qtop">
+        <span class="tag tema" id="qTagTema"></span>
+        <span class="tag ctx" id="qTagCtx"></span>
+        <span class="qnum" id="qNum"></span>
+      </div>
+      <div class="qtext" id="qText"></div>
+      <div class="opts" id="qOpts"></div>
+      <div class="feedback" id="qFeed">
+        <div class="verdict" id="feedVerdict"></div>
+        <div id="feedExp"></div>
+      </div>
+      <div class="qnav">
+        <button class="btn btn-ghost" id="btnPrev">← Anterior</button>
+        <button class="btn btn-primary" id="btnNext">Siguiente →</button>
+        <button class="btn btn-primary" id="btnFinish" style="display:none">Terminar y ver resultados</button>
+        <span class="spacer"></span>
+        <span class="kbd-hint">Atajos: <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><kbd>4</kbd> responder · <kbd>→</kbd> avanzar</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= RESULTADOS ================= -->
+  <section class="result" id="resultZone">
+    <div class="score-box">
+      <div class="big" id="resPct">—</div>
+      <div class="msg" id="resMsg"></div>
+      <div class="sub" id="resSub"></div>
+      <div style="margin-top:18px">
+        <button class="btn" style="background:#fff; color:var(--accent-dark)" id="btnRetry">Reintentar otro examen</button>
+      </div>
+    </div>
+    <h2 style="font-size:18px; margin:22px 0 4px; color:var(--accent-dark)">Revisión pregunta por pregunta</h2>
+    <div class="review-list" id="reviewList"></div>
+  </section>
+
+  <footer>
+    Basado en las <b>Notas de la Sesión 2 — Indicadores lógicos, verdad y validez</b> (LPID · UNITI).<br>
+    Recuerda el hilo conductor: ¿cómo distinguimos la validez de la <i>forma</i> de un argumento respecto de la verdad de su <i>contenido</i>?
+  </footer>
+</main>
+<script>
+// ==================== DATOS ====================
+const TEMAS = {
+  1:{n:"Indicadores lógicos", s:"Indicador de premisa y de conclusión; el orden escrito no siempre coincide con el orden lógico."},
+  2:{n:"Verdad de enunciados", s:"La verdad es propiedad de cada enunciado individual, no del argumento."},
+  3:{n:"Validez de argumentos", s:"Propiedad de la forma: Modus Ponens vs. afirmación del consecuente."},
+  4:{n:"Solidez de argumentos", s:"Válido + premisas de hecho verdaderas. Clasificación completa."},
+  5:{n:"Tablas de verdad", s:"El condicional P → Q y la búsqueda de la fila refutatoria."},
+  6:{n:"Simbolización y formas", s:"P, Q, →, ∴; antecedente y consecuente."}
+};
+const CTXS = {
+  prog:"Programación", innov:"Innovación",
+  ess:"Economía social solidaria", mat:"Matemáticas"
+};
+const EX = [{"t": 1, "c": "prog", "q": "En el argumento «El código no compila, ya que hay una variable sin declarar en la línea 12», ¿qué papel juega «ya que»?", "o": ["Es un indicador de premisa: anuncia la razón por la que el código no compila", "Es un indicador de conclusión: anuncia la idea final del argumento", "No es un indicador: solo conecta dos oraciones sueltas", "Es un indicador de conclusión, pero solo si aparece al inicio de la oración"], "e": "«Ya que» pertenece a la familia de indicadores de premisa (porque, ya que, puesto que, dado que, debido a que, pues). La conclusión («el código no compila») aparece antes en la oración."}, {"t": 1, "c": "innov", "q": "«La startup crece rápido, por lo tanto conviene contratar más desarrolladores.» ¿Cuál enunciado es la conclusión?", "o": ["Conviene contratar más desarrolladores", "La startup crece rápido", "Ninguno: la oración no contiene argumento", "Ambos enunciados son premisas"], "e": "«Por lo tanto» es un indicador de conclusión, así que lo que le sigue es la conclusión: «conviene contratar más desarrolladores». El crecimiento de la startup es la premisa que lo apoya."}, {"t": 1, "c": "ess", "q": "«Puesto que la cooperativa decidió por asamblea, el proyecto de trueque arrancará en marzo.» ¿Qué palabra es el indicador y qué anuncia?", "o": ["«Puesto que» anuncia una premisa", "«Puesto que» anuncia una conclusión", "«Arrancará» es un indicador de conclusión", "La oración no tiene ningún indicador"], "e": "«Puesto que» es indicador de premisa. La premisa es «la cooperativa decidió por asamblea» y la conclusión es «el proyecto de trueque arrancará en marzo»."}, {"t": 1, "c": "mat", "q": "«El número 15 es divisible entre 3, dado que la suma de sus dígitos es 6 y 6 es múltiplo de 3.» ¿Cuántas premisas anuncia el indicador y cuál es?", "o": ["Una premisa: el indicador es «dado que» y la premisa es compuesta", "Dos premisas: los indicadores son «dado que» y «y»", "Una conclusión: el indicador es «dado que»", "Dos conclusiones: no hay indicador de premisa"], "e": "«Dado que» anuncia UNA sola premisa compuesta: «la suma de sus dígitos es 6 y 6 es múltiplo de 3». La palabra «y» solo une ideas dentro de esa premisa; no es un indicador lógico."}, {"t": 1, "c": "prog", "q": "«El servidor cayó; en consecuencia, la API no respondió durante veinte minutos.» ¿Cuál es la conclusión?", "o": ["La API no respondió durante veinte minutos", "El servidor cayó", "El servidor y la API son el mismo equipo", "No hay conclusión: solo hay datos"], "e": "«En consecuencia» es un indicador de conclusión. La caída del servidor es la premisa; la falta de respuesta de la API es lo que se concluye."}, {"t": 1, "c": "mat", "q": "¿Cuál de las siguientes palabras es un indicador de CONCLUSIÓN?", "o": ["por consiguiente", "puesto que", "debido a que", "ya que"], "e": "Los indicadores de conclusión de la sesión son: por lo tanto, por consiguiente, luego, en consecuencia, así que, de modo que. «Puesto que», «debido a que» y «ya que» son indicadores de premisa."}, {"t": 1, "c": "ess", "q": "¿Cuál de las siguientes palabras es un indicador de PREMISA?", "o": ["debido a que", "por lo tanto", "en consecuencia", "así que"], "e": "Los indicadores de premisa de la sesión son: porque, ya que, puesto que, dado que, debido a que, pues. Los otros tres anuncian conclusión."}, {"t": 1, "c": "innov", "q": "«Por consiguiente, lanzaremos el prototipo en octubre: el equipo terminó las pruebas de usuario antes de lo previsto.» ¿Dónde está la conclusión?", "o": ["Aparece AL INICIO, justo después de «Por consiguiente»", "Aparece al final, después de los dos puntos", "No hay conclusión, solo premisas", "Las dos oraciones son conclusiones simultáneas"], "e": "El orden escrito no siempre coincide con el orden lógico. El indicador «por consiguiente» señala SIEMPRE a la conclusión, aunque aparezca al principio de la oración."}, {"t": 1, "c": "prog", "q": "«Dado que la prueba unitaria falló, el equipo no aprobó la versión; así que el lanzamiento se pospuso.» ¿Cuántos indicadores hay y de qué tipo es cada uno?", "o": ["Dos: «dado que» (premisa) y «así que» (conclusión)", "Dos: «dado que» (conclusión) y «así que» (premisa)", "Uno: «así que», que es indicador de premisa", "Ninguno: son solo palabras de enlace"], "e": "«Dado que» introduce la premisa (la prueba falló) y «así que» introduce la conclusión (el lanzamiento se pospuso). El enunciado «el equipo no aprobó la versión» funciona como premisa intermedia."}, {"t": 1, "c": "ess", "q": "«El banco de tiempo creció porque los vecinos confiaron en el sistema; por lo tanto, replicaremos el modelo en otra colonia.» Identifica premisa(s) y conclusión.", "o": ["Premisa: «los vecinos confiaron en el sistema»; conclusión: «replicaremos el modelo en otra colonia»", "Premisa: «replicaremos el modelo»; conclusión: «los vecinos confiaron»", "Las tres oraciones son premisas de una conclusión implícita", "Las tres oraciones son conclusiones"], "e": "«Porque» anuncia la premisa (la confianza vecinal) y «por lo tanto» anuncia la conclusión (replicar el modelo). El crecimiento del banco de tiempo actúa como punto de partida del argumento."}, {"t": 1, "c": "mat", "q": "¿Qué indicador completa mejor el argumento? «Todos los múltiplos de 9 tienen dígitos que suman 9 o un múltiplo de 9; ___ el 27 pertenece a esa familia.»", "o": ["por lo tanto", "puesto que", "ya que", "dado que"], "e": "Primero se presentan las premisas (la regla de los múltiplos de 9) y al final llega la conclusión («el 27 pertenece a esa familia»), así que el hueco pide un indicador de conclusión como «por lo tanto»."}, {"t": 1, "c": "innov", "q": "Completa el argumento con el indicador adecuado: «___ la encuesta mostró interés del 70 por ciento, construimos un producto mínimo viable.»", "o": ["Dado que", "Por lo tanto", "En consecuencia", "De modo que"], "e": "El dato de la encuesta es la razón (premisa) por la que se construyó el prototipo (conclusión). «Dado que» es el único indicador de premisa entre las opciones."}, {"t": 1, "c": "prog", "q": "¿Cuál de estas expresiones NO funciona como indicador lógico de premisa o de conclusión?", "o": ["sin embargo", "luego", "pues", "por consiguiente"], "e": "«Sin embargo» marca contraste (adversación), no anuncia premisa ni conclusión. «Luego» y «por consiguiente» son de conclusión; «pues» es de premisa."}, {"t": 1, "c": "mat", "q": "«Todo cuadrado tiene cuatro lados; esta figura es un cuadrado; luego esta figura tiene cuatro lados.» ¿Cuál es la conclusión?", "o": ["Esta figura tiene cuatro lados", "Todo cuadrado tiene cuatro lados", "Esta figura es un cuadrado", "No hay conclusión explícita"], "e": "«Luego» es indicador de conclusión: lo que le sigue es la conclusión. Las otras dos oraciones son las premisas del argumento."}, {"t": 1, "c": "ess", "q": "«Como la feria de comercio justo fue un éxito, la organizaremos dos veces al año.» El indicador «como» funciona aquí como:", "o": ["Indicador de premisa, porque introduce la razón del éxito del argumento", "Indicador de conclusión", "Indicador de contraste, como «sin embargo»", "No es un indicador lógico"], "e": "«Como» (en el sentido de «porque» o «dado que») introduce la premisa: la feria fue un éxito. La conclusión es que se organizará dos veces al año."}, {"t": 1, "c": "innov", "q": "«El prototipo pasó todas las pruebas; por consiguiente, estamos listos para buscar inversionistas.» ¿Qué enunciado apoya a cuál?", "o": ["«Pasó todas las pruebas» es la premisa que apoya «estamos listos para buscar inversionistas»", "«Estamos listos» es la premisa que apoya «pasó todas las pruebas»", "Ambos son premisas de una conclusión no escrita", "Ninguno apoya al otro: es solo una descripción de hechos"], "e": "«Por consiguiente» marca la conclusión: estar listos para buscar inversionistas. Lo que la apoya es la premisa de que el prototipo pasó todas las pruebas."}, {"t": 1, "c": "prog", "q": "«El programa imprimió un error porque la lista estaba vacía.» ¿Cuál es la premisa?", "o": ["La lista estaba vacía", "El programa imprimió un error", "No hay premisa en la oración", "Ambos enunciados son premisas"], "e": "«Porque» anuncia la premisa: la lista estaba vacía. Esa es la razón que explica el error impreso (la conclusión)."}, {"t": 1, "c": "mat", "q": "«La suma de dos números pares es par; en consecuencia, 8 + 14 es par.» ¿Cuál es la premisa general del argumento?", "o": ["La suma de dos números pares es par", "8 + 14 es par", "8 y 14 son números naturales", "No hay premisa explícita"], "e": "La premisa general es la regla sobre la suma de pares; «en consecuencia» anuncia la conclusión: que 8 + 14 resulta par."}, {"t": 1, "c": "ess", "q": "«Ya que la asamblea aprobó el presupuesto y el sitio web donó los materiales, el comedor comunitario abrirá en septiembre.» ¿Qué contiene este argumento?", "o": ["Dos premisas unidas dentro de una sola oración y una conclusión", "Una premisa y dos conclusiones", "Solo una premisa sin conclusión", "Solo conclusiones encadenadas"], "e": "«Ya que» abre el bloque de premisas (aprobación del presupuesto + donación de materiales, unidas por «y») y la conclusión es la apertura del comedor en septiembre."}, {"t": 1, "c": "prog", "q": "«De modo que el error afecta a todos los usuarios: la función devuelve None cuando la lista está vacía.» ¿Cuál es la conclusión?", "o": ["El error afecta a todos los usuarios", "La función devuelve None cuando la lista está vacía", "Ninguna: ambas oraciones son premisas", "Ambas oraciones son conclusiones"], "e": "«De modo que» es un indicador de conclusión, aunque aparezca al inicio. La conclusión es que el error afecta a todos los usuarios; el comportamiento de la función es la premisa."}, {"t": 2, "c": "mat", "q": "En la lógica de la Sesión 2, la verdad es una propiedad de:", "o": ["Cada enunciado individual: un enunciado es verdadero si corresponde con los hechos y falso si no", "La forma del argumento completo", "El conjunto de premisas evaluadas como sistema", "La conclusión únicamente"], "e": "La verdad se evalúa enunciado por enunciado (premisas y conclusión por separado). La propiedad de la FORMA del argumento es otra cosa: la validez."}, {"t": 2, "c": "prog", "q": "¿La pregunta «¿compiló el programa?» es un enunciado que puede ser verdadero o falso?", "o": ["No: las preguntas no afirman nada, así que no son verdaderas ni falsas", "Sí: toda oración del lenguaje natural es verdadera o falsa", "Sí, pero solo si la respuesta es afirmativa", "Depende del lenguaje de programación que se use"], "e": "Solo los enunciados (oraciones que afirman algo) tienen valor de verdad. Preguntas, órdenes y exclamaciones no afirman hechos, así que no son ni verdaderas ni falsas."}, {"t": 2, "c": "prog", "q": "Datos: el sistema tiene 3 módulos y solo 2 pasaron sus pruebas. ¿El enunciado «todos los módulos pasaron sus pruebas» es verdadero o falso?", "o": ["Falso: 2 de 3 no es «todos»", "Verdadero: la mayoría de los módulos pasó", "Verdadero: el sistema en conjunto funciona", "Ni verdadero ni falso: es una opinión del equipo"], "e": "La verdad del enunciado se compara con los hechos: como un módulo no pasó sus pruebas, el enunciado que dice «todos» es falso. No importa que la mayoría sí haya pasado."}, {"t": 2, "c": "ess", "q": "Datos: la cooperativa «La Milpa» tiene 12 socios y 8 votaron a favor del nuevo reglamento. ¿El enunciado «la mayoría de los socios votó a favor» es verdadero o falso?", "o": ["Verdadero: 8 de 12 es más de la mitad", "Falso: se necesitaban 9 votos para ser mayoría", "Falso: hubo socios que no votaron", "No tiene valor de verdad porque es un resultado de votación"], "e": "8 de 12 supera la mitad (6), así que el enunciado corresponde con los hechos: es verdadero."}, {"t": 2, "c": "mat", "q": "Sin datos adicionales, ¿el enunciado «7 es un número par» es verdadero o falso?", "o": ["Falso: 7 dividido entre 2 deja residuo 1", "Verdadero: todo número podría ser par o impar según el caso", "No tiene valor de verdad hasta que alguien lo demuestre por escrito", "Es una opinión matemática, no un hecho"], "e": "En matemáticas el valor de verdad ya está determinado: 7 no es divisible entre 2, así que el enunciado es falso. No depende de nuestra opinión ni de que alguien lo escriba."}, {"t": 2, "c": "innov", "q": "Datos: la app tuvo 40 000 descargas en enero y 55 000 en febrero. ¿El enunciado «las descargas disminuyeron de enero a febrero» es verdadero o falso?", "o": ["Falso: aumentaron de 40 000 a 55 000", "Verdadero: 40 000 es menos que 55 000", "No se puede saber sin los datos de marzo", "Es un dato, no un enunciado con valor de verdad"], "e": "Los hechos muestran un aumento, así que el enunciado que afirma una disminución es falso. Cuidado con la trampa de leer rápido los números."}, {"t": 2, "c": "mat", "q": "Un argumento tiene una conclusión verdadera. ¿Qué sabemos, por esa sola razón, sobre sus premisas?", "o": ["Nada: pueden ser todas verdaderas, todas falsas o una mezcla", "Que todas son verdaderas", "Que todas son falsas", "Que al menos una es falsa"], "e": "La verdad de la conclusión se evalúa por separado de la verdad de cada premisa. Una conclusión verdadera puede aparecer en argumentos buenos o malos, con premisas verdaderas o falsas."}, {"t": 2, "c": "prog", "q": "¿Puede un enunciado que aparece como premisa en un argumento INVÁLIDO ser verdadero?", "o": ["Sí: la verdad de cada premisa es independiente de la validez del argumento", "No: en un argumento inválido todas las premisas son falsas", "No: solo las conclusiones de argumentos inválidos pueden ser verdaderas", "Depende de si la conclusión también es verdadera"], "e": "Validez y verdad son propiedades distintas. Un argumento inválido puede tener premisas verdaderas, premisas falsas o una mezcla; nada de eso cambia su invalidez."}, {"t": 2, "c": "prog", "q": "Datos: el repositorio tiene 5 ramas; 2 están protegidas. ¿El enunciado «hay más ramas protegidas que desprotegidas» es verdadero o falso?", "o": ["Falso: hay 2 protegidas y 3 desprotegidas", "Verdadero: hay 5 ramas en total", "Verdadero: la mitad son protegidas", "No tiene valor de verdad en un repositorio"], "e": "Con 2 protegidas y 3 desprotegidas, el enunciado no corresponde con los hechos: es falso."}, {"t": 2, "c": "ess", "q": "Datos: el banco comunitario prestó 50 000 pesos y ya se recuperaron 45 000. ¿El enunciado «se recuperó el 90 por ciento del dinero prestado» es verdadero o falso?", "o": ["Verdadero: 45 000 de 50 000 es exactamente el 90 por ciento", "Falso: se recuperó menos del 80 por ciento", "Falso: mientras falte dinero, nada se puede afirmar", "No se puede calcular sin los intereses"], "e": "45 000 / 50 000 = 0.90, que corresponde exactamente con el enunciado. La verdad es correspondencia con los hechos, y aquí los números coinciden."}, {"t": 2, "c": "mat", "q": "¿Cuál de los siguientes enunciados es VERDADERO en matemáticas estándar?", "o": ["Todo número primo mayor que 2 es impar", "Todos los números primos son impares", "El 2 no es un número primo", "Ningún número primo es par"], "e": "El 2 es primo y es par, pero es el único primo par. Por eso «todo primo mayor que 2 es impar» es verdadero, mientras que las otras tres opciones son falsas."}, {"t": 2, "c": "innov", "q": "Datos: el estudio de mercado encuestó a 200 personas y 120 dijeron que pagarían por el servicio. ¿El enunciado «el 60 por ciento de los encuestados dijo que pagaría» es verdadero o falso?", "o": ["Verdadero: 120 de 200 es exactamente el 60 por ciento", "Falso: el porcentaje real es el 50", "Falso: 120 equivale a más del 70 por ciento", "No tiene valor de verdad porque viene de una encuesta"], "e": "120/200 = 0.60. El enunciado coincide con los datos: es verdadero. Los resultados de encuestas también son enunciados con valor de verdad."}, {"t": 2, "c": "prog", "q": "Ana dice: «Mi argumento es bueno porque su conclusión es verdadera». Con lo visto en la sesión, ¿qué le responderías?", "o": ["Que la verdad de la conclusión no basta: hay que revisar también la verdad de las premisas y la forma del argumento", "Que tiene razón: conclusión verdadera equivale a argumento sólido", "Que basta con que las premisas suenen razonables", "Que una conclusión nunca puede ser verdadera si las premisas lo son"], "e": "Ese es el error más común de la sesión: confundir «estar de acuerdo con la conclusión» con «argumento bueno». Se evalúan dos preguntas: la verdad de las premisas y si la conclusión se sigue necesariamente."}, {"t": 2, "c": "mat", "q": "Datos: un triángulo tiene lados 3, 4 y 5, y cumple que 3² + 4² = 5². ¿El enunciado «el triángulo es rectángulo» es verdadero o falso?", "o": ["Verdadero: cumple el teorema de Pitágoras", "Falso: sus lados son todos distintos", "Falso: solo los triángulos equiláteros son rectángulos", "No se puede saber sin medir los ángulos"], "e": "Si los lados cumplen a² + b² = c², el triángulo es rectángulo por el recíproco del teorema de Pitágoras. El enunciado corresponde con los hechos matemáticos: es verdadero."}, {"t": 2, "c": "ess", "q": "Datos: la tienda de trueque registró 30 intercambios en total; 18 fueron de semillas. ¿El enunciado «la mayoría de los intercambios fueron de semillas» es verdadero o falso?", "o": ["Verdadero: 18 de 30 es más de la mitad", "Falso: 18 es exactamente la mitad", "Falso: también hubo otros productos", "No se puede saber porque hubo trueques variados"], "e": "La mitad de 30 es 15; como 18 > 15, sí es mayoría. El enunciado coincide con los hechos: es verdadero."}, {"t": 3, "c": "mat", "q": "En la sesión, la validez se define como una propiedad de:", "o": ["La FORMA del argumento: si las premisas fueran verdaderas, la conclusión tendría que serlo también", "El contenido real de las premisas: qué tanto corresponden con los hechos", "La conclusión: qué tan probable es que sea cierta", "La audiencia: qué tan persuadida queda después del argumento"], "e": "La validez pregunta por la forma: ¿la conclusión se seguiría necesariamente si las premisas fueran verdaderas? No depende de si las premisas son realmente verdaderas."}, {"t": 3, "c": "ess", "q": "Un argumento tiene premisas falsas. ¿Puede aun así ser válido?", "o": ["Sí: la validez solo depende de la forma, no de la verdad del contenido", "No: las premisas falsas anulan automáticamente la validez", "Sí, pero solo si la conclusión también es falsa", "No, y además deja de ser un argumento"], "e": "Es una idea clave de la sesión: la forma puede ser perfecta aunque el contenido sea disparatado (como los elefantes que escriben código). Premisas falsas no impiden la validez; impiden la solidez."}, {"t": 3, "c": "prog", "q": "«Si el servidor fuera un elefante, pesaría más de una tonelada. El servidor es un elefante. Por lo tanto, pesa más de una tonelada.» ¿El argumento es válido?", "o": ["Sí: tiene la forma Modus Ponens, aunque sus premisas sean disparatadas", "No, porque sus premisas son falsas", "No, porque los servidores no son animales", "Sí, y además es sólido"], "e": "Es el «silogismo absurdo» de la sesión: forma válida (P → Q; P; ∴ Q) con contenido absurdo. Válido sí es; sólido no, porque sus premisas no son verdaderas."}, {"t": 3, "c": "prog", "q": "La forma «P → Q; P; por lo tanto Q» se llama:", "o": ["Modus Ponens y es una forma válida", "Modus Tollens y es una forma inválida", "Afirmación del consecuente y es inválida", "Afirmación del antecedente y es inválida"], "e": "Modus Ponens: se afirma el antecedente P y se concluye el consecuente Q. La forma por sí sola garantiza la validez, sin importar qué signifiquen P y Q."}, {"t": 3, "c": "innov", "q": "La forma «P → Q; Q; por lo tanto P» se llama:", "o": ["Afirmación del consecuente y es inválida", "Modus Ponens y es válida", "Negación del consecuente y es válida", "Conclusión del antecedente y es válida"], "e": "Afirmar el consecuente (Q) para concluir el antecedente (P) es la falacia formal vista en la sesión: de «si P entonces Q» y «Q» NO se sigue P con necesidad."}, {"t": 3, "c": "prog", "q": "«Si hay un error de sintaxis, el programa no compila. Hay un error de sintaxis. Por lo tanto, el programa no compila.» La estructura de este argumento es:", "o": ["Modus Ponens: se afirma el antecedente y es válida", "Afirmación del consecuente y es inválida", "Válida solo si el programa es pequeño", "Inválida porque se afirma el antecedente"], "e": "P = «hay un error de sintaxis»; Q = «el programa no compila». Se tiene P → Q, luego se afirma P y se concluye Q: Modus Ponens, forma válida. Afirmar el antecedente no es un error; el error de la sesión es afirmar el CONSECUENTE."}, {"t": 3, "c": "innov", "q": "«Si el producto es bueno, recibe buenas reseñas. Recibe buenas reseñas. Por lo tanto, el producto es bueno.» Este razonamiento:", "o": ["Es inválido: afirma el consecuente, porque las buenas reseñas pueden tener otras causas", "Es válido por Modus Ponens", "Es válido si hay muchas reseñas", "Es válido y además sólido"], "e": "Ejemplo 2 de la sesión en clave de producto: el condicional garantiza que «si es bueno, hay reseñas», no que «solo si es bueno, hay reseñas». La campaña de marketing también puede generar reseñas positivas."}, {"t": 3, "c": "ess", "q": "«Si la asamblea aprueba el presupuesto, se compra el huerto comunitario. La asamblea lo aprobó. Por lo tanto, se compra el huerto.» ¿Válido o inválido?", "o": ["Válido: tiene la forma Modus Ponens", "Inválido: tiene la forma afirmación del consecuente", "Inválido: las premisas podrían ser falsas", "Válido solo si el huerto es barato"], "e": "P = «la asamblea aprueba el presupuesto»; Q = «se compra el huerto». Se afirma P y se concluye Q: Modus Ponens. La validez es de la forma; el precio del huerto es irrelevante."}, {"t": 3, "c": "mat", "q": "«Si un número es divisible entre 6, entonces es par. 8 es par. Por lo tanto, 8 es divisible entre 6.» ¿Qué demuestra este caso?", "o": ["Que la forma es inválida: hay premisas verdaderas y la conclusión es falsa", "Que la forma es válida: el ejemplo habla de números", "Que 8 no es par", "Que el argumento es sólido"], "e": "Contraejemplo perfecto: «divisible entre 6 implica par» es verdadera; «8 es par» es verdadera; pero «8 es divisible entre 6» es falsa. Premisas verdaderas + conclusión falsa = invalidez demostrada."}, {"t": 3, "c": "mat", "q": "Para probar que una forma de argumento es INVÁLIDA, buscamos:", "o": ["Un contraejemplo: un caso donde las premisas son verdaderas y la conclusión es falsa", "Un caso donde las premisas son falsas", "Un caso donde la conclusión es verdadera", "El dictamen de un experto en el tema"], "e": "Ese es el método de la sesión: si podemos imaginar una situación donde el condicional y el consecuente son verdaderos pero el antecedente falso, la forma queda refutada."}, {"t": 3, "c": "prog", "q": "Puede existir un argumento con premisas verdaderas, conclusión verdadera y, sin embargo, INVÁLIDO. ¿Cuándo ocurre esto?", "o": ["Cuando la conclusión no se sigue de las premisas: resulta verdadera por casualidad o por otras razones", "Cuando las premisas son demasiado obvias", "Cuando el argumento tiene más de dos premisas", "Cuando la conclusión es más corta que las premisas"], "e": "La invalidez habla de la conexión, no de los valores de verdad. La sesión lo dice: la conclusión puede resultar cierta «por casualidad», sin seguirse de esas premisas."}, {"t": 3, "c": "prog", "q": "«Si Python fuera un mamífero, entonces respiraría. Python es un mamífero. Por lo tanto, Python respira.» (Aquí «Python» es el lenguaje de programación.) El argumento es:", "o": ["Válido pero no sólido: las premisas son falsas y la forma es correcta", "Inválido, porque sus premisas son falsas", "Sólido, porque la conclusión suena razonable", "Inválido: los lenguajes de programación no respiran"], "e": "La forma es Modus Ponens (válida). Pero «Python es un mamífero» es falsa y «si Python fuera mamífero, respiraría» tampoco es un hecho real del lenguaje. Válido sí; sólido no."}, {"t": 3, "c": "mat", "q": "«Si 4 fuera impar, entonces 4 + 1 sería impar. 4 es impar. Por lo tanto, 5 es impar.» Este argumento es:", "o": ["Válido: Modus Ponens, aunque su segunda premisa es falsa", "Inválido: 4 no es impar", "Válido y sólido", "Inválido: la conclusión resultó verdadera"], "e": "La forma es perfectamente válida. Que la premisa «4 es impar» sea falsa solo afecta la solidez, nunca la validez. Y ojo: la conclusión verdadera tampoco «rescata» al argumento."}, {"t": 3, "c": "ess", "q": "«Si la cooperativa es rentable, sus socios están satisfechos. Los socios están satisfechos. Por lo tanto, la cooperativa es rentable.» El defecto formal de este argumento es:", "o": ["Concluir la causa a partir del efecto: la satisfacción puede tener otras causas", "Usar demasiadas premisas para una conclusión tan simple", "Concluir algo que necesariamente es falso", "No usar ningún indicador lógico"], "e": "Es la afirmación del consecuente: del efecto (socios satisfechos) se quiere inferir la causa (rentabilidad), cuando puede haber otras causas, como la buena comunicación interna."}, {"t": 3, "c": "prog", "q": "Con P = «hay un bug crítico» y Q = «la app se cierra inesperadamente», ¿cuál caso demuestra la INVALIDEZ de «P → Q; Q; por lo tanto P»?", "o": ["La app se cierra inesperadamente por falta de memoria, sin que exista ningún bug crítico", "Hay un bug crítico y la app se cierra inesperadamente", "No hay bug crítico y la app funciona con normalidad", "La app nunca se cierra inesperadamente"], "e": "El contraejemplo requiere Q verdadera, P falsa y P → Q verdadera. Ese es exactamente el caso de la falta de memoria: la app se cierra (Q), no hay bug crítico (no P), y el condicional sigue siendo verdadero."}, {"t": 3, "c": "innov", "q": "Con P = «la startup recibe inversión» y Q = «contrata más personal», ¿qué caso demuestra la invalidez de «P → Q; Q; por lo tanto P»?", "o": ["La startup contrató personal pagando con utilidades propias, sin recibir inversión", "La startup recibió inversión y contrató personal", "La startup no recibió inversión y no contrató a nadie", "La startup recibió inversión y no contrató a nadie"], "e": "El caso A tiene Q verdadera (contrató), P falsa (sin inversión) y el condicional puede ser verdadero. El caso D, en cambio, hace FALSO el condicional, así que no sirve como contraejemplo."}, {"t": 3, "c": "mat", "q": "«Todo cuadrado tiene cuatro lados; esta figura tiene cuatro lados; por lo tanto, esta figura es un cuadrado.» ¿Válido o inválido?", "o": ["Inválido: afirma el consecuente; un rombo también tiene cuatro lados", "Válido: todos los cuadrados tienen cuatro lados", "Válido: la geometría es una ciencia exacta", "Inválido: los cuadrados tienen cinco lados"], "e": "Del hecho de que «todo cuadrado tiene 4 lados» no se sigue que «todo lo que tiene 4 lados sea cuadrado». El rombo es el contraejemplo clásico."}, {"t": 3, "c": "mat", "q": "¿Cuál de estas afirmaciones sobre validez es CORRECTA?", "o": ["Un argumento inválido puede tener una conclusión verdadera", "Un argumento inválido siempre tiene una conclusión falsa", "Un argumento válido garantiza que sus premisas son verdaderas", "La validez depende de estar de acuerdo con la conclusión"], "e": "La invalidez no dice nada sobre el valor de verdad de la conclusión: puede ser verdadera por casualidad. Tampoco un argumento válido garantiza premisas verdaderas: eso es la solidez."}, {"t": 3, "c": "prog", "q": "«Si el test automático pasa, el código se despliega. El código se desplegó. Por lo tanto, el test pasó.» Sabiendo que el equipo también puede desplegar manualmente, el argumento es:", "o": ["Inválido: el despliegue pudo ocurrir por la vía manual, sin que el test pasara", "Válido: es Modus Ponens", "Válido, porque ambas premisas son verdaderas", "Sólido: al final sí hubo despliegue"], "e": "El despliegue manual es el contraejemplo cotidiano: Q verdadera (se desplegó), P falsa (el test no pasó) y el condicional intacto. Es la afirmación del consecuente en plena acción."}, {"t": 3, "c": "ess", "q": "«Si el comedor recibe donativos, sirve 100 comidas al día. El comedor sirve 100 comidas al día. Por lo tanto, recibe donativos.» ¿Qué forma tiene?", "o": ["P → Q; Q; por lo tanto P (afirmación del consecuente)", "P → Q; P; por lo tanto Q (Modus Ponens)", "Es un argumento sin forma reconocible", "Es un solo enunciado, no un argumento"], "e": "La estructura encaja exactamente en P → Q; Q; ∴ P: la forma inválida que la sesión llama afirmación del consecuente."}, {"t": 3, "c": "mat", "q": "«Si n es múltiplo de 4, entonces n es par. 12 es múltiplo de 4. Por lo tanto, 12 es par.» El argumento es:", "o": ["Válido y, además, sólido", "Válido pero no sólido", "Inválido", "Sólido pero inválido"], "e": "La forma es Modus Ponens (válida) y las premisas son de hecho verdaderas (12 sí es múltiplo de 4). Con forma válida + premisas verdaderas, el argumento es sólido."}, {"t": 3, "c": "ess", "q": "¿Qué diferencia hay entre evaluar la VALIDEZ y evaluar la VERDAD dentro de un argumento?", "o": ["La verdad se pregunta enunciado por enunciado; la validez pregunta si la conclusión se seguiría necesariamente de las premisas", "La verdad evalúa la forma y la validez evalúa el contenido", "Son la misma idea con nombres distintos", "La validez solo aplica a matemáticas y la verdad solo a la vida diaria"], "e": "La sesión separa dos preguntas: (1) ¿las premisas, de hecho, son verdaderas? (contenido) y (2) si fueran verdaderas, ¿la conclusión se seguiría? (forma)."}, {"t": 3, "c": "prog", "q": "«Si la función recibe una lista vacía, regresa cero. La función recibió una lista vacía. Por lo tanto, regresa cero.» Esta forma:", "o": ["Es Modus Ponens y garantiza que, si las premisas fueran verdaderas, la conclusión lo sería", "Es afirmación del consecuente y es inválida", "Es válida solo dentro de la programación", "Es inválida porque sus premisas podrían ser falsas"], "e": "Otra vez P → Q; P; ∴ Q. Nótese que la garantía es condicional («si las premisas fueran verdaderas»): eso es exactamente lo que significa ser válido."}, {"t": 3, "c": "innov", "q": "De las premisas «si la inversión llega en enero, lanzamos en marzo» y «la inversión llegó en enero», ¿qué conclusión se sigue con necesidad lógica?", "o": ["Lanzamos en marzo", "No lanzamos en marzo", "La inversión no llegó", "Ninguna conclusión se sigue de esas premisas"], "e": "P → Q y P están dadas; por Modus Ponens se sigue Q. Cualquier otra conclusión no está garantizada por esas premisas."}, {"t": 3, "c": "ess", "q": "«Si la tienda comunitaria vende miel, gana ingresos. La tienda gana ingresos. Por lo tanto, la tienda vende miel.» Supón que la tienda, en efecto, vende miel. El argumento es:", "o": ["Inválido: aunque la conclusión es verdadera, no se sigue; los ingresos pudieron venir del jabón", "Válido, porque la conclusión resultó verdadera", "Válido, porque la primera premisa es verdadera", "Sólido, porque todas sus partes resultaron verdaderas"], "e": "Es la situación descrita en la sesión: premisas verdaderas, conclusión verdadera... y argumento inválido. La conclusión es cierta por casualidad (o por el jabón), no porque se siga de las premisas."}, {"t": 4, "c": "ess", "q": "Según el vocabulario de la sesión, un argumento deductivo es SÓLIDO cuando:", "o": ["Es válido y, además, todas sus premisas son de hecho verdaderas", "Es persuasivo y su conclusión es verdadera", "Tiene muchas premisas verdaderas, aunque sea inválido", "Su conclusión es verdadera, aunque sus premisas sean falsas"], "e": "Solidez = validez + premisas verdaderas. Faltan las dos condiciones juntas; ninguna de las otras opciones las cumple."}, {"t": 4, "c": "mat", "q": "¿Puede un argumento INVÁLIDO ser sólido?", "o": ["No: la solidez exige la validez como condición necesaria", "Sí, si todas sus premisas son verdaderas", "Sí, si su conclusión es verdadera", "Sí, si el tema es matemático"], "e": "La definición es «válido Y con premisas verdaderas». Sin validez, nunca hay solidez, por verdaderas que sean las premisas."}, {"t": 4, "c": "innov", "q": "¿Puede un argumento VÁLIDO no ser sólido?", "o": ["Sí: basta con que al menos una premisa sea falsa", "No: válido y sólido son sinónimos", "Solo si su conclusión es falsa", "Solo si nadie está de acuerdo con él"], "e": "El argumento de los elefantes que escriben código es válido pero no sólido: la forma está perfecta y las premisas son absurdas. Una sola premisa falsa destruye la solidez."}, {"t": 4, "c": "prog", "q": "Argumento: «Si la batería está cargada, el dron vuela. La batería está cargada. Por lo tanto, el dron vuela.» Datos: la batería SÍ está cargada y, de hecho, el dron vuela. Clasifica el argumento:", "o": ["Válido y sólido", "Válido pero no sólido", "Inválido", "Inválido pero sólido"], "e": "Forma: Modus Ponens (válida). Premisas: ambas de hecho verdaderas según los datos. Forma correcta + premisas verdaderas = sólido."}, {"t": 4, "c": "innov", "q": "Argumento: «Si el diseño ganó el premio, atraerá clientes. El diseño ganó el premio. Por lo tanto, atraerá clientes.» Datos: el diseño SÍ ganó el premio, pero la campaña de marketing se canceló y no atrajo clientes. Clasifica:", "o": ["Válido pero no sólido: la primera premisa resultó falsa", "Sólido: el premio es real", "Inválido: la conclusión resultó falsa", "Inválido y sólido a la vez"], "e": "La forma es Modus Ponens (válida). Pero el dato muestra que «ganar el premio no implica atraer clientes»: la primera premisa es falsa y por eso el argumento no es sólido. Fíjate que sigue siendo válido: la conclusión falsa no cambia la forma."}, {"t": 4, "c": "ess", "q": "Argumento: «Si el banco comunitario es transparente, la gente deposita. La gente deposita. Por lo tanto, el banco es transparente.» Datos: la gente deposita por confianza vecinal, y el banco ha ocultado información a la asamblea. Clasifica:", "o": ["Inválido (afirma el consecuente) y, con estos datos, tampoco sólido", "Válido y sólido", "Válido pero no sólido", "Sólido pero inválido"], "e": "Doble falla: la forma es afirmación del consecuente (inválida) y la primera premisa es falsa (la gente deposita por otras razones). «Sólido pero inválido» es imposible por definición."}, {"t": 4, "c": "mat", "q": "Argumento: «Si un número termina en 0, es múltiplo de 5. 40 termina en 0. Por lo tanto, 40 es múltiplo de 5.» Clasifica:", "o": ["Válido y sólido", "Válido pero no sólido", "Inválido: afirma el consecuente", "No se puede clasificar sin más datos"], "e": "P → Q es una regla aritmética verdadera; P («40 termina en 0») es verdadera. Modus Ponens + premisas verdaderas = argumento sólido."}, {"t": 4, "c": "prog", "q": "Argumento: «Si el programa está infectado, muestra ventanas emergentes. El programa está infectado. Por lo tanto, muestra ventanas emergentes.» Datos: el programa NO está infectado ni muestra ventanas emergentes. Clasifica:", "o": ["Válido pero no sólido: la segunda premisa es falsa", "Inválido: sus premisas son falsas", "Sólido: la conclusión coincide con los datos", "Válido y sólido"], "e": "La forma es Modus Ponens, así que es válido. Pero la premisa «el programa está infectado» es falsa según los datos, y eso rompe la solidez. Que la conclusión también sea falsa no vuelve inválido al argumento."}, {"t": 4, "c": "ess", "q": "Para clasificar un argumento como sólido, la sesión propone dos preguntas. ¿Cuáles y en qué orden?", "o": ["1) ¿La forma es válida? 2) ¿Todas las premisas son de hecho verdaderas?", "1) ¿La conclusión es verdadera? 2) ¿Me convence a mí?", "1) ¿Cuántas premisas tiene? 2) ¿Son suficientemente cortas?", "1) ¿Quién lo afirma? 2) ¿Qué tan popular es?"], "e": "Primero la forma (validez), después el contenido (verdad de todas las premisas). El orden importa: si la forma ya es inválida, ni siquiera hace falta revisar las premisas para negar la solidez."}, {"t": 4, "c": "innov", "q": "Argumento: «Si la app cumple la normativa, no la sancionan. La app cumple la normativa. Por lo tanto, no la sancionan.» Datos: la app SÍ cumple la normativa y no ha sido sancionada. Clasifica:", "o": ["Válido y sólido", "Válido pero no sólido", "Inválido: afirma el consecuente", "Inválido: las premisas son demasiado obvias"], "e": "Modus Ponens con premisas verdaderas. Que las premisas sean obvias o aburridas no afecta ni la validez ni la solidez."}, {"t": 4, "c": "mat", "q": "Argumento: «Si un número termina en 4, entonces es par. 24 termina en 4. Por lo tanto, 24 es par.» Clasifica:", "o": ["Válido y sólido", "Válido pero no sólido", "Inválido: afirma el consecuente", "Inválido: es solo un cálculo, no un argumento"], "e": "Forma Modus Ponens; premisas verdaderas (la regla es cierta y 24 termina en 4). Argumento sólido."}, {"t": 4, "c": "ess", "q": "Un vecino dice: «No me gusta esa conclusión, así que el argumento no es sólido». Desde la lógica de la sesión:", "o": ["Se equivoca: la solidez se evalúa con validez y verdad de las premisas, no con acuerdo personal", "Tiene razón: si no convence, el argumento deja de ser sólido", "Tiene razón solo si es el presidente de la cooperativa", "La solidez depende de un voto de la asamblea"], "e": "Competencia «Ser» de la sesión: argumentar sin confundir «estar de acuerdo» con «ser válido/sólido». La solidez es una cuestión técnica, no de gustos."}, {"t": 4, "c": "prog", "q": "Argumento: «Si el texto es un enlace, aparece subrayado. El texto aparece subrayado. Por lo tanto, es un enlace.» Datos: en esta interfaz también se subrayan los títulos, que no son enlaces. Clasifica:", "o": ["Inválido (afirma el consecuente) y, con estos datos, no sólido", "Válido y sólido", "Válido pero no sólido", "Sólido pero no válido"], "e": "Los títulos subrayados son el contraejemplo: Q verdadera (subrayado), P falsa (no es enlace). Forma inválida + primera premisa falsa: ni válido ni sólido."}, {"t": 4, "c": "ess", "q": "Si un argumento es sólido, ¿qué sabemos con certeza sobre su conclusión?", "o": ["Que es verdadera: de premisas verdaderas y forma válida solo se sigue una conclusión verdadera", "Que es verdadera solo si nos agrada", "Que es falsa", "Nada: la solidez no dice nada sobre la conclusión"], "e": "Esa es la fuerza de la solidez: garantiza la verdad de la conclusión. Por eso en la sesión los argumentos sólidos son el estándar más alto de un argumento deductivo."}, {"t": 4, "c": "innov", "q": "Argumento: «Si el prototipo pasa las pruebas de estrés, está listo para producción. Pasó las pruebas de estrés. Por lo tanto, está listo.» Datos: pasó las pruebas, pero ingeniería determinó que «pasar pruebas implica estar listo» era falso: falta un rediseño. Clasifica:", "o": ["Válido (Modus Ponens) pero no sólido", "Inválido: la conclusión resultó falsa", "Sólido: pasó las pruebas", "Inválido y sólido"], "e": "La forma sigue siendo Modus Ponens (válida), pero la primera premisa quedó refutada por los hechos. Conclusion: válido pero no sólido."}, {"t": 4, "c": "ess", "q": "Argumento: «Puesto que la cooperativa exporta café, paga impuestos de exportación. La cooperativa exporta café. Por lo tanto, paga esos impuestos.» Datos: exporta café y, como exige la ley, paga dichos impuestos. Clasifica:", "o": ["Válido y sólido", "Válido pero no sólido", "Inválido", "No se puede clasificar"], "e": "La premisa condicional es verdadera (la ley la garantiza), la premisa menor también, y la forma es Modus Ponens. Sólido."}, {"t": 4, "c": "mat", "q": "Argumento: «Si x es mayor que 10, entonces x es mayor que 5. En este problema x = 15. Por lo tanto, x es mayor que 5.» Clasifica:", "o": ["Válido y sólido", "Válido pero no sólido", "Inválido", "Inválido pero sólido"], "e": "El condicional es una verdad aritmética universal y «x = 15» hace verdadero el antecedente. Forma válida + premisas verdaderas + conclusión verdadera: sólido."}, {"t": 4, "c": "prog", "q": "Argumento: «Si el commit rompe la compilación, el robot de integración avisa. El robot avisó. Por lo tanto, el commit rompió la compilación.» Datos: el robot también avisa cuando falla el estilo del código, y esta vez fue por el estilo. Clasifica:", "o": ["Inválido (afirma el consecuente) y no sólido", "Válido y sólido", "Válido pero no sólido", "Sólido: el robot sí avisó"], "e": "El robot avisó por otra causa: exactamente el patrón de la afirmación del consecuente. La conclusión resulta falsa y la forma era inválida desde el inicio."}, {"t": 4, "c": "mat", "q": "«Sólido pero inválido» es:", "o": ["Imposible: la validez es condición necesaria de la solidez", "Posible: basta con que las premisas sean verdaderas", "Posible si la conclusión es verdadera", "Posible únicamente en matemáticas"], "e": "Solidez = validez AND premisas verdaderas. Sin la primera condición, la etiqueta «sólido» no puede aplicarse nunca."}, {"t": 4, "c": "innov", "q": "Publicación: «El 90 por ciento de nuestros usuarios se conecta a diario; por lo tanto, nuestra app es mejor que la de la competencia.» Datos: el 90 por ciento es exacto, pero no hay datos de la competencia. Clasifica:", "o": ["Inválido o incompleto: el dato verdadero no obliga a la conclusión sin una premisa que compare con la competencia", "Válido y sólido: el dato es verdadero", "Válido pero no sólido", "Sólido: los usuarios se conectan a diario"], "e": "Es el caso de estudio de la sesión (el 80 por ciento de satisfacción): un dato verdadero no convierte el argumento en válido. Falta la premisa puente, por ejemplo «nuestra tasa de conexión diaria es mayor que la de toda la competencia»."}, {"t": 5, "c": "mat", "q": "Si P es verdadera y Q es verdadera, ¿cuál es el valor del enunciado condicional P → Q?", "o": ["Verdadero", "Falso", "Depende del significado de P y Q", "Indefinido"], "e": "En la tabla del condicional, la fila P = V, Q = V produce un condicional verdadero. Es la fila del caso ideal: la promesa se cumple."}, {"t": 5, "c": "mat", "q": "Si P es verdadera y Q es falsa, ¿cuál es el valor de P → Q?", "o": ["Falso: es la única fila donde el condicional falla", "Verdadero", "Indefinido", "Depende de si P causa realmente a Q"], "e": "Un condicional solo es falso cuando su antecedente se cumple y el consecuente no: prometiste «si P, entonces Q», se cumplió P y no ocurrió Q. La promesa quedó rota."}, {"t": 5, "c": "prog", "q": "P = «hay una excepción no manejada» (verdadera); Q = «el registro de errores (log) lo documenta» (falsa). ¿Cuál es el valor de P → Q?", "o": ["Falso: ocurrió la condición y el log no la registró", "Verdadero: el log pudo fallar por otra razón", "No se puede evaluar sin revisar el código", "Verdadero solo si el log funciona"], "e": "P = V y Q = F: esa combinación hace falso al condicional. En la práctica, un «log fiable» que no registra una excepción real queda desmentido por los hechos."}, {"t": 5, "c": "ess", "q": "P = «la cooperativa recibe un donativo» (falsa); Q = «compra semillas» (verdadera). ¿Cuál es el valor de P → Q?", "o": ["Verdadero: con el antecedente falso, el condicional es verdadero sin importar Q", "Falso: la condición nunca se cumplió", "Falso: las semillas no fueron compradas con el donativo", "Indefinido: no hubo donativo"], "e": "Cuando P es falsa, el condicional no puede «fallar»: no hay caso en que P se cumpla y Q no ocurra. Por eso ambas filas con P falsa dan verdadero, aunque suene extraño al inicio."}, {"t": 5, "c": "innov", "q": "P = «el prototipo gana el concurso» (falsa); Q = «obtiene financiamiento» (falsa). ¿Cuál es el valor de P → Q?", "o": ["Verdadero", "Falso: ambas partes son falsas", "Indefinido", "Verdadero solo si existe causalidad"], "e": "P falsa y Q falsa también produce condicional verdadero. La tabla solo condena una fila: P verdadera con Q falsa."}, {"t": 5, "c": "prog", "q": "¿En qué única combinación de valores el condicional P → Q resulta FALSO?", "o": ["P verdadera y Q falsa", "P falsa y Q verdadera", "P falsa y Q falsa", "P verdadera y Q verdadera"], "e": "Es la fila clave de toda la tabla: V, F → F. Memorízala: es el único caso en que un «si... entonces...» queda refutado."}, {"t": 5, "c": "mat", "q": "En la tabla de verdad de P → Q (con las 4 combinaciones de P y Q), ¿cuántas filas producen un condicional VERDADERO?", "o": ["Tres", "Dos", "Una", "Cuatro"], "e": "Las filas (V,V), (F,V) y (F,F) dan verdadero; solo (V,F) da falso. Tres de cuatro filas son verdaderas."}, {"t": 5, "c": "mat", "q": "Para la forma de argumento «P → Q; Q; por lo tanto P», ¿qué fila de la tabla tiene las DOS premisas verdaderas y la conclusión FALSA?", "o": ["P falsa y Q verdadera: entonces P → Q es verdadero, Q es verdadero y P es falso", "P verdadera y Q verdadera", "P falsa y Q falsa", "P verdadera y Q falsa"], "e": "En la fila P = F, Q = V: la primera premisa (P → Q) vale verdadero, la segunda (Q) vale verdadero, pero la conclusión (P) es falsa. Esa única fila es el contraejemplo formal que declara inválida a la afirmación del consecuente."}, {"t": 5, "c": "ess", "q": "Para la forma «P → Q; P; por lo tanto Q» (Modus Ponens), ¿existe alguna fila donde ambas premisas sean verdaderas y la conclusión falsa?", "o": ["No: la única fila con ambas premisas verdaderas es P = V, Q = V, y ahí la conclusión es verdadera", "Sí: la fila P = V, Q = F", "Sí: la fila P = F, Q = V", "Sí: la fila P = F, Q = F"], "e": "Revisa las cuatro filas: para que P → Q y P sean verdaderas, P debe ser verdadera, y entonces solo sirve la fila (V,V), donde Q también lo es. Sin fila refutatoria, la forma queda demostrada como válida."}, {"t": 5, "c": "ess", "q": "P = «la asamblea aprueba el proyecto» (verdadera); Q = «el proyecto inicia en mayo» (falsa). En el argumento «P → Q; P; por lo tanto Q», según la tabla:", "o": ["La primera premisa es falsa, la segunda verdadera y la conclusión falsa: argumento válido pero no sólido", "Ambas premisas son verdaderas y la conclusión falsa, lo que refutaría a Modus Ponens", "Todas las partes resultan verdaderas", "Todas las partes resultan falsas"], "e": "Con P = V y Q = F, el condicional P → Q es FALSO. El argumento conserva su validez formal (Modus Ponens), pero como una premisa es falsa, no es sólido. La tabla ayuda a separar las dos evaluaciones."}, {"t": 5, "c": "innov", "q": "P = «la campaña aumenta seguidores»; Q = «aumentan las ventas». ¿Qué situación real haría FALSO el enunciado «si la campaña aumenta seguidores, entonces aumentan las ventas»?", "o": ["La campaña aumentó seguidores, pero las ventas no aumentaron", "La campaña no aumentó seguidores, pero las ventas aumentaron", "La campaña no aumentó seguidores y las ventas no aumentaron", "La campaña aumentó seguidores y las ventas también"], "e": "Solo la primera situación cumple P verdadera con Q falsa: la única forma de desmentir un condicional es que se cumpla el antecedente y falle el consecuente."}, {"t": 5, "c": "mat", "q": "En la tabla de verdad, la fila P = falsa y Q = verdadera produce un condicional P → Q:", "o": ["Verdadero", "Falso", "Paradojico", "Depende del orden de las columnas"], "e": "Con el antecedente falso, el condicional queda verdadero sin importar el consecuente: (F, V) → V."}, {"t": 5, "c": "prog", "q": "P = «el usuario es administrador» (falsa); Q = «el usuario puede borrar registros» (verdadera). ¿El par de valores refuta la forma «P → Q; Q; por lo tanto P»?", "o": ["Sí: P → Q resulta verdadero (P falsa), Q es verdadera y la conclusión P es falsa", "No: con P falsa nada se puede evaluar", "No: esa forma es válida y ninguna fila la refuta", "Sí, pero solo si P fuera verdadera"], "e": "Justo en esta fila las premisas brillan verdaderas y la conclusión miente. Es la fila refutatoria de la afirmación del consecuente: un usuario sin permisos de administrador (P falsa) que sí borra registros (Q verdadera)."}, {"t": 5, "c": "mat", "q": "En la tabla de verdad completa, ¿cuántas filas tienen la forma «P → Q; Q; por lo tanto P» con premisas verdaderas y conclusión falsa?", "o": ["Exactamente una: P falsa y Q verdadera", "Dos", "Ninguna: la forma es válida", "Las cuatro filas"], "e": "Solo (F, V) cumple el trío: P → Q verdadero, Q verdadero, P falso. Una sola fila basta para declarar inválida la forma."}, {"t": 5, "c": "ess", "q": "¿Para qué usamos una tabla de verdad al evaluar argumentos, según el enfoque de la sesión?", "o": ["Para buscar de forma sistemática una fila donde las premisas sean verdaderas y la conclusión falsa", "Para contar cuántas premisas tiene el argumento", "Para medir qué tan persuasivo resulta el argumento", "Para reemplazar el trabajo con indicadores lógicos"], "e": "La tabla es la versión formal de «buscar el contraejemplo»: si existe la fila mala (premisas V, conclusión F), la forma es inválida; si no existe, es válida."}, {"t": 5, "c": "prog", "q": "P = «la prueba de carga pasa» (verdadera); Q = «el servidor responde en menos de un segundo» (verdadera). ¿Cuál es el valor de P → Q?", "o": ["Verdadero", "Falso", "Indefinido sin más mediciones", "Verdadero solo en producción"], "e": "P = V, Q = V: la fila (V, V) produce condicional verdadero."}, {"t": 5, "c": "mat", "q": "Si P es falsa y Q es falsa, el condicional P → Q es:", "o": ["Verdadero: el condicional solo falla cuando P es verdadera y Q falsa", "Falso: ninguna de las dos condiciones se cumplió", "Falso: el antecedente es falso", "Indeterminado"], "e": "La fila (F, F) da verdadero. Intuición: si nunca se cumplió la condición P, la promesa «si P, entonces Q» no fue desmentida en ningún caso."}, {"t": 5, "c": "innov", "q": "P = «el producto es defectuoso» (falsa); Q = «hubo devoluciones» (verdadera). El argumento «P → Q; Q; por lo tanto P» concluye «el producto es defectuoso». En esta fila de la tabla:", "o": ["Las premisas son verdaderas y la conclusión es falsa: la fila refuta el argumento", "Las premisas son falsas y la conclusión verdadera", "Todas las partes son verdaderas", "Nada se puede evaluar sin construir la tabla completa"], "e": "P = F y Q = V: el condicional (P → Q) es verdadero, Q es verdadero... y P, la conclusión, es falso. Es la fila refutatoria de la afirmación del consecuente."}, {"t": 5, "c": "prog", "q": "Ejemplo: «si llueve, el sensor de la azotea se activa». Hoy no llovió y el sensor está inactivo (P = F, Q = F). ¿El enunciado condicional resulta verdadero o falso?", "o": ["Verdadero: no hay caso en que se cumpla «llueve» y falle el sensor", "Falso: ni la lluvia ni el sensor ocurrieron", "Falso: el antecedente es falso", "Indeterminado hasta mañana"], "e": "La fila (F, F) produce condicional verdadero. Un condicional falso requiere que el antecedente SÍ ocurra y el consecuente NO."}, {"t": 5, "c": "mat", "q": "Síntesis: la tabla de P → Q tiene tres filas verdaderas y una falsa. ¿Cuál es la única fila falsa?", "o": ["P = V, Q = F", "P = V, Q = V", "P = F, Q = V", "P = F, Q = F"], "e": "El condicional únicamente es falso con antecedente verdadero y consecuente falso. Todas las demás filas lo dejan en pie."}, {"t": 6, "c": "prog", "q": "P = «el test falla»; Q = «el despliegue se detiene». ¿Cómo se simboliza «si el test falla, el despliegue se detiene»?", "o": ["P → Q", "Q → P", "P ∴ Q", "Q ∴ P"], "e": "El antecedente (lo que va después del «si») es P y el consecuente es Q, así que la condicional es P → Q. El símbolo ∴ significa «por lo tanto» y se usa para argumentos, no para enunciados."}, {"t": 6, "c": "mat", "q": "P = «n es par»; Q = «n es divisible entre 4». ¿Cómo se simboliza «si n es divisible entre 4, entonces n es par»?", "o": ["Q → P", "P → Q", "P ∴ Q", "Q ∴ P"], "e": "Aquí el antecedente es Q (divisible entre 4) y el consecuente es P (par): Q → P. Cuidado con no invertir las letras solo porque «par» se mencionó primero."}, {"t": 6, "c": "ess", "q": "«La cooperativa recibe el subsidio; por lo tanto, compra el invernadero.» Con P = «recibe el subsidio» y Q = «compra el invernadero», la estructura es:", "o": ["P ∴ Q: una premisa y una conclusión", "P → Q; P; ∴ Q", "P → Q; Q; ∴ P", "Q ∴ P"], "e": "El argumento tiene una sola premisa («recibe el subsidio») y una conclusión marcada por «por lo tanto». No hay condicional explícito, así que no es Modus Ponens: es simplemente P ∴ Q."}, {"t": 6, "c": "innov", "q": "«Si la inversión llega, contratamos ingenieras. La inversión llegó. Por lo tanto, contratamos ingenieras.» La forma simbolizada es:", "o": ["P → Q; P; ∴ Q", "P → Q; Q; ∴ P", "Q → P; Q; ∴ P", "P; Q; ∴ P"], "e": "Primera premisa condicional (P → Q), segunda premisa afirma el antecedente (P) y la conclusión extrae el consecuente (Q): Modus Ponens, la forma válida estrella de la sesión."}, {"t": 6, "c": "prog", "q": "«Si hay un punto de interrupción (breakpoint), el depurador se detiene. El depurador se detuvo. Por lo tanto, hay un punto de interrupción.» La forma es:", "o": ["P → Q; Q; ∴ P", "P → Q; P; ∴ Q", "P ∴ Q", "Q ∴ P"], "e": "Se afirma el consecuente (el depurador se detuvo) para concluir el antecedente (hay breakpoint): la forma inválida de la sesión, P → Q; Q; ∴ P."}, {"t": 6, "c": "mat", "q": "P = «el ángulo es recto»; Q = «mide 90 grados». ¿Cuál oración corresponde exactamente al enunciado condicional P → Q?", "o": ["Si el ángulo es recto, entonces mide 90 grados", "Si el ángulo mide 90 grados, entonces es recto", "El ángulo es recto; por lo tanto, mide 90 grados", "El ángulo mide 90 grados; por lo tanto, es recto"], "e": "Ojo con la diferencia: las opciones C y D son ARGUMENTOS (llevan «por lo tanto»), no enunciados condicionales. P → Q se lee «si P, entonces Q», con P como antecedente."}, {"t": 6, "c": "ess", "q": "«Dado que la feria fue exitosa, repetiremos en diciembre.» Con P = «la feria fue exitosa» y Q = «repetiremos en diciembre», la estructura es:", "o": ["P ∴ Q, con «dado que» marcando la premisa", "P → Q; P; ∴ Q", "P → Q; Q; ∴ P", "Q ∴ P"], "e": "«Dado que» es indicador de premisa: hay una sola premisa (P) y una conclusión (Q). La estructura del argumento es P ∴ Q, aunque no aparezca el símbolo escrito."}, {"t": 6, "c": "innov", "q": "«Si el sensor detecta movimiento, la cámara graba. La cámara está grabando. Por lo tanto, hay movimiento.» ¿Qué forma tiene?", "o": ["Afirmación del consecuente: P → Q; Q; ∴ P", "Modus Ponens: P → Q; P; ∴ Q", "Es un argumento sin forma reconocible", "Es un enunciado único, no un argumento"], "e": "La cámara puede grabar por otros motivos (por ejemplo, grabación programada), así que concluir «hay movimiento» afirma el consecuente: P → Q; Q; ∴ P."}, {"t": 6, "c": "prog", "q": "Sabemos que «si la memoria supera el 90 por ciento, el sistema envía una alerta» es verdadera, y que la memoria SÍ supera el 90 por ciento. ¿Qué concluimos con forma válida?", "o": ["El sistema envía una alerta", "El sistema no envía ninguna alerta", "La memoria no supera el 90 por ciento", "Nada se puede concluir"], "e": "P → Q y P disponibles: Modus Ponens nos da Q. Cualquier otra conclusión no está garantizada por esas dos premisas."}, {"t": 6, "c": "mat", "q": "Sabemos que «si un número termina en 6, entonces es par» y que 36 termina en 6. ¿Qué se sigue válidamente?", "o": ["36 es par", "36 es impar", "Todo número par termina en 6", "36 es un número primo"], "e": "Modus Ponens: del condicional y del antecedente (36 termina en 6) se sigue el consecuente (36 es par). La opción C invierte el condicional y no se sigue."}, {"t": 6, "c": "ess", "q": "Sabemos que «si la cooperativa gana el premio, aparece en el periódico» es verdadera, y que la cooperativa SÍ aparece en el periódico. Concluir «ganó el premio» sería:", "o": ["Una afirmación del consecuente: razonamiento inválido", "Un Modus Ponens: razonamiento válido", "Válido si el periódico es local", "Sólido en cualquier escenario"], "e": "Aparecer en el periódico es el consecuente Q; afirmar Q para concluir P es exactamente la falacia formal que la sesión llama afirmación del consecuente. La mención pudo deberse a otra nota."}, {"t": 6, "c": "innov", "q": "¿Cuál de estos argumentos tiene forma de Modus Ponens?", "o": ["Si el inversionista firma, el proyecto arranca. El inversionista firmó. Por lo tanto, el proyecto arranca.", "Si el inversionista firma, el proyecto arranca. El proyecto arrancó. Por lo tanto, el inversionista firmó.", "El inversionista firmó. Por lo tanto, el proyecto arranca.", "Si el proyecto arranca, el inversionista firma. El inversionista no firmó. Por lo tanto, el proyecto no arranca."], "e": "La opción A es P → Q; P; ∴ Q. La B es afirmación del consecuente; la C no tiene condicional; la D tiene la condicional invertida y niega el antecedente."}, {"t": 6, "c": "prog", "q": "En el enunciado «si el commit pasa las pruebas, se fusiona a la rama principal», el ANTECEDENTE P es:", "o": ["El commit pasa las pruebas", "Se fusiona a la rama principal", "El commit", "La rama principal"], "e": "El antecedente es lo que sigue al «si»: la condición. El consecuente es lo que se afirma que ocurrirá si la condición se cumple."}, {"t": 6, "c": "ess", "q": "En el enunciado «si la cosecha falla, el precio del mercado sube», el CONSECUENTE Q es:", "o": ["El precio del mercado sube", "La cosecha falla", "El mercado", "La cosecha"], "e": "El consecuente es la parte que depende de la condición: «el precio del mercado sube». La cosecha fallida es el antecedente."}, {"t": 6, "c": "mat", "q": "¿Cuál es la diferencia entre escribir «P → Q» y escribir «P; ∴ Q»?", "o": ["«P → Q» es un solo enunciado condicional; «P; ∴ Q» es un argumento con una premisa y una conclusión", "Son la misma cosa escrita de dos maneras", "«P → Q» es un argumento y «P; ∴ Q» es un enunciado", "«P → Q» siempre es falso y «P; ∴ Q» siempre es verdadero"], "e": "El condicional P → Q afirma una relación (puede ser verdadero o falso como enunciado). El argumento P ∴ Q, en cambio, pone una premisa al lado de una conclusión y por eso sí se le puede pedir validez."}];
+
+// ==================== ESTADO ====================
+const S = {
+  mode:"practica", tema:"all", ctx:"all",
+  deck:[], cur:0, answered:false,
+  stats:{resp:0, ok:0, racha:0},
+  exam:{sel:{}, active:false},
+  bestExam: null
+};
+const LS_KEY = "logica_s2_v1";
+
+function loadLS(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(raw){
+      const d = JSON.parse(raw);
+      S.stats = d.stats || S.stats;
+      S.bestExam = (typeof d.bestExam === "number") ? d.bestExam : null;
+    }
+  }catch(e){}
+}
+function saveLS(){
+  try{
+    localStorage.setItem(LS_KEY, JSON.stringify({stats:S.stats, bestExam:S.bestExam}));
+  }catch(e){}
+}
+loadLS();
+
+// ==================== UTILIDADES ====================
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1; i>0; i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+const $ = id => document.getElementById(id);
+
+// ==================== FILTROS / MAZO ====================
+function filteredPool(){
+  return EX.map((e,i)=>i).filter(i=>{
+    const e = EX[i];
+    return (S.tema==="all" || e.t===S.tema) && (S.ctx==="all" || e.c===S.ctx);
+  });
+}
+function buildDeck(){
+  const pool = filteredPool();
+  $("countInfo").textContent = pool.length + " ejercicio(s) disponibles con estos filtros";
+  return shuffle(pool);
+}
+
+// ==================== RENDER ====================
+function renderStats(){
+  $("stResp").textContent = S.stats.resp;
+  $("stOk").textContent = S.stats.ok;
+  $("stRacha").textContent = S.stats.racha;
+  $("stPrec").textContent = S.stats.resp ? Math.round(100*S.stats.ok/S.stats.resp)+"%" : "—";
+  const prog = S.mode==="examen"
+    ? (S.exam.active ? (Object.keys(S.exam.sel).length/Math.max(S.deck.length,1))*100 : 0)
+    : (S.deck.length ? (S.cur/S.deck.length)*100 : 0);
+  $("progFill").style.width = Math.min(100,prog)+"%";
+}
+
+function renderChips(){
+  const box = $("chipsTema"); box.innerHTML = "";
+  const mk = (val,label)=>{
+    const b = document.createElement("button");
+    b.type="button"; b.className="chip"+(S.tema===val?" on":""); b.textContent=label;
+    b.onclick = ()=>{ S.tema=val; renderChips(); resetAll(); };
+    box.appendChild(b);
+  };
+  mk("all","Todos los temas");
+  for(const k of Object.keys(TEMAS)) mk(Number(k), (k)+". "+TEMAS[k].n);
+}
+
+function currentView(){
+  // Devuelve {ex, order} según modo y progreso.
+  // El orden de opciones se fija UNA vez por pregunta (S.orders) para que la
+  // evaluación use el mismo orden que se mostró.
+  const idx = S.deck[S.cur];
+  if(idx===undefined) return null;
+  const ex = EX[idx];
+  if(!S.orders) S.orders = {};
+  if(!S.orders[idx]) S.orders[idx] = shuffle([0,1,2,3]);
+  return {ex, order: S.orders[idx], idx};
+}
+
+function renderQuestion(){
+  const view = currentView();
+  if(!view){ showEmpty(); return; }
+  const {ex, order, idx} = view;
+  $("quizZone").style.display="block";
+  $("resultZone").style.display="none";
+  $("emptyMsg").style.display="none";
+  $("qcard").style.display="block";
+
+  $("qTagTema").textContent = TEMAS[ex.t].n;
+  $("qTagCtx").textContent = CTXS[ex.c];
+  $("qNum").textContent = (S.mode==="examen" ? "Examen · pregunta " : "Ejercicio ")+(S.cur+1)+" de "+S.deck.length;
+  $("qText").innerHTML = escapeHtml(ex.q);
+
+  const box = $("qOpts"); box.innerHTML = "";
+  const letters = ["a","b","c","d"];
+  order.forEach((oi,pos)=>{
+    const btn = document.createElement("button");
+    btn.type="button"; btn.className="opt";
+    btn.innerHTML = '<span class="letter">'+letters[pos]+'</span><span>'+escapeHtml(ex.o[oi])+'</span>';
+    btn.dataset.pos = pos;
+    btn.onclick = ()=>answer(pos);
+    box.appendChild(btn);
+  });
+
+  // Estado de respuesta
+  S.answered = false;
+  const fb = $("qFeed"); fb.className="feedback"; fb.classList.remove("show");
+
+  if(S.mode==="examen" && S.exam.sel[idx]!==undefined){
+    // ya respondida en el examen: mostrar selección bloqueada (sin revelar si es correcta)
+    S.answered = true;
+    const posOfSel = order.indexOf(S.exam.sel[idx]);
+    box.children[posOfSel].classList.add("selected");
+    box.querySelectorAll(".opt").forEach(b=>b.disabled=true);
+  }
+
+  // Botones
+  $("btnPrev").disabled = S.cur===0;
+  const isLast = S.cur===S.deck.length-1;
+  if(S.mode==="examen"){
+    $("btnNext").style.display = isLast ? "none" : "inline-block";
+    $("btnFinish").style.display = "inline-block";
+    const total = S.deck.length, resp = Object.keys(S.exam.sel).length;
+    $("btnFinish").disabled = resp<total;
+    $("btnFinish").textContent = resp<total ? "Terminar ("+resp+"/"+total+")" : "Terminar y ver resultados";
+  }else{
+    $("btnNext").style.display = "inline-block";
+    $("btnFinish").style.display = "none";
+    $("btnNext").textContent = isLast ? "Finalizar ronda" : "Siguiente →";
+  }
+  renderStats();
+}
+
+function showEmpty(){
+  $("qcard").style.display="none";
+  $("emptyMsg").style.display="block";
+  $("resultZone").style.display="none";
+  renderStats();
+}
+
+function escapeHtml(s){
+  return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+// ==================== RESPONDER ====================
+function answer(pos){
+  const view = currentView();
+  if(!view || S.answered) return;
+  const {ex, order, idx} = view;
+  const oi = order[pos];
+  const correct = oi===0;
+  const box = $("qOpts");
+
+  if(S.mode==="practica"){
+    S.answered = true;
+    box.querySelectorAll(".opt").forEach(b=>b.disabled=true);
+    box.children[pos].classList.add(correct?"correct":"wrong");
+    if(!correct){
+      const posOk = order.indexOf(0);
+      box.children[posOk].classList.add("correct");
+    }
+    const fb = $("qFeed");
+    fb.className = "feedback show "+(correct?"ok":"bad");
+    $("feedVerdict").innerHTML = correct
+      ? '<span>✓</span> Correcto'
+      : '<span>✗</span> Incorrecto — la respuesta marcada en verde es la correcta';
+    $("feedExp").innerHTML = "<b>Por qué:</b> "+escapeHtml(ex.e || "");
+    S.stats.resp++; if(correct){S.stats.ok++; S.stats.racha++;} else {S.stats.racha=0;}
+    saveLS(); renderStats();
+  }else{
+    // examen: registrar y bloquear
+    S.exam.sel[idx] = oi;
+    box.querySelectorAll(".opt").forEach(b=>{b.disabled=true; b.classList.remove("selected");});
+    box.children[pos].classList.add("selected");
+    renderStats();
+    // actualizar botón terminar
+    const total = S.deck.length, resp = Object.keys(S.exam.sel).length;
+    $("btnFinish").disabled = resp<total;
+    $("btnFinish").textContent = resp<total ? "Terminar ("+resp+"/"+total+")" : "Terminar y ver resultados";
+  }
+}
+
+// ==================== NAVEGACIÓN ====================
+function next(){
+  if(S.cur < S.deck.length-1){ S.cur++; renderQuestion(); }
+  else{
+    if(S.mode==="practica") endPractice();
+  }
+}
+function prev(){ if(S.cur>0){ S.cur--; renderQuestion(); } }
+
+function endPractice(){
+  const n = S.deck.length;
+  const acc = S.stats.resp ? Math.round(100*S.stats.ok/S.stats.resp) : 0;
+  $("qcard").style.display="none";
+  $("resultZone").style.display="block";
+  $("resPct").textContent = acc+"%";
+  $("resMsg").textContent = "Ronda de práctica terminada ("+n+" ejercicios)";
+  $("resSub").textContent = "Pulsa «Reintentar otro examen» o vuelve arriba para mezclar una nueva ronda con otros filtros.";
+  $("reviewList").innerHTML = "";
+  $("btnRetry").textContent = "Mezclar otra ronda de práctica";
+  $("btnRetry").onclick = ()=>{ startPractice(); window.scrollTo({top:0,behavior:"smooth"}); };
+  renderStats();
+}
+
+// ==================== EXAMEN ====================
+function startExam(){
+  S.mode="examen";
+  $("mExamen").classList.add("on"); $("mPractica").classList.remove("on");
+  S.deck = buildDeck();
+  const n = Math.min(20, S.deck.length);
+  S.deck = S.deck.slice(0,n);
+  S.cur = 0; S.answered=false; S.orders={};
+  S.exam = {sel:{}, active:true};
+  renderQuestion();
+}
+function finishExam(){
+  if(S.mode!=="examen") return;
+  let ok = 0;
+  const rows = [];
+  S.deck.forEach((idx,k)=>{
+    const ex = EX[idx];
+    const chosen = S.exam.sel[idx];
+    const correct = chosen===0;
+    if(correct) ok++;
+    const order = (S.orders && S.orders[idx]) || [0,1,2,3];
+    const posOf = v => order.indexOf(v);
+    const letters = ["a","b","c","d"];
+    rows.push(
+      '<div class="rev '+(correct?"ok":"bad")+'">'+
+        '<div class="rev-head"><span class="rev-num">Pregunta '+(k+1)+'</span>'+
+        '<span class="tag tema">'+TEMAS[ex.t].n+'</span>'+
+        '<span class="rev-state">'+(correct?"Correcta":"Incorrecta")+'</span></div>'+
+        '<div class="rev-q">'+escapeHtml(ex.q)+'</div>'+
+        (correct
+          ? '<div class="rev-ans yours ok-c"><b>Tu respuesta ('+letters[posOf(chosen)]+'):</b> '+escapeHtml(ex.o[chosen])+'</div>'
+          : '<div class="rev-ans yours bad-c"><b>Tu respuesta ('+letters[posOf(chosen)]+'):</b> '+escapeHtml(ex.o[chosen])+'</div>'+
+            '<div class="rev-ans"><b>Correcta ('+letters[posOf(0)]+'):</b> '+escapeHtml(ex.o[0])+'</div>'
+        )+
+        '<div class="rev-exp"><b>Por qué:</b> '+escapeHtml(ex.e || "")+'</div>'+
+      '</div>'
+    );
+  });
+  const pct = Math.round(100*ok/S.deck.length);
+  S.bestExam = (S.bestExam===null) ? pct : Math.max(S.bestExam,pct);
+  saveLS();
+  $("qcard").style.display="none";
+  $("resultZone").style.display="block";
+  $("resPct").textContent = ok+" / "+S.deck.length+"  ("+pct+"%)";
+  $("resMsg").textContent =
+    pct>=90 ? "¡Excelente! Dominas la distinción verdad–validez–solidez." :
+    pct>=70 ? "¡Muy bien! Repasa las preguntas falladas y vuelve a intentarlo." :
+    pct>=50 ? "Vas por buen camino: abre el repaso de teoría y enfócate en los temas fallados." :
+    "No te desanimes: empieza por el repaso de teoría y practica el Tema 1 en modo práctica.";
+  $("resSub").textContent = "Tu mejor resultado en exámenes: "+S.bestExam+"%";
+  $("reviewList").innerHTML = rows.join("");
+  $("btnRetry").textContent = "Reintentar otro examen";
+  $("btnRetry").onclick = ()=>{ startExam(); window.scrollTo({top:0,behavior:"smooth"}); };
+  renderStats();
+  window.scrollTo({top:$("resultZone").offsetTop-20, behavior:"smooth"});
+}
+
+// ==================== PRÁCTICA ====================
+function startPractice(){
+  S.mode="practica";
+  $("mPractica").classList.add("on"); $("mExamen").classList.remove("on");
+  S.deck = buildDeck();
+  S.cur = 0; S.answered=false; S.orders={}; S.exam={sel:{},active:false};
+  if(S.deck.length===0){ showEmpty(); return; }
+  renderQuestion();
+}
+
+// ==================== RESET ====================
+function resetAll(){
+  S.cur=0; S.answered=false; S.orders={}; S.exam={sel:{},active:false};
+  $("resultZone").style.display="none";
+  showEmpty();
+}
+
+// ==================== EVENTOS ====================
+$("mPractica").onclick = ()=>startPractice();
+$("mExamen").onclick = ()=>startExam();
+$("btnStart").onclick = ()=>{ S.mode==="examen" ? startExam() : startPractice(); };
+$("btnNext").onclick = next;
+$("btnPrev").onclick = prev;
+$("btnFinish").onclick = finishExam;
+$("btnReset").onclick = ()=>{
+  if(confirm("¿Borrar tus estadísticas acumuladas y tu mejor examen?")){
+    S.stats={resp:0,ok:0,racha:0}; S.bestExam=null; saveLS();
+    resetAll(); renderStats();
+  }
+};
+$("selCtx").onchange = e=>{ S.ctx=e.target.value; resetAll(); };
+
+document.addEventListener("keydown", e=>{
+  if($("qcard").style.display==="none") return;
+  const map = {"1":0,"2":1,"3":2,"4":3,"a":0,"b":1,"c":2,"d":3};
+  const k = e.key.toLowerCase();
+  if(k in map && !S.answered) answer(map[k]);
+  else if(e.key==="ArrowRight") next();
+  else if(e.key==="ArrowLeft") prev();
+});
+
+// ==================== INICIO ====================
+renderChips();
+$("badgeTotal").textContent = EX.length+" ejercicios";
+resetAll();
+</script>
+
+</body>
+</html>
