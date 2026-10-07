@@ -70,6 +70,16 @@
   table.tt th, table.tt td{border:1px solid var(--border); padding:5px 13px; text-align:center;}
   table.tt th{background:var(--accent-dark); color:#fff; font-weight:700;}
   table.tt tr.bad td{background:var(--bad-soft); font-weight:700; color:var(--bad);}
+
+  /* Tablas anchas (Modus Ponens y Afirmación del Consecuente) */
+  table.tt.wide{font-size:12.5px; width:100%;}
+  table.tt.wide th, table.tt.wide td{padding:4px 8px; vertical-align:middle;}
+  table.tt.wide th small{font-size:10px; font-weight:600; opacity:.85; display:block; line-height:1.2;}
+  @media (max-width:640px){
+    table.tt.wide{font-size:11px;}
+    table.tt.wide th, table.tt.wide td{padding:3px 5px;}
+  }
+
   .metodo{counter-reset:paso; margin-top:14px;}
   .metodo .paso{
     display:flex; gap:12px; align-items:flex-start; padding:9px 0; border-top:1px dashed var(--border);
@@ -232,9 +242,9 @@
 
 <header>
   <div class="wrap">
-    <div class="kicker">LPID · LESS · Sesión 2 · Indicadores lógicos, verdad y validez</div>
+    <div class="kicker">LPID · LESS · Sesión 2 · Indicadores lógicos, verdad y validez · Unidad de Aprendizaje Razonamiento Lógico Matemático · Dr Adrian Cerda · UNITI 2026 </div>
     <h1>Ejercicios de refuerzo y práctica: verdad, validez y solidez de argumentos</h1>
-    <p class="sub">Ejercicios de opción múltiple con retroalimentación. Las opciones se mezclan en cada intento.</p>
+    <p class="sub">Ejercicios de opción múltiple con retroalimentación. Las opciones se mezclan en cada intento, ten la libertad de eligir los ejercicios con los que quieras practicar. Puedes borrar tu progreso inicial y superar, si te lo propones, la barrera de un progreso excelente.</p>
     <div class="badges">
       <span class="badge" id="badgeTotal">115 ejercicios</span>
       <span class="badge">6 temas de la sesión</span>
@@ -286,6 +296,8 @@
           <p class="def" style="margin-top:7px">Para refutar una forma, es decir, para probar que una estrucutura es invalida, debes buscar un <b>contraejemplo</b>, lo cual significa encontrar o inventar un escenario en donde las premisas sean realmente verdaderas y la conclusión sea falsa en realidad.<br>Nota: la afirmación del consecuente siempre puede refutarse.</p>
         </div>
       </div>
+
+      <!-- ===== Tabla de verdad del condicional ===== -->
       <div class="tcard" style="margin-top:12px">
         <h3>Tabla de verdad del condicional P → Q</h3>
         <table class="tt">
@@ -297,11 +309,98 @@
         </table>
         <p class="def" style="text-align:center; margin-top:8px">Solo una fila lo hace falso: <b>P verdadera y Q falsa</b>. Con esa tabla se prueba que Modus Ponens no tiene fila refutatoria y que la afirmación del consecuente sí la tiene.</p>
       </div>
+
+      <!-- ===== Tabla de verdad: Modus Ponens ===== -->
+      <div class="tcard" style="margin-top:12px">
+        <h3>Tabla de verdad aplicada a Modus Ponens (forma VÁLIDA)</h3>
+        <p class="def" style="text-align:center; margin:8px 0">
+          <span class="simb">P → Q; P; ∴ Q</span>
+        </p>
+        <div style="overflow-x:auto">
+          <table class="tt wide">
+            <thead>
+              <tr>
+                <th>P</th>
+                <th>Q</th>
+                <th>P → Q<br><small>(Premisa 1)</small></th>
+                <th>P<br><small>(Premisa 2)</small></th>
+                <th>Q<br><small>(Conclusión)</small></th>
+                <th>¿Fila refutatoria?</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>V</td><td>V</td><td><b>V</b></td><td><b>V</b></td><td><b>V</b></td>
+                <td>No (todo verdadero)</td>
+              </tr>
+              <tr>
+                <td>V</td><td>F</td><td>F</td><td>V</td><td>F</td>
+                <td>No (premisa 1 es falsa)</td>
+              </tr>
+              <tr>
+                <td>F</td><td>V</td><td>V</td><td>F</td><td>V</td>
+                <td>No (premisa 2 es falsa)</td>
+              </tr>
+              <tr>
+                <td>F</td><td>F</td><td>V</td><td>F</td><td>F</td>
+                <td>No (premisa 2 es falsa)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="def" style="text-align:center; margin-top:8px">
+          <b>Resultado:</b> no existe ninguna fila donde ambas premisas sean verdaderas y la conclusión sea falsa. Por eso el Modus Ponens es <b>válido</b>.
+        </p>
+      </div>
+
+      <!-- ===== Tabla de verdad: Afirmación del Consecuente ===== -->
+      <div class="tcard" style="margin-top:12px">
+        <h3>Tabla de verdad aplicada a la Afirmación del Consecuente (forma INVÁLIDA)</h3>
+        <p class="def" style="text-align:center; margin:8px 0">
+          <span class="simb">P → Q; Q; ∴ P</span>
+        </p>
+        <div style="overflow-x:auto">
+          <table class="tt wide">
+            <thead>
+              <tr>
+                <th>P</th>
+                <th>Q</th>
+                <th>P → Q<br><small>(Premisa 1)</small></th>
+                <th>Q<br><small>(Premisa 2)</small></th>
+                <th>P<br><small>(Conclusión)</small></th>
+                <th>¿Fila refutatoria?</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>V</td><td>V</td><td><b>V</b></td><td><b>V</b></td><td><b>V</b></td>
+                <td>No</td>
+              </tr>
+              <tr>
+                <td>V</td><td>F</td><td>F</td><td>F</td><td>V</td>
+                <td>No (premisa 1 es falsa)</td>
+              </tr>
+              <tr class="bad">
+                <td><b>F</b></td><td><b>V</b></td><td><b>V</b></td><td><b>V</b></td><td><b>F</b></td>
+                <td><b>SÍ ← fila refutatoria</b></td>
+              </tr>
+              <tr>
+                <td>F</td><td>F</td><td>V</td><td>F</td><td>F</td>
+                <td>No (premisa 2 es falsa)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="def" style="text-align:center; margin-top:8px">
+          <b>Resultado:</b> en la fila <b>P = F, Q = V</b> ambas premisas son verdaderas (P → Q es V, Q es V) pero la conclusión es falsa (P es F). Esta es la <b>fila refutatoria</b> que demuestra que el argumento es <b>inválido</b>.
+        </p>
+      </div>
+
       <div class="metodo">
         <div class="paso">Localiza premisas y conclusión con los indicadores (aunque el orden escrito esté invertido).</div>
         <div class="paso">Pregunta de contenido: ¿las premisas, de hecho, son verdaderas?</div>
         <div class="paso">Pregunta de forma: si las premisas fueran verdaderas, ¿la conclusión se seguiría necesariamente?</div>
-        <div class="paso">Clasifica: <b>sólido</b> (válido + premisas verdaderas), <b>válido pero no sólido</b>, o <b>inválido</b> — aunque su conclusión resulte cierta por casualidad.</div>
+        <div class="paso">Clasifica los argumentos como: <b>sólido</b> (válido + premisas verdaderas), <b>válido pero no sólido</b>, o <b>inválido</b> — aunque su conclusión resulte cierta por casualidad.</div>
       </div>
     </div>
   </details>
@@ -387,7 +486,7 @@
   </section>
 
   <footer>
-    Basado en las <b>Notas de la Sesión 2 — Indicadores lógicos, verdad y validez</b> (LPID · UNITI).<br>
+    Basado en las <b>Notas de la Sesión 2 — Indicadores lógicos, verdad y validez</b> (LPID · LESS · UNITI). Dr. Adrián Cerda <br>
     Recuerda el hilo conductor: ¿cómo distinguimos la validez de la <i>forma</i> de un argumento respecto de la verdad de su <i>contenido</i>?
   </footer>
 </main>
