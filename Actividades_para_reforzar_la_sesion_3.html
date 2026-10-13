@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ejercicios de refuerzo y práctica: deducción, inducción y falacias (Sesión 3)</title>
+<style>
+  :root{
+    --bg:#eff0f1; --card:#ffffff; --ink:#1a1b1c; --muted:#6f7378;
+    --accent:#366ea6; --accent-dark:#334250; --accent-soft:#eaf1f8;
+    --stripe:#ebedee; --border:#c7d0da; --ok:#46875c; --ok-soft:#eaf4ed;
+    --bad:#92453e; --bad-soft:#f7ecea; --warn:#a18347;
+    --r:14px; --shadow:0 1px 3px rgba(26,27,28,.08),0 6px 18px rgba(26,27,28,.06);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    background:var(--bg); color:var(--ink); line-height:1.55; font-size:16px;
+  }
+  .wrap{max-width:860px; margin:0 auto; padding:0 18px;}
+
+  /* ---------- Header ---------- */
+  header{
+    background:linear-gradient(160deg,var(--accent-dark) 0%, #3a5a7d 70%, var(--accent) 130%);
+    color:#fff; padding:34px 0 30px;
+  }
+  .kicker{
+    font-size:12px; letter-spacing:2.5px; text-transform:uppercase;
+    opacity:.75; margin-bottom:10px; font-weight:600;
+  }
+  header h1{font-size:clamp(22px,4vw,31px); line-height:1.2; font-weight:800; max-width:640px;}
+  header .sub{margin-top:10px; max-width:620px; font-size:15px; opacity:.88;}
+  .badges{display:flex; flex-wrap:wrap; gap:8px; margin-top:16px;}
+  .badge{
+    background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.25);
+    padding:5px 12px; border-radius:999px; font-size:12.5px; font-weight:600;
+  }
+
+  /* ---------- Teoría ---------- */
+  details.teoria{
+    background:var(--card); border:1px solid var(--border); border-radius:var(--r);
+    margin:22px 0 0; box-shadow:var(--shadow); overflow:hidden;
+  }
+  details.teoria summary{
+    cursor:pointer; padding:16px 20px; font-weight:700; font-size:15.5px;
+    color:var(--accent-dark); list-style:none; display:flex; align-items:center; gap:10px;
+    user-select:none;
+  }
+  details.teoria summary::-webkit-details-marker{display:none;}
+  details.teoria summary .chev{transition:transform .2s; color:var(--accent); font-size:13px;}
+  details.teoria[open] summary .chev{transform:rotate(90deg);}
+  .teoria-body{padding:4px 20px 22px; border-top:1px solid var(--stripe);}
+  .teoria-body p.intro{margin:14px 0 4px; font-size:14.5px; color:var(--muted);}
+  .tgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:12px; margin-top:14px;}
+  .tcard{
+    border:1px solid var(--border); border-radius:10px; padding:14px 15px;
+    background:#fbfcfd; font-size:13.8px;
+  }
+  .tcard h3{font-size:13.5px; color:var(--accent-dark); margin-bottom:7px; letter-spacing:.3px;}
+  .tcard ul{padding-left:17px;}
+  .tcard li{margin:3px 0;}
+  .tcard.pill-list li{
+    list-style:none; display:inline-block; background:var(--accent-soft); color:var(--accent-dark);
+    border:1px solid var(--border); border-radius:999px; padding:2px 10px; margin:3px 3px 3px 0; font-weight:600;
+  }
+  .tcard .def{margin-top:6px;}
+  .tcard .def b{color:var(--accent-dark);}
+  table.tt{border-collapse:collapse; margin:8px auto 0; font-size:13.5px;}
+  table.tt th, table.tt td{border:1px solid var(--border); padding:5px 13px; text-align:center;}
+  table.tt th{background:var(--accent-dark); color:#fff; font-weight:700;}
+  table.tt tr.bad td{background:var(--bad-soft); font-weight:700; color:var(--bad);}
+  table.tt.wide{font-size:12.5px; width:100%;}
+  table.tt.wide th, table.tt.wide td{padding:5px 10px; vertical-align:middle; text-align:left;}
+  table.tt.wide th small{font-size:10px; font-weight:600; opacity:.85; display:block; line-height:1.2;}
+  table.tt.wide td.fam{font-weight:800; color:var(--accent-dark); text-align:left;}
+
+  .metodo{counter-reset:paso; margin-top:14px;}
+  .metodo .paso{
+    display:flex; gap:12px; align-items:flex-start; padding:9px 0; border-top:1px dashed var(--border);
+    font-size:14px;
+  }
+  .metodo .paso::before{
+    counter-increment:paso; content:counter(paso);
+    flex:0 0 26px; height:26px; border-radius:50%; background:var(--accent); color:#fff;
+    display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13.5px; margin-top:1px;
+  }
+  .simb{font-family:"SF Mono",Consolas,Menlo,monospace; background:var(--stripe); padding:1px 6px; border-radius:5px; font-size:13px;}
+
+  /* ---------- Controles ---------- */
+  .controls{
+    background:var(--card); border:1px solid var(--border); border-radius:var(--r);
+    box-shadow:var(--shadow); margin-top:18px; padding:16px 18px;
+  }
+  .ctl-row{display:flex; flex-wrap:wrap; gap:10px; align-items:center;}
+  .ctl-label{font-size:12px; text-transform:uppercase; letter-spacing:1.2px; color:var(--muted); font-weight:700; margin-right:2px;}
+  .seg{display:flex; border:1.5px solid var(--accent); border-radius:10px; overflow:hidden;}
+  .seg button{
+    border:0; background:#fff; color:var(--accent); padding:9px 18px; font-size:14px; font-weight:700; cursor:pointer;
+    transition:background .15s,color .15s;
+  }
+  .seg button.on{background:var(--accent); color:#fff;}
+  .chips{display:flex; flex-wrap:wrap; gap:7px;}
+  .chip{
+    border:1.5px solid var(--border); background:#fff; color:var(--accent-dark);
+    border-radius:999px; padding:6px 13px; font-size:13px; font-weight:600; cursor:pointer; transition:all .15s;
+  }
+  .chip:hover{border-color:var(--accent);}
+  .chip.on{background:var(--accent-dark); border-color:var(--accent-dark); color:#fff;}
+  select.sel{
+    border:1.5px solid var(--border); border-radius:10px; padding:8px 12px; font-size:14px;
+    background:#fff; color:var(--ink); cursor:pointer; font-family:inherit;
+  }
+  .btn{
+    border:0; border-radius:10px; padding:11px 20px; font-size:14.5px; font-weight:700; cursor:pointer;
+    transition:transform .08s, box-shadow .15s; font-family:inherit;
+  }
+  .btn:active{transform:translateY(1px);}
+  .btn-primary{background:var(--accent); color:#fff; box-shadow:0 3px 10px rgba(54,110,166,.35);}
+  .btn-primary:hover{background:#2f6096;}
+  .btn-ghost{background:#fff; color:var(--accent-dark); border:1.5px solid var(--border);}
+  .btn-ghost:hover{border-color:var(--accent); color:var(--accent);}
+  .btn:disabled{opacity:.45; cursor:not-allowed; box-shadow:none;}
+  .ctl-actions{display:flex; flex-wrap:wrap; gap:10px; margin-top:14px; padding-top:14px; border-top:1px solid var(--stripe);}
+
+  /* ---------- Estadísticas ---------- */
+  .statsbar{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:18px;
+  }
+  .stat{
+    background:var(--card); border:1px solid var(--border); border-radius:12px; padding:12px 8px; text-align:center;
+    box-shadow:var(--shadow);
+  }
+  .stat .n{font-size:22px; font-weight:800; color:var(--accent-dark); line-height:1.1;}
+  .stat .l{font-size:11px; text-transform:uppercase; letter-spacing:1px; color:var(--muted); margin-top:3px; font-weight:600;}
+  .progress{height:7px; background:var(--stripe); border-radius:99px; margin-top:12px; overflow:hidden;}
+  .progress > div{height:100%; width:0%; background:linear-gradient(90deg,var(--accent),#5b93c4); border-radius:99px; transition:width .3s;}
+
+  /* ---------- Tarjeta de pregunta ---------- */
+  .qcard{
+    background:var(--card); border:1px solid var(--border); border-radius:var(--r);
+    box-shadow:var(--shadow); margin-top:18px; padding:22px 24px;
+  }
+  .qtop{display:flex; flex-wrap:wrap; gap:7px; align-items:center; margin-bottom:14px;}
+  .tag{font-size:11.5px; font-weight:700; padding:4px 11px; border-radius:999px; letter-spacing:.4px;}
+  .tag.tema{background:var(--accent-soft); color:var(--accent-dark); border:1px solid var(--border);}
+  .tag.ctx{background:#fff; color:var(--muted); border:1px solid var(--border);}
+  .qnum{margin-left:auto; font-size:12.5px; color:var(--muted); font-weight:600;}
+  .qtext{font-size:16.5px; line-height:1.6; margin-bottom:18px;}
+  .qtext .arg{
+    background:#fbfcfd; border-left:3px solid var(--accent); border-radius:0 9px 9px 0;
+    padding:10px 14px; margin:10px 0; display:block; white-space:pre-line; font-size:15.5px;
+  }
+  .opts{display:grid; gap:9px;}
+  .opt{
+    display:flex; gap:12px; align-items:flex-start; width:100%; text-align:left;
+    border:1.5px solid var(--border); background:#fff; border-radius:11px;
+    padding:12px 14px; font-size:15px; line-height:1.5; cursor:pointer; font-family:inherit; color:var(--ink);
+    transition:border-color .15s, background .15s;
+  }
+  .opt:hover:not(:disabled){border-color:var(--accent); background:var(--accent-soft);}
+  .opt:disabled{cursor:default;}
+  .opt .letter{
+    flex:0 0 27px; height:27px; border-radius:8px; border:1.5px solid var(--border);
+    display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13.5px; color:var(--accent-dark);
+    background:#fff;
+  }
+  .opt.correct{border-color:var(--ok); background:var(--ok-soft);}
+  .opt.correct .letter{background:var(--ok); border-color:var(--ok); color:#fff;}
+  .opt.wrong{border-color:var(--bad); background:var(--bad-soft);}
+  .opt.wrong .letter{background:var(--bad); border-color:var(--bad); color:#fff;}
+  .opt.selected{border-color:var(--accent); background:var(--accent-soft);}
+  .opt.selected .letter{background:var(--accent); border-color:var(--accent); color:#fff;}
+  .feedback{
+    margin-top:16px; border-radius:11px; padding:14px 16px; font-size:14.5px; line-height:1.6; display:none;
+  }
+  .feedback.show{display:block;}
+  .feedback.ok{background:var(--ok-soft); border-left:4px solid var(--ok);}
+  .feedback.bad{background:var(--bad-soft); border-left:4px solid var(--bad);}
+  .feedback .verdict{font-weight:800; margin-bottom:5px; display:flex; align-items:center; gap:8px;}
+  .feedback.ok .verdict{color:var(--ok);}
+  .feedback.bad .verdict{color:var(--bad);}
+  .qnav{display:flex; flex-wrap:wrap; gap:10px; margin-top:18px; align-items:center;}
+  .qnav .spacer{flex:1;}
+  .kbd-hint{font-size:12px; color:var(--muted);}
+  .kbd-hint kbd{
+    border:1px solid var(--border); border-bottom-width:2px; border-radius:5px; padding:1px 6px;
+    font-size:11px; background:#fff; font-family:inherit;
+  }
+
+  /* ---------- Resultados ---------- */
+  .result{display:none;}
+  .result .score-box{
+    text-align:center; padding:28px 20px; border-radius:var(--r);
+    background:linear-gradient(160deg,var(--accent-dark),var(--accent)); color:#fff;
+    box-shadow:var(--shadow);
+  }
+  .result .score-box .big{font-size:52px; font-weight:900; line-height:1;}
+  .result .score-box .msg{margin-top:10px; font-size:16px; font-weight:600;}
+  .result .score-box .sub{opacity:.85; font-size:13.5px; margin-top:6px;}
+  .review-list{margin-top:18px; display:grid; gap:12px;}
+  .rev{
+    background:var(--card); border:1px solid var(--border); border-left:4px solid var(--border);
+    border-radius:12px; padding:15px 17px; box-shadow:var(--shadow);
+  }
+  .rev.ok{border-left-color:var(--ok);}
+  .rev.bad{border-left-color:var(--bad);}
+  .rev .rev-head{display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:8px;}
+  .rev .rev-num{font-size:12px; font-weight:800; color:var(--muted);}
+  .rev .rev-state{font-size:11.5px; font-weight:800; padding:3px 10px; border-radius:999px;}
+  .rev.ok .rev-state{background:var(--ok-soft); color:var(--ok);}
+  .rev.bad .rev-state{background:var(--bad-soft); color:var(--bad);}
+  .rev .rev-q{font-size:14.5px; margin-bottom:9px;}
+  .rev .rev-ans{font-size:13.8px; margin:4px 0;}
+  .rev .rev-ans b{font-weight:700;}
+  .rev .rev-ans.yours.ok-c{color:var(--ok);}
+  .rev .rev-ans.yours.bad-c{color:var(--bad);}
+  .rev .rev-exp{
+    margin-top:9px; font-size:13.5px; background:#fbfcfd; border-radius:9px; padding:10px 13px; color:var(--ink);
+    border:1px dashed var(--border);
+  }
+
+  .empty{
+    background:var(--card); border:1.5px dashed var(--border); border-radius:var(--r);
+    padding:34px 24px; text-align:center; color:var(--muted); margin-top:18px; display:none;
+  }
+  footer{margin:34px 0 26px; text-align:center; font-size:12.5px; color:var(--muted); line-height:1.7;}
+
+  @media (max-width:640px){
+    .statsbar{grid-template-columns:repeat(2,1fr);}
+    .qcard{padding:18px 16px;}
+    .qnum{margin-left:0; width:100%;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="kicker">LPID · LESS · Sesión 3 · Deducción, inducción y falacias (relevancia, inducción débil, presunción y ambigüedad) · Unidad de Aprendizaje Razonamiento Lógico Matemático · Dr Adrian Cerda · UNITI 2026 </div>
+    <h1>Ejercicios de refuerzo y práctica: deducción, inducción y falacias</h1>
+    <p class="sub">Ejercicios de opción múltiple con retroalimentación. Las opciones se mezclan en cada intento. Puedes practicar todos los temas o concentrarte en uno, en cualquiera de los cinco contextos, y superar la barrera de un progreso excelente.</p>
+    <div class="badges">
+      <span class="badge" id="badgeTotal">94 ejercicios</span>
+      <span class="badge">6 temas de la sesión</span>
+      <span class="badge">5 contextos</span>
+      <span class="badge">Modo práctica y modo examen</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ================= TEORIA ================= -->
+  <details class="teoria" id="teoriaBox">
+    <summary><span class="chev">▶</span> Repaso rápido de la teoría de la sesión</summary>
+    <div class="teoria-body">
+      <p class="intro">En lógica, <b>no todo razonamiento se rompe igual</b>. Antes de responder, recuerda el vocabulario clave, las dos clases de razonamiento y las cuatro familias de falacias.</p>
+
+      <div class="tgrid">
+        <div class="tcard">
+          <h3>Deducción</h3>
+          <p class="def">Razonamiento en el que, <b>si las premisas son verdaderas, la conclusión se sigue con necesidad</b>. La verdad de las premisas garantiza por completo la de la conclusión.<br>Ejemplo: «Todos los humanos son mortales; Sócrates es humano; luego Sócrates es mortal.»<br>Marca lingüística: «<b>necesariamente</b>», «<b>luego</b>», «<b>por lo tanto</b>».</p>
+        </div>
+        <div class="tcard">
+          <h3>Inducción</h3>
+          <p class="def">Razonamiento en el que las premisas dan <b>apoyo probable, no necesario</b>, a la conclusión. La conclusión puede resultar falsa aun con premisas verdaderas (cisnes negros).<br>Ejemplo: «He visto 100 cisnes y los 100 son blancos; probablemente todos los cisnes son blancos.»<br>Marca lingüística: «<b>probablemente</b>», «<b>es plausible que</b>», «<b>cabe esperar</b>».</p>
+        </div>
+        <div class="tcard">
+          <h3>Falacia (en general)</h3>
+          <p class="def">Argumento que <b>parece válido</b> pero <b>no lo es</b>. La sesión trabaja cuatro familias según <i>dónde</i> se rompe la inferencia: en la conexión (relevancia), en la fuerza de la muestra (inducción débil), en lo que se da por sentado (presunción) o en el sentido de las palabras (ambigüedad).</p>
+        </div>
+        <div class="tcard">
+          <h3>Falacia de relevancia</h3>
+          <p class="def">La(s) premisa(s) <b>no tiene(n) relación lógica real</b> con la conclusión, aunque parezcan convincentes.<br>Subtipos: <b>ad hominem</b> (atacar a la persona), <b>apelación a la autoridad</b>, <b>paja</b> o hombre de paja (distorsionar la propuesta), <b>apelación a la emoción</b>.<br>Ejemplo: «No escuches a María sobre el bug porque ni siquiera tiene título.»</p>
+        </div>
+        <div class="tcard">
+          <h3>Falacia de inducción débil</h3>
+          <p class="def">Las premisas <b>sí son relevantes</b>, pero <b>demasiado escasas o poco representativas</b> para sostener la conclusión con la fuerza que se le atribuye.<br>Subtipos: <b>generalización apresurada</b>, <b>muestra sesgada</b>, <b>ley de números pequeños</b>, <b>evidencia anecdótica</b>.<br>Ejemplo: «Probé la librería X dos veces y falló; todas las librerías open source son poco confiables.»</p>
+        </div>
+        <div class="tcard">
+          <h3>Falacia de presunción</h3>
+          <p class="def">El argumento <b>da por sentado, sin justificarlo</b>, algo que necesitaría prueba.<br>Subtipos: <b>petición de principio</b> (la conclusión ya está en la premisa), <b>falsa dicotomía</b>, <b>pendiente resbaladiza</b>.<br>Ejemplo: «La astrología es válida porque los astrólogos lo confirman.»</p>
+        </div>
+        <div class="tcard">
+          <h3>Falacia de ambigüedad</h3>
+          <p class="def">Una palabra o frase <b>cambia de significado a mitad del argumento</b>, y ese cambio sostiene indebidamente la inferencia.<br>Subtipos: <b>equívoco</b>, <b>anfibología</b> (frase gramaticalmente ambigua), <b>composición</b>, <b>división</b>.<br>Ejemplo: «Los programas de cómputo necesitan un compilador; el gobierno aprueba programas sociales; luego los programas sociales necesitan un compilador.»</p>
+        </div>
+        <div class="tcard">
+          <h3>IA y falacias</h3>
+          <p class="def">Los modelos de aprendizaje automático <b>razonan inductivamente</b>: generalizan desde datos de entrenamiento. Heredan, por tanto, el riesgo central de la <b>inducción débil</b> (muestra sesgada, generalización apresurada). El caso de estudio de la sesión (algoritmo de contratación sesgado) ilustra cómo «datos reales» no implican «datos representativos».</p>
+        </div>
+      </div>
+
+      <!-- ===== Tabla comparativa: Deducción vs Inducción ===== -->
+      <div class="tcard" style="margin-top:12px">
+        <h3>Deducción vs inducción — marcas distintivas</h3>
+        <div style="overflow-x:auto">
+          <table class="tt wide">
+            <thead>
+              <tr>
+                <th>Criterio</th>
+                <th>Deducción</th>
+                <th>Inducción</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Fuerza de la inferencia</td><td>Necesaria</td><td>Probable</td></tr>
+              <tr><td>Si premisas V, conclusión</td><td><b>Siempre V</b></td><td>Puede ser F</td></tr>
+              <tr><td>Origen de las premisas</td><td>Definiciones, leyes, reglas</td><td>Observaciones, muestras</td></tr>
+              <tr><td>Marcas lingüísticas</td><td>«luego», «necesariamente»</td><td>«probablemente», «plausible»</td></tr>
+              <tr><td>Riesgo típico</td><td>Validez (forma)</td><td>Inducción débil (muestra)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ===== Tabla resumen de las 4 familias ===== -->
+      <div class="tcard" style="margin-top:12px">
+        <h3>Las cuatro familias de falacias — resumen</h3>
+        <div style="overflow-x:auto">
+          <table class="tt wide">
+            <thead>
+              <tr>
+                <th>Familia</th>
+                <th>¿Dónde se rompe?</th>
+                <th>Subtipo típico</th>
+                <th>Ejemplo en una línea</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="fam">Relevancia</td>
+                <td>Las premisas no conectan con la conclusión</td>
+                <td>Ad hominem</td>
+                <td>«No le creas: ni siquiera terminó la carrera.»</td>
+              </tr>
+              <tr>
+                <td class="fam">Inducción débil</td>
+                <td>La muestra es escasa o sesgada</td>
+                <td>Generalización apresurada</td>
+                <td>«Dos pruebas fallaron; todo open source es malo.»</td>
+              </tr>
+              <tr>
+                <td class="fam">Presunción</td>
+                <td>Se da por sentado lo que necesita prueba</td>
+                <td>Petición de principio</td>
+                <td>«Es válido porque los expertos lo afirman.»</td>
+              </tr>
+              <tr>
+                <td class="fam">Ambigüedad</td>
+                <td>Una palabra cambia de significado</td>
+                <td>Equívoco</td>
+                <td>«Los programas sociales necesitan compilador.»</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="metodo">
+        <div class="paso">Clasifica el razonamiento: ¿deductivo (necesario) o inductivo (probable)? Fíjate en las marcas lingüísticas.</div>
+        <div class="paso">Si parece débil o inválido, ubica la familia: ¿las premisas conectan con la conclusión? (relevancia)</div>
+        <div class="paso">Verifica la muestra: ¿es suficiente y representativa? (inducción débil)</div>
+        <div class="paso">Verifica lo dado por sentado: ¿alguna premisa asume lo que debe probar? (presunción)</div>
+        <div class="paso">Verifica el sentido de las palabras: ¿algún término clave cambia de significado entre premisas y conclusión? (ambigüedad)</div>
+        <div class="paso">Justifica por escrito citando la <b>marca específica</b> de la falacia, no solo la familia.</div>
+      </div>
+    </div>
+  </details>
+
+  <!-- ================= CONTROLES ================= -->
+  <section class="controls" id="controls">
+    <div class="ctl-row">
+      <span class="ctl-label">Modo</span>
+      <div class="seg" role="group" aria-label="Modo de práctica">
+        <button id="mPractica" class="on" type="button">Práctica</button>
+        <button id="mExamen" type="button">Examen</button>
+      </div>
+      <span style="flex:1"></span>
+      <span class="ctl-label">Contexto</span>
+      <select id="selCtx" class="sel">
+        <option value="all">Todos los contextos</option>
+        <option value="prog">Programación</option>
+        <option value="innov">Innovación</option>
+        <option value="ess">Economía social solidaria</option>
+        <option value="mat">Matemáticas</option>
+        <option value="ia">IA y algoritmos</option>
+      </select>
+    </div>
+    <div class="ctl-row" style="margin-top:12px">
+      <span class="ctl-label">Tema</span>
+      <div class="chips" id="chipsTema"></div>
+    </div>
+    <div class="ctl-actions">
+      <button class="btn btn-primary" id="btnStart">Mezclar y practicar</button>
+      <button class="btn btn-ghost" id="btnReset">Borrar mi progreso</button>
+      <span class="kbd-hint" id="countInfo"></span>
+    </div>
+  </section>
+
+  <!-- ================= ESTADISTICAS ================= -->
+  <div class="statsbar">
+    <div class="stat"><div class="n" id="stResp">0</div><div class="l">Respondidas</div></div>
+    <div class="stat"><div class="n" id="stOk">0</div><div class="l">Correctas</div></div>
+    <div class="stat"><div class="n" id="stRacha">0</div><div class="l">Racha actual</div></div>
+    <div class="stat"><div class="n" id="stPrec">—</div><div class="l">Precisión</div></div>
+  </div>
+  <div class="progress"><div id="progFill"></div></div>
+
+  <!-- ================= QUIZ ================= -->
+  <section id="quizZone">
+    <div class="empty" id="emptyMsg">
+      <p style="font-size:16px; font-weight:700; margin-bottom:6px">Elige tus filtros y pulsa «Mezclar y practicar»</p>
+      <p style="font-size:14px">Puedes practicar todos los temas o concentrarte en uno, en cualquiera de los cinco contextos.</p>
+    </div>
+    <div class="qcard" id="qcard" style="display:none">
+      <div class="qtop">
+        <span class="tag tema" id="qTagTema"></span>
+        <span class="tag ctx" id="qTagCtx"></span>
+        <span class="qnum" id="qNum"></span>
+      </div>
+      <div class="qtext" id="qText"></div>
+      <div class="opts" id="qOpts"></div>
+      <div class="feedback" id="qFeed">
+        <div class="verdict" id="feedVerdict"></div>
+        <div id="feedExp"></div>
+      </div>
+      <div class="qnav">
+        <button class="btn btn-ghost" id="btnPrev">← Anterior</button>
+        <button class="btn btn-primary" id="btnNext">Siguiente →</button>
+        <button class="btn btn-primary" id="btnFinish" style="display:none">Terminar y ver resultados</button>
+        <span class="spacer"></span>
+        <span class="kbd-hint">Atajos: <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><kbd>4</kbd> responder · <kbd>→</kbd> avanzar</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= RESULTADOS ================= -->
+  <section class="result" id="resultZone">
+    <div class="score-box">
+      <div class="big" id="resPct">—</div>
+      <div class="msg" id="resMsg"></div>
+      <div class="sub" id="resSub"></div>
+      <div style="margin-top:18px">
+        <button class="btn" style="background:#fff; color:var(--accent-dark)" id="btnRetry">Reintentar otro examen</button>
+      </div>
+    </div>
+    <h2 style="font-size:18px; margin:22px 0 4px; color:var(--accent-dark)">Revisión pregunta por pregunta</h2>
+    <div class="review-list" id="reviewList"></div>
+  </section>
+
+  <footer>
+    Recuerda el hilo conductor: <i>¿Cuándo una conclusión es necesaria y cuándo solo probable, y de qué maneras típicas se rompe un argumento cuando comete una falacia?</i>
+  </footer>
+</main>
+<script>
+// ==================== DATOS ====================
+const TEMAS = {"1": {"n": "Deducción vs inducción", "s": "Necesario (deducción) vs probable (inducción). Marcas lingüísticas de cada uno."}, "2": {"n": "Falacias de relevancia", "s": "Ad hominem, apelación a la autoridad, paja, apelación a la emoción."}, "3": {"n": "Falacias de inducción débil", "s": "Generalización apresurada, muestra sesgada, evidencia anecdótica."}, "4": {"n": "Falacias de presunción", "s": "Petición de principio, falsa dicotomía, pendiente resbaladiza."}, "5": {"n": "Falacias de ambigüedad", "s": "Equívoco, anfibología, composición, división."}, "6": {"n": "Falacias en IA y algoritmos", "s": "Caso de estudio: sesgo algorítmico como inducción débil."}};
+const CTXS = {"prog": "Programación", "innov": "Innovación", "ess": "Economía social solidaria", "mat": "Matemáticas", "ia": "IA y algoritmos"};
+const EX = [{"t": 1, "c": "prog", "q": "«Si el test falla, el pipeline se detiene. El test falló. Luego el pipeline se detiene.» ¿Es deductivo o inductivo?", "o": ["Deductivo: si las premisas son verdaderas, la conclusión se sigue necesariamente.", "Inductivo: la conclusión es solo probable.", "Es una falacia de relevancia: la premisa no conecta con la conclusión.", "No es un argumento: solo es una descripción."], "e": "Es deductivo: la forma «si P entonces Q; P; luego Q» (Modus Ponens) garantiza la conclusión cuando las premisas son verdaderas. La necesidad es la marca de la deducción."}, {"t": 1, "c": "prog", "q": "«En 8 de los últimos 10 deploys hubo un hotfix en las primeras 24 h; probablemente el próximo deploy también requiera un hotfix.» ¿Qué tipo de razonamiento es?", "o": ["Inductivo: la conclusión se apoya en una frecuencia observada y es probable, no necesaria.", "Deductivo: la conclusión se sigue con necesidad de las premisas.", "Falacia de ambigüedad: «hotfix» tiene dos significados.", "Falacia de presunción: se da por sentado el resultado."], "e": "Es inductivo: la premisa recuenta observaciones pasadas y la conclusión proyecta esa frecuencia al futuro con un «probablemente». Ese modal de probabilidad es la marca lingüística de la inducción."}, {"t": 1, "c": "prog", "q": "«En TypeScript, una variable declarada como string no puede asignarse a un tipo number. La variable x se declaró como string. Luego, x no puede asignarse a number.» Esta inferencia es:", "o": ["Deductiva: se sigue de la definición del lenguaje, no de una observación.", "Inductiva: se generaliza desde casos.", "Falacia de relevancia.", "Falacia de ambigüedad."], "e": "Es deductiva: la conclusión se desprende de la definición estática del tipado. Si las reglas del lenguaje y la declaración son verdaderas, no es posible que x se asigne a number. No hay generalización desde datos."}, {"t": 1, "c": "prog", "q": "«Probé la librería X en dos proyectos y funcionó bien; la librería X probablemente sea estable.» ¿Deductivo o inductivo?", "o": ["Inductivo: dos casos no garantizan, solo hacen probable.", "Deductivo: si funciona en dos, funciona siempre.", "Es deductivo solo si la librería es de código abierto.", "Es una falacia de presunción, no de inducción."], "e": "Es inductivo: la premisa (dos pruebas exitosas) da apoyo parcial a la conclusión (estabilidad general). No la garantiza. La muestra pequeña es un problema adicional (inducción débil), pero la clase del razonamiento es inductiva."}, {"t": 1, "c": "innov", "q": "«Toda startup que captó Serie B en 2023 tenía MRR superior a USD 100k. Kayma captó Serie B en 2023. Luego Kayma tenía MRR superior a USD 100k.» ¿Qué clase de razonamiento es?", "o": ["Deductivo: la conclusión se sigue necesariamente de las premisas.", "Inductivo: la conclusión es probable a partir de los casos.", "Falacia de presunción.", "Falacia de ambigüedad."], "e": "Es deductivo: la primera premisa es una definición universal del conjunto; si ambas premisas son verdaderas, no es posible que la conclusión sea falsa. La necesidad es la firma de la deducción."}, {"t": 1, "c": "innov", "q": "«De las 4 startups del batch 2023 del acelerador, 3 quebraron antes del año. Probablemente las startups del acelerador quebrarán antes del año.» ¿Deductivo o inductivo?", "o": ["Inductivo: la conclusión proyecta una frecuencia observada a una población.", "Deductivo: «3 de 4» garantiza la conclusión.", "Falacia de relevancia, porque los datos no tienen que ver con la conclusión.", "Falacia de ambigüedad."], "e": "Es inductivo: la premisa recuenta una observación (3 de 4) y la conclusión proyecta esa tasa al conjunto. La marca «probablemente» y la generalización desde una muestra son propias de la inducción."}, {"t": 1, "c": "innov", "q": "¿Cuál de los siguientes marcadores lingüísticos indica que un razonamiento aspira a ser deductivo?", "o": ["«Por lo tanto, necesariamente...»", "«Probablemente, en consecuencia...»", "«Es plausible que...»", "«A partir de la muestra, cabe esperar que...»"], "e": "«Necesariamente» señala que el emisor cree que, si las premisas son verdaderas, la conclusión no puede ser falsa. Los demás («probablemente», «plausible», «cabe esperar») son típicos de la inducción."}, {"t": 1, "c": "ess", "q": "«Toda cooperativa de la red COMTRA reparte excedentes en proporción al trabajo aportado. Lumbrica está en la red COMTRA. Luego Lumbrica reparte excedentes en proporción al trabajo.» ¿Clasificación?", "o": ["Deductivo: la conclusión se sigue necesariamente de las dos premisas.", "Inductivo: la conclusión es probable.", "Falacia de ambigüedad.", "Falacia de relevancia."], "e": "Es deductivo: una de las premisas es universal («toda cooperativa de la red...») y la otra aplica el caso a esa regla. Si las premisas son verdaderas, la conclusión necesariamente lo es."}, {"t": 1, "c": "ess", "q": "«En las 5 ferias de trueque de la región observadas este año no se usó dinero. Probablemente las ferias de trueque de la región operan sin dinero.» ¿Deductivo o inductivo?", "o": ["Inductivo: la conclusión generaliza a partir de 5 observaciones.", "Deductivo: 5 casos bastan para una ley universal.", "Falacia de presunción.", "Falacia de ambigüedad."], "e": "Es inductivo: la premisa recuenta observaciones y la conclusión generaliza. La marca «probablemente» delata la conciencia del hablante de que la conclusión es solo probable. Si fuera deductiva no cabría ese modal."}, {"t": 1, "c": "ess", "q": "¿Cuál es la diferencia crucial entre deducción e inducción?", "o": ["En la deducción la conclusión es necesaria; en la inducción, solo probable.", "En la deducción las premisas son siempre verdaderas; en la inducción, siempre falsas.", "En la deducción hay más premisas; en la inducción, menos.", "En la deducción se usan símbolos; en la inducción, palabras."], "e": "La diferencia es la fuerza de la inferencia: la deducción garantiza la conclusión (si las premisas son verdaderas, la conclusión no puede ser falsa); la inducción solo la hace probable, y la conclusión puede resultar falsa aun con premisas verdaderas (como los cisnes negros)."}, {"t": 1, "c": "mat", "q": "«Todo número divisible por 6 es divisible por 3. 24 es divisible por 6. Luego 24 es divisible por 3.» ¿Es deductivo o inductivo?", "o": ["Deductivo: la conclusión se sigue necesariamente de la definición.", "Inductivo: se generaliza a partir de un solo número.", "Falacia de presunción.", "Falacia de ambigüedad."], "e": "Es deductivo: una de las premisas es una ley universal aritmética y la otra aplica el caso. Si ambas son verdaderas, es imposible que la conclusión sea falsa."}, {"t": 1, "c": "mat", "q": "«Lancé un dado equilibrado 100 veces y en 48 obtuve un número par. Probablemente el próximo lanzamiento sea par.» ¿Clase de razonamiento?", "o": ["Inductivo: la conclusión proyecta una frecuencia observada.", "Deductivo: si 48/100, la conclusión es necesaria.", "Falacia de ambigüedad: «par» tiene varios significados.", "Falacia de presunción."], "e": "Es inductivo: la premisa recuenta observaciones y la conclusión proyecta la frecuencia al próximo evento. Aunque la frecuencia no coincide con la probabilidad teórica (50%), el razonamiento sigue siendo inductivo: probable, no necesaria."}, {"t": 1, "c": "mat", "q": "¿Cuál enunciado expresa una conclusión típicamente inductiva?", "o": ["«En consecuencia, es plausible que el patrón continúe.»", "«Luego, necesariamente, todo múltiplo de 6 lo es de 3.»", "«Por lo tanto, con necesidad lógica, se sigue que...»", "«Es imposible que la conclusión sea falsa si las premisas son verdaderas.»"], "e": "«Plausible» y la mención de «patrón» (que sugiere regularidad empírica) son marcas típicas de la inducción. Las demás afirman necesidad, marca de la deducción."}, {"t": 1, "c": "mat", "q": "«Todo número par es de la forma 2k con k entero. 18 es par. Luego 18 = 2·9 con 9 entero.» ¿Deductivo o inductivo?", "o": ["Deductivo: la conclusión se sigue de la definición algebraica de par.", "Inductivo: se infiere a partir de un ejemplo.", "Falacia de ambigüedad.", "Falacia de relevancia."], "e": "Es deductivo: la primera premisa define «par» y la segunda aplica la definición. Si las premisas son verdaderas, la conclusión es necesariamente verdadera. No hay generalización."}, {"t": 1, "c": "ia", "q": "«Un modelo entrenado con 10 000 imágenes de perros clasifica bien el 95% en un conjunto de prueba. Probablemente clasificará bien nuevas imágenes similares.» ¿Qué tipo de razonamiento hace el enunciado?", "o": ["Inductivo: generaliza el desempeño observado en test a imágenes futuras.", "Deductivo: si acertó 95%, acertará siempre.", "Falacia de presunción: se da por sentado.", "Falacia de ambigüedad: «clasificar» cambia de significado."], "e": "Es inductivo: la premisa reporta una tasa observada en un conjunto de prueba y la conclusión proyecta esa tasa al futuro. La marca «probablemente» y el carácter muestral del conjunto de prueba son propios de la inducción."}, {"t": 1, "c": "ia", "q": "«Si el modelo ya entrenado recibe una entrada x con parámetros θ fijos, devuelve f(x;θ). El modelo recibió x con esos θ. Luego devuelve f(x;θ).» ¿Clase de razonamiento?", "o": ["Deductivo: la inferencia del modelo se sigue necesariamente de su definición matemática.", "Inductivo: la salida se infiere desde ejemplos.", "Falacia de relevancia.", "Falacia de ambigüedad."], "e": "Es deductivo: una vez fijos los parámetros, la salida está determinada por la función. La inferencia (uso) del modelo es deductiva, aunque su entrenamiento fue inductivo. Distinguir entrenamiento de inferencia es clave en IA."}, {"t": 1, "c": "ia", "q": "¿Por qué se dice que los modelos de aprendizaje automático «razonan» inductivamente?", "o": ["Porque generalizan a partir de datos de entrenamiento: la conclusión (desempeño futuro) es probable, no necesaria.", "Porque siempre parten de axiomas.", "Porque nunca cometen errores si los datos son muchos.", "Porque aplican silogismos válidos en cada inferencia."], "e": "El aprendizaje automático induce patrones desde una muestra de datos. El desempeño en nuevos datos es probable, no garantizado. Por eso hereda los riesgos de la inducción débil (sesgo, muestra no representativa, etc.)."}, {"t": 1, "c": "ia", "q": "Un algoritmo predice «este cliente es riesgoso» porque su perfil coincide con perfiles previos que no pagaron. La conclusión sobre este cliente es:", "o": ["Inductiva y, por tanto, abierta a revisión con más datos.", "Deductiva y, por tanto, imposible de revisar.", "Una falacia de ambigüedad.", "Una falacia de presunción."], "e": "La conclusión se apoya en una regularidad observada (perfiles similares impagaron). Es inductiva: probable, no necesaria; la llegada de nuevos datos puede cambiar la predicción. Esa abertura a la revisión es la marca de la inducción."}, {"t": 2, "c": "prog", "q": "«No escuches el análisis de Lucía sobre el bug del sistema: ni siquiera tiene título universitario.» ¿Qué falacia comete?", "o": ["Ad hominem (relevancia): ataca a la persona, no a su análisis.", "Generalización apresurada (inducción débil).", "Petición de principio (presunción).", "Equívoco (ambigüedad)."], "e": "Ataca la credencial de Lucía (su título) en vez de evaluar si su análisis técnico del bug es correcto. El título es irrelevante para la verdad o falsedad del análisis. Eso es ad hominem, una falacia de relevancia."}, {"t": 2, "c": "prog", "q": "«Linus Torvalds dijo que este código es malo; luego el código es malo.» ¿Qué problema tiene?", "o": ["Apelación a la autoridad: una autoridad técnica no reemplaza la evaluación directa del código.", "Equívoco: «malo» cambia de significado.", "Generalización apresurada.", "Petición de principio."], "e": "Aun cuando Torvalds sea una autoridad en kernels, su opinión no garantiza la verdad del juicio; un argumento técnico debe evaluarse con criterios técnicos. La apelación a la autoridad es una falacia de relevancia."}, {"t": 2, "c": "prog", "q": "«El equipo propone añadir tests de integración. O sea, quieren que dejemos de escribir features por tres meses. Eso es absurdo.» ¿Qué falacia es?", "o": ["Paja (hombre de paja): se distorsiona la propuesta para atacarla.", "Ad hominem.", "Falsa dicotomía.", "Equívoco."], "e": "El equipo propuso añadir tests, no suspender features. Reformular la propuesta en términos extremos («dejar de escribir features por tres meses») para derribarla es un hombre de paja, falacia de relevancia."}, {"t": 2, "c": "prog", "q": "«Si no aprobamos este merge ya, el cliente se enojará y nos echarán. ¡Aprobémoslo!» ¿Qué falacia es?", "o": ["Apelación a la emoción (relevancia): el miedo no prueba que el merge sea correcto.", "Generalización apresurada.", "Petición de principio.", "Equívoco."], "e": "El argumento apela al miedo (perder el cliente) para forzar una decisión técnica. La emoción no es evidencia de que el merge sea correcto. Falacia de relevancia."}, {"t": 2, "c": "innov", "q": "«El consultor dice que el pitch está mal estructurado, pero él nunca ha fundado nada. Ignoren su feedback.» ¿Qué falacia es?", "o": ["Ad hominem (relevancia): descarta la crítica atacando la experiencia del consultor.", "Apelación a autoridad.", "Falsa dicotomía.", "Equívoco."], "e": "Aunque la experiencia del consultor pueda dar contexto, descartar la crítica solo por su trayectoria ataca a la persona, no al argumento. Es ad hominem."}, {"t": 2, "c": "innov", "q": "«Un premio Nobel de física recomienda esta app de meditación; debe ser buena.» ¿Qué falacia es?", "o": ["Apelación a la autoridad: la autoridad en física no es autoridad en meditación.", "Generalización apresurada.", "Petición de principio.", "Equívoco."], "e": "La autoridad técnica del premio Nobel está en física, no en meditación. Usar su respaldo para validar una app de meditación es una apelación a la autoridad fuera de su campo, falacia de relevancia."}, {"t": 2, "c": "innov", "q": "«Los inversionistas piden un plan de monetización; o sea, quieren que cobremos a usuarios pobres. ¡No lo permitiremos!» ¿Qué falacia es?", "o": ["Paja (hombre de paja): se distorsiona «plan de monetización» como «cobrar a usuarios pobres».", "Ad hominem.", "Pendiente resbaladiza.", "Equívoco."], "e": "«Plan de monetización» admite muchas opciones (suscripción B2B, freemium, publicidad). Reformularlo como «cobrar a usuarios pobres» para atacarlo es un hombre de paja."}, {"t": 2, "c": "ess", "q": "«El compa dijo que el fondo rotatorio no cuadra, pero él llegó tarde a la asamblea. No le hagamos caso.» ¿Qué falacia es?", "o": ["Ad hominem: la llegada tarde no invalida el dato contable.", "Generalización apresurada.", "Equívoco.", "Petición de principio."], "e": "Llegar tarde a la asamblea es irrelevante para la verdad o falsedad de que el fondo no cuadra. Atacar a la persona en vez del argumento es ad hominem."}, {"t": 2, "c": "ess", "q": "«El fundador de la red cooperativa más grande del país dice que esta cooperativa es viable. Luego es viable.» ¿Qué falacia es?", "o": ["Apelación a la autoridad: la viabilidad se demuestra con cifras, no con un respaldo.", "Ad hominem.", "Generalización apresurada.", "Equívoco."], "e": "Aunque el fundador tenga autoridad simbólica, la viabilidad económica se prueba con proyecciones y cifras, no con su palabra. Apelación a la autoridad, falacia de relevancia."}, {"t": 2, "c": "ess", "q": "«Si no donamos nuestro excedente a esta causa, somos egoístas. ¡Donemos!» ¿Qué falacia es?", "o": ["Apelación a la emoción: la culpa no es razón para decidir la distribución del excedente.", "Generalización apresurada.", "Petición de principio.", "Equívoco."], "e": "El argumento apela a la culpa para forzar la decisión. La emoción no sustituye a la deliberación asamblearia. Es apelación a la emoción."}, {"t": 2, "c": "mat", "q": "«El profesor de la otra cátedra dice que esta demostración tiene un hueco; pero ese profesor reprueba a todos. No le crean.» ¿Qué falacia es?", "o": ["Ad hominem: el historial docente del profesor no invalida la observación matemática.", "Apelación a la autoridad.", "Pendiente resbaladiza.", "Petición de principio."], "e": "Aún si el profesor reprueba a todos, su observación sobre la demostración debe examinarse matemáticamente. Descartarla atacando al docente es ad hominem."}, {"t": 2, "c": "mat", "q": "«El Fields Medal Edward Witten dice que este argumento es correcto; luego es correcto.» ¿Qué falacia comete?", "o": ["Apelación a la autoridad: el respaldo de un experto no reemplaza la verificación directa de la prueba.", "Equívoco.", "Generalización apresurada.", "Ad hominem."], "e": "Aun un Fields Medal puede equivocarse; la corrección de una prueba se verifica repasándola. Apelar a la autoridad, incluso la legítima, no demuestra la conclusión."}, {"t": 2, "c": "ia", "q": "«Ese investigador firma un paper que critica a nuestro modelo de IA, pero trabaja para la competencia. Su crítica no vale.» ¿Qué falacia es?", "o": ["Ad hominem (circunstancial): descarta la crítica por el conflicto de intereses, no por su contenido.", "Apelación a la autoridad.", "Generalización apresurada.", "Equívoco."], "e": "El conflicto de intereses puede motivar sospecha, pero no invalida la crítica per se. La falacia es descartar el argumento atacando a quien lo emite. Es ad hominem circunstancial."}, {"t": 2, "c": "ia", "q": "«Una empresa líder usa este algoritmo de contratación; luego el algoritmo es justo.» ¿Qué falacia es?", "o": ["Apelación a la autoridad (y a la popularidad): el uso por una empresa no prueba justicia.", "Generalización apresurada.", "Petición de principio.", "Equívoco."], "e": "Que una empresa use el algoritmo es un dato sobre adopción, no sobre justicia. La justicia se mide por criterios éticos y métricas, no por la adopción. Apelación a la autoridad/popularidad."}, {"t": 2, "c": "ia", "q": "«Quienes piden auditar el algoritmo quieren que dejemos de usar IA y devolver la contratación al papel. No es viable.» ¿Qué falacia es?", "o": ["Paja: se exagera «auditar» como «abandonar la IA».", "Ad hominem.", "Falsa dicotomía.", "Equívoco."], "e": "Auditar un algoritmo no equivale a abandonar la IA. Reformular la propuesta en términos extremos para descartarla es un hombre de paja."}, {"t": 2, "c": "ia", "q": "¿Cuál es la marca común a todas las falacias de relevancia?", "o": ["Las premisas no tienen relación lógica real con la conclusión.", "Las premisas son siempre falsas.", "La conclusión aparece al inicio.", "El argumento usa símbolos."], "e": "En las falacias de relevancia las premisas no conectan lógicamente con la conclusión (atacan a la persona, apelan a la emoción, etc.); solo parecen convincentes. La otra marca es que suelen ser persuasivas psicológicamente."}, {"t": 3, "c": "prog", "q": "«Probé la librería X dos veces y falló; todas las librerías de código abierto son poco confiables.» ¿Qué falacia es?", "o": ["Generalización apresurada (inducción débil): la muestra es demasiado pequeña y de una sola librería.", "Ad hominem.", "Petición de principio.", "Equívoco."], "e": "Dos pruebas en una librería no son base suficiente para juzgar a todas las librerías de código abierto (millones). La premisa es relevante — a diferencia del ad hominem — pero débil para el alcance de la conclusión."}, {"t": 3, "c": "prog", "q": "«En una encuesta a 200 desarrolladores senior, el 95% prefiere el lenguaje A. Luego los programadores prefieren el lenguaje A.» ¿Qué falacia es?", "o": ["Muestra sesgada (inducción débil): solo se consultó a seniors.", "Apelación a la autoridad.", "Equívoco.", "Pendiente resbaladiza."], "e": "La muestra solo incluye seniors, sesgada hacia cierto perfil. La conclusión sobre «los programadores» en general no se sostiene. Es inducción débil por muestra sesgada."}, {"t": 3, "c": "prog", "q": "«En dos proyectos usamos este framework y funcionó. Por estadística, en el próximo también funcionará.» ¿Qué falacia es?", "o": ["Ley de números pequeños (inducción débil): se confunde muestra grande con muestra chica.", "Ad hominem.", "Petición de principio.", "Equívoco."], "e": "Creer que dos casos bastan para una regularidad estadística es confundir n pequeño con n grande. Es una variante de inducción débil llamada «ley de los números pequeños»."}, {"t": 3, "c": "prog", "q": "«Mi tío programó en ensamblador 30 años y nunca tuvo bugs; luego programar en ensamblador es seguro.» ¿Qué falacia es?", "o": ["Evidencia anecdótica (inducción débil): un caso personal no basta para concluir.", "Ad hominem.", "Equívoco.", "Petición de principio."], "e": "Una anécdota personal no es estadística. Sostener la seguridad de un lenguaje a partir de un solo caso es inducción débil por evidencia anecdótica."}, {"t": 3, "c": "innov", "q": "«3 de las 4 startups del batch 2023 quebraron; luego las startups del acelerador siempre quiebran.» ¿Qué falacia es?", "o": ["Generalización apresurada (inducción débil): 4 casos no bastan para «siempre».", "Ad hominem.", "Equívoco.", "Pendiente resbaladiza."], "e": "Cuatro observaciones en un solo batch no son base suficiente para una ley universal sobre todas las startups del acelerador. La conclusión es mucho más fuerte de lo que la evidencia permite."}, {"t": 3, "c": "innov", "q": "«Una encuesta entre asistentes a Web Summit dice que 90% prefiere trabajo presencial. Luego en el sector tech se prefiere trabajo presencial.» ¿Qué falacia es?", "o": ["Muestra sesgada: asistir a Web Summit correlaciona con preferir presencial.", "Ad hominem.", "Equívoco.", "Petición de principio."], "e": "La población que asiste a una conferencia presencial no es representativa del sector tech. La conclusión general se apoya en una muestra sesgada, falacia de inducción débil."}, {"t": 3, "c": "innov", "q": "«Apple, Google y Amazon empezaron en garajes; luego toda startup exitosa empieza en garaje.» ¿Qué falacia es?", "o": ["Generalización apresurada (sesgo del superviviente): solo se ven los éxitos.", "Ad hominem.", "Equívoco.", "Petición de principio."], "e": "Se generaliza a partir de tres casos célebres ignorando miles de startups exitosas que no empezaron en garaje. Es generalización apresurada con sesgo de supervivencia."}, {"t": 3, "c": "ess", "q": "«En dos cooperativas observamos asambleas largas; en las cooperativas las asambleas son siempre largas.» ¿Qué falacia es?", "o": ["Generalización apresurada: dos casos no bastan.", "Ad hominem.", "Equívoco.", "Pendiente resbaladiza."], "e": "Dos observaciones no son muestra suficiente para concluir sobre todas las cooperativas. La inducción débil por generalización apresurada falla en el tamaño de la muestra."}, {"t": 3, "c": "ess", "q": "«Una encuesta a 50 socios del consejo directivo de la cooperativa dice que 80% está satisfecho. Luego los socios están satisfechos.» ¿Qué falacia es?", "o": ["Muestra sesgada: solo se consultó al consejo directivo.", "Equívoco.", "Pendiente resbaladiza.", "Ad hominem."], "e": "Consultar solo al consejo directivo sesga la respuesta hacia un perfil. La conclusión sobre todos los socios se apoya en una muestra sesgada. Inducción débil."}, {"t": 3, "c": "ess", "q": "«Mi vecino del trueque nunca ha tenido problemas; el trueque es seguro.» ¿Qué falacia es?", "o": ["Evidencia anecdótica: un caso personal no sustenta conclusión general.", "Ad hominem.", "Equívoco.", "Pendiente resbaladiza."], "e": "Un caso personal no constituye evidencia estadística. Sostener la seguridad del trueque en general a partir de un solo testimonio es inducción débil por evidencia anecdótica."}, {"t": 3, "c": "mat", "q": "«Verifiqué que 2, 4, 6 y 8 son pares; luego todos los pares son pares.» Esta inferencia:", "o": ["Es verdadera pero por demostración deductiva, no por inducción (la forma «2k» prueba universal).", "Generalización apresurada.", "Muestra sesgada.", "Equívoco."], "e": "Aunque la premisa parece una enumeración, la conclusión «todos los pares son pares» es una tautología que se prueba deductivamente desde la definición. No es falacia: es deducción. Este ejercicio distingue inducción débil de deducción."}, {"t": 3, "c": "mat", "q": "«Verifiqué que 4, 6 y 8 no son primos. Luego los pares no son primos.» ¿Qué falacia se comete si se concluye solo desde esos tres casos?", "o": ["Generalización apresurada: tres casos no prueban una ley sobre infinitos números (además, olvida el 2).", "Equívoco.", "Ad hominem.", "Pendiente resbaladiza."], "e": "Tres casos no bastan para concluir una ley universal sobre todos los pares. La inducción débil exige una muestra mayor o un argumento deductivo que cubra todos los casos. Además, el 2 es par y primo, así que la conclusión es falsa."}, {"t": 3, "c": "mat", "q": "«En una muestra de 100 estudiantes de ingeniería, el 70% prefiere cálculo sobre álgebra. Luego los estudiantes prefieren cálculo sobre álgebra.» ¿Qué falacia es?", "o": ["Muestra sesgada: solo se consultó a ingeniería.", "Equívoco.", "Pendiente resbaladiza.", "Ad hominem."], "e": "La muestra está sesgada hacia un perfil (ingeniería). Generalizar a todos los estudiantes sin controlar otras carreras es inducción débil por muestra sesgada."}, {"t": 3, "c": "ia", "q": "«Probamos el modelo de clasificación en 20 imágenes y acertó 19; el modelo es 95% preciso.» ¿Qué falacia es?", "o": ["Generalización apresurada: 20 imágenes no bastan para estimar la precisión.", "Equívoco.", "Ad hominem.", "Pendiente resbaladiza."], "e": "Una prueba con 20 imágenes no permite estimar confiablemente la precisión en producción. La conclusión «95% preciso» se apoya en una muestra demasiado pequeña. Inducción débil."}, {"t": 3, "c": "ia", "q": "«El algoritmo de contratación se evaluó en 1000 currículums históricos y el 90% de los recomendados por el algoritmo coinciden con los contratados históricamente. Luego el algoritmo es justo.» ¿Qué falacia es?", "o": ["Muestra sesgada: los datos históricos contienen el sesgo que se quiere eliminar.", "Equívoco.", "Ad hominem.", "Pendiente resbaladiza."], "e": "Evaluar al algoritmo con los mismos datos históricos sesgados que se usaron para entrenarlo es una muestra sesgada: el «éxito» solo reproduce el sesgo previo. Inducción débil."}, {"t": 3, "c": "ia", "q": "¿Por qué se dice que los modelos de IA son particularmente sensibles a la inducción débil?", "o": ["Porque generalizan desde datos de entrenamiento y heredan sus sesgos y límites de muestra.", "Porque nunca se entrenan con datos.", "Porque son deductivos puros.", "Porque aplican silogismos necesarios."], "e": "El aprendizaje automático induce desde una muestra. Si la muestra es sesgada o pequeña, el modelo reproduce sus defectos. Por eso la inducción débil es el riesgo central de los sistemas de IA."}, {"t": 4, "c": "prog", "q": "«Este código es seguro porque la propia empresa que lo vende asegura que pasó todas las pruebas.» ¿Qué falacia es?", "o": ["Petición de principio: la empresa asume lo que debe probar (que sus pruebas garantizan seguridad).", "Ad hominem.", "Equívoco.", "Generalización apresurada."], "e": "La empresa parte de suponer que sus pruebas son confiables para concluir que el software es seguro. La conclusión (seguridad) ya está escondida en la premisa (que las pruebas garantizan seguridad). Petición de principio."}, {"t": 4, "c": "prog", "q": "«O migras a la nube hoy o tu empresa quiebra mañana.» ¿Qué falacia es?", "o": ["Falsa dicotomía: oculta opciones intermedias (migración gradual, híbrida, etc.).", "Ad hominem.", "Equívoco.", "Generalización apresurada."], "e": "Presentar solo dos opciones extremas cuando existen alternativas intermedias es una falsa dicotomía. La decisión técnica no se reduce a ese dilema."}, {"t": 4, "c": "prog", "q": "«Si permitimos un commit sin revisión, pronto nadie revisará nada y el repo será un caos.» ¿Qué falacia es?", "o": ["Pendiente resbaladiza: no se justifica la cadena causal de los pasos.", "Ad hominem.", "Equívoco.", "Petición de principio."], "e": "Aceptar un commit sin revisión no implica mecánicamente que se abandone toda revisión. Falta justificar cada paso de la cadena. Pendiente resbaladiza."}, {"t": 4, "c": "prog", "q": "«Este framework es el mejor, porque ningún otro lo supera.» ¿Qué falacia es?", "o": ["Petición de principio: «ningún otro lo supera» ya supone que es el mejor.", "Ad hominem.", "Equívoco.", "Generalización apresurada."], "e": "Decir que «ningún otro lo supera» es equivalente a «es el mejor»: la premisa repite la conclusión. La carga de la prueba no se ha satisfecho. Petición de principio."}, {"t": 4, "c": "innov", "q": "«O pivotas a IA o mueres. No hay otra salida.» ¿Qué falacia es?", "o": ["Falsa dicotomía: ignora nichos, alianzas, modelo de negocio alternativo.", "Ad hominem.", "Equívoco.", "Pendiente resbaladiza."], "e": "El mercado admite muchas estrategias viables sin pivotar a IA. Reducir a dos alternativas extremas es una falsa dicotomía, falacia de presunción."}, {"t": 4, "c": "innov", "q": "«Esta startup es la más innovadora del ecosistema, porque ninguna otra la supera en innovación.» ¿Qué falacia es?", "o": ["Petición de principio: la premisa repite la conclusión.", "Ad hominem.", "Equívoco.", "Generalización apresurada."], "e": "«Ninguna la supera en innovación» y «es la más innovadora» dicen lo mismo. La premisa asume lo que debe probar. Petición de principio."}, {"t": 4, "c": "innov", "q": "«Si abrimos un canal de soporte por WhatsApp, pronto pedirá uno por Telegram, luego por correo, luego por carta, y al final no podremos dar soporte.» ¿Qué falacia es?", "o": ["Pendiente resbaladiza: no se justifica la cadena de pasos.", "Ad hominem.", "Equívoco.", "Falsa dicotomía."], "e": "Cada nuevo canal no implica automáticamente el siguiente ni el colapso del soporte. Sin justificar los pasos, la cadena es una pendiente resbaladiza."}, {"t": 4, "c": "ess", "q": "«La asamblea siempre tiene razón, porque la asamblea no se equivoca.» ¿Qué falacia es?", "o": ["Petición de principio: «no se equivoca» ya afirma que siempre tiene razón.", "Ad hominem.", "Equívoco.", "Generalización apresurada."], "e": "Decir que la asamblea no se equivoca equivale a decir que siempre tiene razón. La premisa repite la conclusión sin prueba independiente. Petición de principio."}, {"t": 4, "c": "ess", "q": "«O aceptas la decisión de la asamblea o no eres verdadero cooperativista.» ¿Qué falacia es?", "o": ["Falsa dicotomía: oculta la posibilidad de disentir respetuosamente.", "Ad hominem.", "Equívoco.", "Pendiente resbaladiza."], "e": "Se puede estar en desacuerdo con una asamblea sin dejar de ser cooperativista. Reducir el desacuerdo a «no verdadero cooperativista» es una falsa dicotomía."}, {"t": 4, "c": "ess", "q": "«Si permitimos que un socio falte a una asamblea, pronto nadie vendrá y la cooperativa se disolverá.» ¿Qué falacia es?", "o": ["Pendiente resbaladiza: la cadena de pasos no está justificada.", "Ad hominem.", "Equívoco.", "Petición de principio."], "e": "Una falta no implica un abandono generalizado. Sin justificar los pasos, la predicción catastrófica es una pendiente resbaladiza."}, {"t": 4, "c": "mat", "q": "«Este teorema es verdadero porque es un teorema, y los teoremas son verdaderos.» ¿Qué falacia es?", "o": ["Petición de principio: «es verdadero» se afirma en la premisa.", "Ad hominem.", "Equívoco.", "Generalización apresurada."], "e": "Decir que «es verdadero porque es un teorema» asume lo que debe probar (que la demostración es correcta). El estatus de teorema ya incluye su verdad; usarlo para probar la verdad es circular. Petición de principio."}, {"t": 4, "c": "mat", "q": "«O un número natural es par o es impar; no hay más opciones.» En el conjunto de los naturales, esta afirmación:", "o": ["No es falacia: la dicotomía par/impar es exhaustiva en los naturales.", "Falsa dicotomía: ignora los negativos.", "Equívoco.", "Generalización apresurada."], "e": "En el conjunto de los naturales, par/impar es una partición exhaustiva y excluyente. La afirmación no es falacia. Distinguir es importante: no toda dicotomía es falsa."}, {"t": 4, "c": "mat", "q": "«Si permitimos un contraejemplo a esta conjetura, pronto dudaremos de todo y las matemáticas colapsarán.» ¿Qué falacia es?", "o": ["Pendiente resbaladiza: la cadena no está justificada.", "Ad hominem.", "Equívoco.", "Petición de principio."], "e": "Un contraejemplo refuta una conjetura pero no desmorona todas las matemáticas. Sin pasos justificados, la predicción es una pendiente resbaladiza."}, {"t": 4, "c": "ia", "q": "«El algoritmo es justo porque sus salidas son objetivas y la objetividad es justa.» ¿Qué falacia es?", "o": ["Petición de principio: «objetividad es justicia» es la conclusión disfrazada de premisa.", "Ad hominem.", "Equívoco.", "Generalización apresurada."], "e": "Asumir que la «objetividad» del algoritmo implica justicia es justamente lo que debe probarse (los datos pueden ser objetivos en medición e injustos en efecto). Petición de principio."}, {"t": 4, "c": "ia", "q": "«O usamos el algoritmo tal cual o prescindimos de la IA por completo.» ¿Qué falacia es?", "o": ["Falsa dicotomía: oculta opciones intermedias (auditar, ajustar, regular).", "Ad hominem.", "Equívoco.", "Pendiente resbaladiza."], "e": "Existen alternativas intermedias (auditar el algoritmo, ajustar los datos, regular su uso). Reducir a dos extremos es una falsa dicotomía."}, {"t": 4, "c": "ia", "q": "¿Cuál es la marca común de las falacias de presunción?", "o": ["El argumento da por sentado, sin justificar, algo que requeriría prueba.", "Las premisas son irrelevantes para la conclusión.", "Una palabra cambia de significado.", "La muestra es demasiado pequeña."], "e": "Las falacias de presunción asumen como cierto lo que está en disputa: la conclusión se filtra en las premisas (petición de principio), o se supone un dilema exclusivo (falsa dicotomía), o una cadena causal (pendiente resbaladiza) sin justificar cada paso."}, {"t": 5, "c": "prog", "q": "«Los programas de computadora necesitan un compilador; el gobierno aprueba programas sociales; luego los programas sociales necesitan un compilador.» ¿Qué falacia es?", "o": ["Equívoco: «programa» cambia de significado entre las dos premisas.", "Ad hominem.", "Generalización apresurada.", "Petición de principio."], "e": "«Programa» se usa primero como programa de cómputo y luego como programa gubernamental. El argumento solo parece válido porque la palabra se repite; en realidad conecta dos ideas distintas. Equívoco."}, {"t": 5, "c": "prog", "q": "El equipo de backend escribió que «la causa del bug es la API y el frontend». El equipo de frontend concluye: «el bug está en la API». ¿Qué falacia comete el frontend?", "o": ["Anfibología: la frase es gramaticalmente ambigua y se elige una lectura.", "Ad hominem.", "Equívoco.", "Petición de principio."], "e": "«La causa del bug es la API y el frontend» admite varias lecturas (la causa es la API y, por separado, el frontend; o la causa es la interacción de ambos). Elegir una sin justificar es anfibología."}, {"t": 5, "c": "prog", "q": "«Cada función del módulo está probada unitariamente; luego el módulo completo está probado.» ¿Qué falacia es?", "o": ["Composición: lo que vale de las partes no vale del todo.", "Ad hominem.", "Equívoco.", "Petición de principio."], "e": "Las pruebas unitarias no garantizan la integración del módulo. Trasladar la propiedad de las partes al todo es falacia de composición, una ambigüedad entre parte y todo."}, {"t": 5, "c": "prog", "q": "«El sistema tiene alta disponibilidad (99.99%); luego cada microservicio tiene 99.99% de disponibilidad.» ¿Qué falacia es?", "o": ["División: lo que vale del todo no vale de cada parte.", "Ad hominem.", "Equívoco.", "Pendiente resbaladiza."], "e": "La disponibilidad del sistema se obtiene por redundancia entre servicios; un servicio individual puede tener menos disponibilidad. Trasladar la propiedad del todo a cada parte es falacia de división."}, {"t": 5, "c": "innov", "q": "«La startup es un unicornio; todo unicornio tiene cuerno; luego la startup tiene cuerno.» ¿Qué falacia es?", "o": ["Equívoco: «unicornio» se usa metafóricamente y luego literalmente.", "Ad hominem.", "Generalización apresurada.", "Petición de principio."], "e": "«Unicornio» en startups significa valuación > USD 1B; en zoología refiere al animal mitológico. Cambiar el significado a mitad del argumento es equívoco."}, {"t": 5, "c": "innov", "q": "El inversor dijo: «Apoyaré al equipo si el CEO se queda». El equipo interpretó: «si el cargo de CEO se mantiene». ¿Qué falacia es?", "o": ["Anfibología: la frase es ambigua y se elige una lectura.", "Ad hominem.", "Equívoco.", "Petición de principio."], "e": "«Si el CEO se queda» admite la lectura personal (este CEO sigue) y la lectura de cargo (el rol de CEO sigue). La ambigüedad gramatical permite elegir la versión conveniente: anfibología."}, {"t": 5, "c": "innov", "q": "«Cada miembro del equipo es talentoso; luego el equipo completo es talentoso.» ¿Qué falacia es?", "o": ["Composición: el talento individual no garantiza el desempeño del equipo.", "Ad hominem.", "Equívoco.", "Petición de principio."], "e": "El desempeño de un equipo depende de la coordinación, no solo de la suma de talentos individuales. Trasladar la propiedad de las partes al todo es composición."}, {"t": 5, "c": "ess", "q": "«La cooperativa devuelve el capital al socio; el capital es dinero; luego devuelve dinero al socio.» ¿Qué falacia es?", "o": ["Equívoco: «capital» en cooperativismo es el aporte social, no el capital financiero.", "Ad hominem.", "Generalización apresurada.", "Petición de principio."], "e": "«Capital» en cooperativismo puede referir al aporte social o a la cuenta individual del socio, distinto del capital accionario. Cambiar el sentido a mitad del argumento es equívoco."}, {"t": 5, "c": "ess", "q": "La asamblea decidió «que el fondo se reparta entre los socios activos». El consejo interpretó: «solo entre los socios activos al cierre del año». ¿Qué falacia es?", "o": ["Anfibología: la frase admite varias lecturas temporales.", "Ad hominem.", "Equívoco.", "Petición de principio."], "e": "«Socios activos» puede referir a los activos en el momento de la decisión o a los activos al cierre. La ambigüedad gramatical abre dos lecturas; elegir una sin justificar es anfibología."}, {"t": 5, "c": "ess", "q": "«Cada socio individualmente no podría pagar el local; luego la cooperativa no podría pagar el local.» ¿Qué falacia es?", "o": ["Composición: lo que vale de cada parte no vale del todo.", "Ad hominem.", "Equívoco.", "Petición de principio."], "e": "La cooperativa como colectivo puede pagar lo que cada socio individual no. Trasladar la limitación individual al colectivo es falacia de composición."}, {"t": 5, "c": "mat", "q": "«La raíz cuadrada de 4 es 2 y -2; la raíz es 2; luego 2 = -2.» ¿Qué falacia es?", "o": ["Equívoco: «es» se usa como igualdad y como pertenencia.", "Ad hominem.", "Generalización apresurada.", "Petición de principio."], "e": "«La raíz cuadrada de 4 es 2» no significa «2 = raíz» en sentido de identidad numérica, sino «2 pertenece al conjunto de raíces». Cambiar el sentido de «es» a mitad del argumento es equívoco."}, {"t": 5, "c": "mat", "q": "El profesor escribió «todos los estudiantes no aprobaron». Si se concluye sin más que «ninguno aprobó», se comete:", "o": ["Anfibología: la frase admite la lectura «no todos aprobaron» y «ninguno aprobó».", "Ad hominem.", "Equívoco.", "Petición de principio."], "e": "En español «todos los estudiantes no aprobaron» admite dos lecturas: «no todos aprobaron» y «ninguno aprobó». Elegir una sin aclarar es anfibología."}, {"t": 5, "c": "mat", "q": "«Cada número de la sucesión es par; luego la sucesión es par.» ¿Qué falacia es?", "o": ["Composición: «par» se aplica a los términos, no a la sucesión como objeto.", "Ad hominem.", "Equívoco.", "Petición de principio."], "e": "«Par» es propiedad de un número, no de una sucesión. Trasladar la propiedad de los términos al todo (la sucesión como objeto) es falacia de composición."}, {"t": 5, "c": "mat", "q": "«El conjunto {2,4,6} tiene tres elementos; luego el 2 tiene tres elementos.» ¿Qué falacia es?", "o": ["División: el cardinal es propiedad del conjunto, no de sus elementos.", "Ad hominem.", "Equívoco.", "Petición de principio."], "e": "«Tener tres elementos» es propiedad del conjunto, no de cada elemento. Trasladar la propiedad del todo a una parte es falacia de división."}, {"t": 5, "c": "ia", "q": "«El algoritmo es objetivo porque usa datos; lo objetivo es justo; luego el algoritmo es justo.» ¿Qué falacia es?", "o": ["Equívoco: «objetivo» se usa como «medible» y luego como «sin sesgo».", "Ad hominem.", "Generalización apresurada.", "Petición de principio."], "e": "«Objetivo» puede significar «cuantitativo» (medible) o «sin sesgo». Cambiar el sentido a mitad del argumento para concluir justicia es equívoco. Es la trampa típica en discusiones sobre algoritmos."}, {"t": 5, "c": "ia", "q": "¿Cuál es la marca común de las falacias de ambigüedad?", "o": ["Una palabra o frase cambia de significado a mitad del argumento.", "Las premisas son irrelevantes.", "La muestra es pequeña.", "La conclusión está en la premisa."], "e": "Equívoco, anfibología, composición y división comparten un mismo mecanismo: el sentido de una expresión se desliza entre premisas y conclusiones, y ese desliz sostiene indebidamente la inferencia."}, {"t": 6, "c": "ia", "q": "«El algoritmo recomienda contratar más hombres que mujeres para desarrollador senior; como se basa en datos reales de la empresa, la recomendación es objetiva y debe seguirse.» ¿Qué problema principal tiene?", "o": ["Inducción débil (muestra sesgada): los datos históricos reflejan un sesgo previo de contratación.", "Equívoco.", "Ad hominem.", "Falsa dicotomía."], "e": "Los «datos reales» no son neutrales: si durante 10 años la empresa contrató pocas mujeres por sesgo, los datos no representan el talento real. La generalización reproduce el sesgo. Es inducción débil por muestra sesgada."}, {"t": 6, "c": "ia", "q": "En el caso de estudio, ¿qué riesgo hay en usar «objetiva» como sinónimo de «libre de sesgo»?", "o": ["Equívoco: «objetiva» puede significar «cuantitativa» o «sin sesgo».", "Ad hominem.", "Falsa dicotomía.", "Pendiente resbaladiza."], "e": "«Objetiva» como «medible/cuantitativa» no implica «libre de sesgo». Confundir ambos sentidos es un equívoco que permite disfrazar de neutral un resultado sesgado."}, {"t": 6, "c": "ia", "q": "«El modelo es confiable porque sus resultados son consistentes y la consistencia es signo de confiabilidad.» ¿Qué falacia es?", "o": ["Petición de principio: la consistencia no prueba confiabilidad si los datos son sesgados.", "Ad hominem.", "Equívoco.", "Generalización apresurada."], "e": "La consistencia solo indica estabilidad, no ausencia de sesgo. Asumir que consistencia = confiabilidad sin probarlo es petición de principio."}, {"t": 6, "c": "ia", "q": "«O usamos el algoritmo sin tocarlo o renunciamos a la IA.» ¿Qué falacia es?", "o": ["Falsa dicotomía: hay opciones intermedias (auditar, ajustar, reentrenar).", "Ad hominem.", "Equívoco.", "Generalización apresurada."], "e": "Auditar, ajustar pesos, reentrenar con datos equilibrados, son alternativas intermedias. Reducir el dilema a dos extremos es falsa dicotomía."}, {"t": 6, "c": "ia", "q": "«Una empresa tecnológica líder usa este algoritmo; luego el algoritmo es justo.» ¿Qué falacia es?", "o": ["Apelación a la autoridad/popularidad: la adopción no prueba justicia.", "Equívoco.", "Ad hominem.", "Petición de principio."], "e": "Que una empresa use el algoritmo es dato sobre adopción, no sobre justicia. La justicia se prueba con métricas éticas, no con la firma de una marca."}, {"t": 6, "c": "ia", "q": "«El chatbot acertó 5 preguntas de prueba; el chatbot siempre acertará.» ¿Qué falacia es?", "o": ["Generalización apresurada: 5 ítems no bastan.", "Equívoco.", "Ad hominem.", "Petición de principio."], "e": "Cinco aciertos no son muestra suficiente para concluir que el chatbot siempre acierta. Inducción débil por generalización apresurada."}, {"t": 6, "c": "ia", "q": "«Esa investigadora crítica el sesgo de nuestro modelo, pero no trabaja en industria. Su crítica no vale.» ¿Qué falacia es?", "o": ["Ad hominem circunstancial: descarta la crítica por el perfil, no por su contenido.", "Apelación a la autoridad.", "Equívoco.", "Petición de principio."], "e": "Aunque la investigadora no trabaje en industria, su crítica debe examinarse técnicamente. Descartarla atacando su perfil es ad hominem."}, {"t": 6, "c": "ia", "q": "«Quienes piden auditar el modelo quieren prohibir la IA. No se puede prohibir la IA.» ¿Qué falacia es?", "o": ["Paja: «auditar» se exagera como «prohibir».", "Ad hominem.", "Equívoco.", "Falsa dicotomía."], "e": "Auditar un modelo no equivale a prohibir la IA. Reformular la propuesta en términos extremos para derribarla es un hombre de paja."}, {"t": 6, "c": "ia", "q": "«Si explicamos las decisiones del modelo a un usuario, pronto pedirá explicaciones para todas las decisiones, luego querrá vetarlas, y al final el sistema colapsará.» ¿Qué falacia es?", "o": ["Pendiente resbaladiza: la cadena causal no está justificada.", "Ad hominem.", "Equívoco.", "Petición de principio."], "e": "Explicar una decisión no implica automáticamente exigir vetar todas. Sin justificar cada paso, la predicción catastrófica es pendiente resbaladiza."}, {"t": 6, "c": "ia", "q": "¿Cuál es la conexión central entre IA y la falacia de inducción débil?", "o": ["Los modelos generalizan desde una muestra y, si esta es sesgada, reproducen y amplifican el sesgo.", "Los modelos son deductivos puros.", "Los modelos no usan datos.", "Los modelos nunca se equivocan."], "e": "El aprendizaje automático induce desde datos de entrenamiento. Si la muestra es sesgada o pequeña, el modelo hereda esos defectos y los proyecta al futuro. La inducción débil es el riesgo central de la IA."}, {"t": 6, "c": "ia", "q": "Antes de confiar ciegamente en un modelo de IA, ¿cuál de estas recomendaciones es la más coherente con la teoría de la sesión?", "o": ["Auditar los datos de entrenamiento y vigilar la representatividad de la muestra.", "Asumir que el modelo es correcto mientras no se pruebe lo contrario.", "Descartar la IA y volver al juicio humano puro.", "Aplicar el modelo sin métricas, ya que la confianza es intuitiva."], "e": "Auditar los datos y la representatividad de la muestra ataca de raíz la falacia de inducción débil. Las otras opciones ignoran el problema o caen en falsa dicotomía."}, {"t": 6, "c": "ia", "q": "En el caso del algoritmo de selección, la frase «como el modelo se basa en datos reales de la empresa, la recomendación es objetiva» mezcla dos falacias. ¿Cuáles?", "o": ["Equívoco («objetiva») e inducción débil (muestra sesgada histórica).", "Ad hominem y paja.", "Falsa dicotomía y pendiente resbaladiza.", "Petición de principio y generalización apresurada."], "e": "«Objetiva» oscila entre «medible» y «sin sesgo» (equívoco), y los datos históricos reflejan el sesgo previo de la empresa (inducción débil por muestra sesgada). Ambas falacias se combinan en un solo enunciado."}];
+
+// ==================== ESTADO ====================
+const S = {
+  mode:"practica", tema:"all", ctx:"all",
+  deck:[], cur:0, answered:false,
+  stats:{resp:0, ok:0, racha:0},
+  exam:{sel:{}, active:false},
+  bestExam: null
+};
+const LS_KEY = "logica_s3_v1";
+
+function loadLS(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(raw){
+      const d = JSON.parse(raw);
+      S.stats = d.stats || S.stats;
+      S.bestExam = (typeof d.bestExam === "number") ? d.bestExam : null;
+    }
+  }catch(e){}
+}
+function saveLS(){
+  try{
+    localStorage.setItem(LS_KEY, JSON.stringify({stats:S.stats, bestExam:S.bestExam}));
+  }catch(e){}
+}
+loadLS();
+
+// ==================== UTILIDADES ====================
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1; i>0; i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+const $ = id => document.getElementById(id);
+
+// ==================== FILTROS / MAZO ====================
+function filteredPool(){
+  return EX.map((e,i)=>i).filter(i=>{
+    const e = EX[i];
+    return (S.tema==="all" || e.t===S.tema) && (S.ctx==="all" || e.c===S.ctx);
+  });
+}
+function buildDeck(){
+  const pool = filteredPool();
+  $("countInfo").textContent = pool.length + " ejercicio(s) disponibles con estos filtros";
+  return shuffle(pool);
+}
+
+// ==================== RENDER ====================
+function renderStats(){
+  $("stResp").textContent = S.stats.resp;
+  $("stOk").textContent = S.stats.ok;
+  $("stRacha").textContent = S.stats.racha;
+  $("stPrec").textContent = S.stats.resp ? Math.round(100*S.stats.ok/S.stats.resp)+"%" : "—";
+  const prog = S.mode==="examen"
+    ? (S.exam.active ? (Object.keys(S.exam.sel).length/Math.max(S.deck.length,1))*100 : 0)
+    : (S.deck.length ? (S.cur/S.deck.length)*100 : 0);
+  $("progFill").style.width = Math.min(100,prog)+"%";
+}
+
+function renderChips(){
+  const box = $("chipsTema"); box.innerHTML = "";
+  const mk = (val,label)=>{
+    const b = document.createElement("button");
+    b.type="button"; b.className="chip"+(S.tema===val?" on":""); b.textContent=label;
+    b.onclick = ()=>{ S.tema=val; renderChips(); resetAll(); };
+    box.appendChild(b);
+  };
+  mk("all","Todos los temas");
+  for(const k of Object.keys(TEMAS)) mk(Number(k), (k)+". "+TEMAS[k].n);
+}
+
+function currentView(){
+  const idx = S.deck[S.cur];
+  if(idx===undefined) return null;
+  const ex = EX[idx];
+  if(!S.orders) S.orders = {};
+  if(!S.orders[idx]) S.orders[idx] = shuffle([0,1,2,3]);
+  return {ex, order: S.orders[idx], idx};
+}
+
+function renderQuestion(){
+  const view = currentView();
+  if(!view){ showEmpty(); return; }
+  const {ex, order, idx} = view;
+  $("quizZone").style.display="block";
+  $("resultZone").style.display="none";
+  $("emptyMsg").style.display="none";
+  $("qcard").style.display="block";
+
+  $("qTagTema").textContent = TEMAS[ex.t].n;
+  $("qTagCtx").textContent = CTXS[ex.c];
+  $("qNum").textContent = (S.mode==="examen" ? "Examen · pregunta " : "Ejercicio ")+(S.cur+1)+" de "+S.deck.length;
+  $("qText").innerHTML = escapeHtml(ex.q);
+
+  const box = $("qOpts"); box.innerHTML = "";
+  const letters = ["a","b","c","d"];
+  order.forEach((oi,pos)=>{
+    const btn = document.createElement("button");
+    btn.type="button"; btn.className="opt";
+    btn.innerHTML = '<span class="letter">'+letters[pos]+'</span><span>'+escapeHtml(ex.o[oi])+'</span>';
+    btn.dataset.pos = pos;
+    btn.onclick = ()=>answer(pos);
+    box.appendChild(btn);
+  });
+
+  S.answered = false;
+  const fb = $("qFeed"); fb.className="feedback"; fb.classList.remove("show");
+
+  if(S.mode==="examen" && S.exam.sel[idx]!==undefined){
+    S.answered = true;
+    const posOfSel = order.indexOf(S.exam.sel[idx]);
+    box.children[posOfSel].classList.add("selected");
+    box.querySelectorAll(".opt").forEach(b=>b.disabled=true);
+  }
+
+  $("btnPrev").disabled = S.cur===0;
+  const isLast = S.cur===S.deck.length-1;
+  if(S.mode==="examen"){
+    $("btnNext").style.display = isLast ? "none" : "inline-block";
+    $("btnFinish").style.display = "inline-block";
+    const total = S.deck.length, resp = Object.keys(S.exam.sel).length;
+    $("btnFinish").disabled = resp<total;
+    $("btnFinish").textContent = resp<total ? "Terminar ("+resp+"/"+total+")" : "Terminar y ver resultados";
+  }else{
+    $("btnNext").style.display = "inline-block";
+    $("btnFinish").style.display = "none";
+    $("btnNext").textContent = isLast ? "Finalizar ronda" : "Siguiente →";
+  }
+  renderStats();
+}
+
+function showEmpty(){
+  $("qcard").style.display="none";
+  $("emptyMsg").style.display="block";
+  $("resultZone").style.display="none";
+  renderStats();
+}
+
+function escapeHtml(s){
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+// ==================== RESPONDER ====================
+function answer(pos){
+  const view = currentView();
+  if(!view || S.answered) return;
+  const {ex, order, idx} = view;
+  const oi = order[pos];
+  const correct = oi===0;
+  const box = $("qOpts");
+
+  if(S.mode==="practica"){
+    S.answered = true;
+    box.querySelectorAll(".opt").forEach(b=>b.disabled=true);
+    box.children[pos].classList.add(correct?"correct":"wrong");
+    if(!correct){
+      const posOk = order.indexOf(0);
+      box.children[posOk].classList.add("correct");
+    }
+    const fb = $("qFeed");
+    fb.className = "feedback show "+(correct?"ok":"bad");
+    $("feedVerdict").innerHTML = correct
+      ? '<span>&#10003;</span> Correcto'
+      : '<span>&#10007;</span> Incorrecto — la respuesta marcada en verde es la correcta';
+    $("feedExp").innerHTML = "<b>Por qué:</b> "+escapeHtml(ex.e || "");
+    S.stats.resp++; if(correct){S.stats.ok++; S.stats.racha++;} else {S.stats.racha=0;}
+    saveLS(); renderStats();
+  }else{
+    S.exam.sel[idx] = oi;
+    box.querySelectorAll(".opt").forEach(b=>{b.disabled=true; b.classList.remove("selected");});
+    box.children[pos].classList.add("selected");
+    renderStats();
+    const total = S.deck.length, resp = Object.keys(S.exam.sel).length;
+    $("btnFinish").disabled = resp<total;
+    $("btnFinish").textContent = resp<total ? "Terminar ("+resp+"/"+total+")" : "Terminar y ver resultados";
+  }
+}
+
+// ==================== NAVEGACIÓN ====================
+function next(){
+  if(S.cur < S.deck.length-1){ S.cur++; renderQuestion(); }
+  else{
+    if(S.mode==="practica") endPractice();
+  }
+}
+function prev(){ if(S.cur>0){ S.cur--; renderQuestion(); } }
+
+function endPractice(){
+  const n = S.deck.length;
+  const acc = S.stats.resp ? Math.round(100*S.stats.ok/S.stats.resp) : 0;
+  $("qcard").style.display="none";
+  $("resultZone").style.display="block";
+  $("resPct").textContent = acc+"%";
+  $("resMsg").textContent = "Ronda de práctica terminada ("+n+" ejercicios)";
+  $("resSub").textContent = "Pulsa «Reintentar otro examen» o vuelve arriba para mezclar una nueva ronda con otros filtros.";
+  $("reviewList").innerHTML = "";
+  $("btnRetry").textContent = "Mezclar otra ronda de práctica";
+  $("btnRetry").onclick = ()=>{ startPractice(); window.scrollTo({top:0,behavior:"smooth"}); };
+  renderStats();
+}
+
+// ==================== EXAMEN ====================
+function startExam(){
+  S.mode="examen";
+  $("mExamen").classList.add("on"); $("mPractica").classList.remove("on");
+  S.deck = buildDeck();
+  const n = Math.min(20, S.deck.length);
+  S.deck = S.deck.slice(0,n);
+  S.cur = 0; S.answered=false; S.orders={};
+  S.exam = {sel:{}, active:true};
+  renderQuestion();
+}
+function finishExam(){
+  if(S.mode!=="examen") return;
+  let ok = 0;
+  const rows = [];
+  S.deck.forEach((idx,k)=>{
+    const ex = EX[idx];
+    const chosen = S.exam.sel[idx];
+    const correct = chosen===0;
+    if(correct) ok++;
+    const order = (S.orders && S.orders[idx]) || [0,1,2,3];
+    const posOf = v => order.indexOf(v);
+    const letters = ["a","b","c","d"];
+    rows.push(
+      '<div class="rev '+(correct?"ok":"bad")+'">'+
+        '<div class="rev-head"><span class="rev-num">Pregunta '+(k+1)+'</span>'+
+        '<span class="tag tema">'+escapeHtml(TEMAS[ex.t].n)+'</span>'+
+        '<span class="rev-state">'+(correct?"Correcta":"Incorrecta")+'</span></div>'+
+        '<div class="rev-q">'+escapeHtml(ex.q)+'</div>'+
+        (correct
+          ? '<div class="rev-ans yours ok-c"><b>Tu respuesta ('+letters[posOf(chosen)]+'):</b> '+escapeHtml(ex.o[chosen])+'</div>'
+          : '<div class="rev-ans yours bad-c"><b>Tu respuesta ('+letters[posOf(chosen)]+'):</b> '+escapeHtml(ex.o[chosen])+'</div>'+
+            '<div class="rev-ans"><b>Correcta ('+letters[posOf(0)]+'):</b> '+escapeHtml(ex.o[0])+'</div>'
+        )+
+        '<div class="rev-exp"><b>Por qué:</b> '+escapeHtml(ex.e || "")+'</div>'+
+      '</div>'
+    );
+  });
+  const pct = Math.round(100*ok/S.deck.length);
+  S.bestExam = (S.bestExam===null) ? pct : Math.max(S.bestExam,pct);
+  saveLS();
+  $("qcard").style.display="none";
+  $("resultZone").style.display="block";
+  $("resPct").textContent = ok+" / "+S.deck.length+"  ("+pct+"%)";
+  $("resMsg").textContent =
+    pct>=90 ? "¡Excelente! Dominas la distinción deducción–inducción y las cuatro familias de falacias." :
+    pct>=70 ? "¡Muy bien! Repasa las preguntas falladas y vuelve a intentarlo." :
+    pct>=50 ? "Vas por buen camino: abre el repaso de teoría y enfócate en los temas fallados." :
+    "No te desanimes: empieza por el repaso de teoría y practica el Tema 1 en modo práctica.";
+  $("resSub").textContent = "Tu mejor resultado en exámenes: "+S.bestExam+"%";
+  $("reviewList").innerHTML = rows.join("");
+  $("btnRetry").textContent = "Reintentar otro examen";
+  $("btnRetry").onclick = ()=>{ startExam(); window.scrollTo({top:0,behavior:"smooth"}); };
+  renderStats();
+  window.scrollTo({top:$("resultZone").offsetTop-20, behavior:"smooth"});
+}
+
+// ==================== PRÁCTICA ====================
+function startPractice(){
+  S.mode="practica";
+  $("mPractica").classList.add("on"); $("mExamen").classList.remove("on");
+  S.deck = buildDeck();
+  S.cur = 0; S.answered=false; S.orders={}; S.exam={sel:{},active:false};
+  if(S.deck.length===0){ showEmpty(); return; }
+  renderQuestion();
+}
+
+// ==================== RESET ====================
+function resetAll(){
+  S.cur=0; S.answered=false; S.orders={}; S.exam={sel:{},active:false};
+  $("resultZone").style.display="none";
+  showEmpty();
+}
+
+// ==================== EVENTOS ====================
+$("mPractica").onclick = ()=>startPractice();
+$("mExamen").onclick = ()=>startExam();
+$("btnStart").onclick = ()=>{ S.mode==="examen" ? startExam() : startPractice(); };
+$("btnNext").onclick = next;
+$("btnPrev").onclick = prev;
+$("btnFinish").onclick = finishExam;
+$("btnReset").onclick = ()=>{
+  if(confirm("¿Borrar tus estadísticas acumuladas y tu mejor examen?")){
+    S.stats={resp:0,ok:0,racha:0}; S.bestExam=null; saveLS();
+    resetAll(); renderStats();
+  }
+};
+$("selCtx").onchange = e=>{ S.ctx=e.target.value; resetAll(); };
+
+document.addEventListener("keydown", e=>{
+  if($("qcard").style.display==="none") return;
+  const map = {"1":0,"2":1,"3":2,"4":3,"a":0,"b":1,"c":2,"d":3};
+  const k = e.key.toLowerCase();
+  if(k in map && !S.answered) answer(map[k]);
+  else if(e.key==="ArrowRight") next();
+  else if(e.key==="ArrowLeft") prev();
+});
+
+// ==================== INICIO ====================
+renderChips();
+$("badgeTotal").textContent = EX.length+" ejercicios";
+resetAll();
+</script>
+
+</body>
+</html>
