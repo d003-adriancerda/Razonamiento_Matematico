@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Generador de Ejercicios de RLM · Economía Social Solidaria y Programación e Innovación Digital</title>
+  <title>Generador de Ejercicios · Dr. J. Adrián Cerda</title>
   
   <script>
   window.MathJax = {
@@ -96,7 +96,7 @@
     header {
       background: linear-gradient(135deg, var(--brand), var(--brand2));
       color: #ffffff;
-      padding: 30px 34px;
+      padding: 28px 34px;
       position: relative;
       overflow: hidden;
     }
@@ -119,32 +119,42 @@
     }
 
     h1 {
-      font-size: 1.65rem;
+      font-size: 1.72rem;
       font-weight: 800;
-      line-height: 1.25;
-      margin-bottom: 6px;
+      line-height: 1.22;
+      margin-bottom: 4px;
       letter-spacing: -0.01em;
     }
 
+    .header-subline {
+      display: block;
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin-top: 5px;
+      opacity: 0.96;
+      letter-spacing: normal;
+    }
+
     .subtitle {
-      font-size: 0.98rem;
-      opacity: 0.94;
+      font-size: 0.95rem;
+      opacity: 0.92;
       font-weight: 400;
       line-height: 1.4;
+      margin-top: 5px;
     }
 
     .header-art {
-      width: 78px;
-      height: 78px;
+      width: 76px;
+      height: 76px;
       flex-shrink: 0;
       opacity: 0.95;
     }
 
     main {
-      padding: 30px 34px;
+      padding: 28px 34px;
       display: flex;
       flex-direction: column;
-      gap: 24px;
+      gap: 22px;
     }
 
     .top-action-bar {
@@ -201,29 +211,11 @@
       background: #fafbfc;
       border: 1px solid var(--line);
       border-radius: 18px;
-      padding: 26px;
+      padding: 24px 26px;
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 16px;
     }
-
-    .chips-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .chip {
-      font-size: 0.78rem;
-      font-weight: 700;
-      padding: 5px 12px;
-      border-radius: 20px;
-      letter-spacing: 0.03em;
-      text-transform: uppercase;
-    }
-    .chip-var { background: #f3e8ff; color: var(--brand2); border: 1px solid #e9d5ff; }
-    .chip-type { background: #e0e7ff; color: var(--brand); border: 1px solid #c7d2fe; }
 
     .enunciado-body {
       display: flex;
@@ -515,9 +507,10 @@
     .h-dot.err { background: var(--err); }
 
     footer {
-      padding: 20px 26px;
+      padding: 18px 26px;
       text-align: center;
-      font-size: 0.84rem;
+      font-size: 0.92rem;
+      font-weight: 600;
       color: var(--muted);
       border-top: 1px solid var(--line);
       background: #fafbfc;
@@ -539,7 +532,7 @@
       .esquema-wrap { width: 100%; min-width: 100%; }
       .esquema-canvas-container { height: 260px; }
       main { padding: 22px 18px; }
-      header { padding: 24px 20px; }
+      header { padding: 22px 20px; }
     }
 
     @media (max-width: 560px) {
@@ -572,8 +565,8 @@
     <div class="header-dots"></div>
     <div class="header-content">
       <div>
-        <h1>Generador de Ejercicios</h1>
-        <div class="subtitle">Economía Social Solidaria y Programación e Innovación Digital · Razonamiento Lógico-Matemático, Lógica Categórica y Teoría de Conjuntos</div>
+        <h1>Generador de Ejercicios<br><span class="header-subline">Economía Social Solidaria, Programación e Innovación Digital</span></h1>
+        <div class="subtitle">Razonamiento Lógico-Matemático</div>
       </div>
       <svg class="header-art" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <circle cx="38" cy="50" r="28" stroke="rgba(255,255,255,0.85)" fill="rgba(255,255,255,0.12)"/>
@@ -592,11 +585,6 @@
     </div>
 
     <div id="enunciado">
-      <div class="chips-row">
-        <span class="chip chip-var" id="chipVar">Variante</span>
-        <span class="chip chip-type" id="chipType">Tipo de respuesta</span>
-      </div>
-
       <div class="enunciado-body">
         <div class="enunciado-texto" id="problemaTexto">
           Cargando ejercicio...
@@ -665,7 +653,7 @@
   </main>
 
   <footer>
-    Generador educativo · Razonamiento Lógico-Matemático · Economía Social Solidaria y Programación e Innovación Digital · Dr. J. Adrián Cerda 
+    Dr. J. Adrián Cerda
   </footer>
 </div>
 
@@ -876,7 +864,6 @@ function limpiarTextoPlano(s) {
           .trim();
 }
 
-// Validador inteligente de proposiciones formuladas por el alumno
 function coincideProposicionCanonica(entrada, tipoEsperado, raizSujeto, raizPredicado) {
   var s = limpiarTextoPlano(entrada);
   if (!s) return false;
@@ -1037,7 +1024,6 @@ function procesarLatexTexto(f) {
    ========================================================================== */
 
 var ejercicioActual = null;
-var etiquetaActual = '';
 var figuraActual = null;
 var yaVerificadoCorrecto = false;
 
@@ -1428,7 +1414,7 @@ function dibujarDiagramaVenn(g, fig) {
 }
 
 /* ==========================================================================
-   BANCO DE FORMULACIONES (TEMAS: ECONOMÍA SOLIDARIA, IA, PROGRAMACIÓN)
+   BANCO DE PROPOSICIONES
    ========================================================================== */
 
 var TEMAS_PROPOSICIONES = [
@@ -1490,10 +1476,10 @@ var TEMAS_PROPOSICIONES = [
 ];
 
 /* ==========================================================================
-   BANCO DE VARIANTES (INCLUYE ESCRITURA DIRECTA DE PROPOSICIONES)
+   BANCO DE 10 VARIANTES
    ========================================================================== */
 
-// V1: Formular la Contradictoria (escribir el enunciado O a partir de A, o I a partir de E)
+// V1: Formular la Contradictoria
 function var1_escribirContradictoria() {
   var item = azar(TEMAS_PROPOSICIONES);
   var deAaO = Math.random() < 0.5;
@@ -1502,7 +1488,6 @@ function var1_escribirContradictoria() {
   var fraseOrigen = deAaO ? item.A : item.E;
   var fraseEsperada = deAaO ? item.O : item.I;
 
-  etiquetaActual = 'Formular Contradictoria (' + origenTipo + ' → ' + targetTipo + ')';
   figuraActual = {
     tipo: 'cuadrado',
     nodoDato: origenTipo,
@@ -1533,7 +1518,7 @@ function var1_escribirContradictoria() {
   };
 }
 
-// V2: Formular la Contraria (escribir el enunciado E a partir de A, o A a partir de E)
+// V2: Formular la Contraria
 function var2_escribirContraria() {
   var item = azar(TEMAS_PROPOSICIONES);
   var deAaE = Math.random() < 0.5;
@@ -1542,7 +1527,6 @@ function var2_escribirContraria() {
   var fraseOrigen = deAaE ? item.A : item.E;
   var fraseEsperada = deAaE ? item.E : item.A;
 
-  etiquetaActual = 'Formular Contraria (' + origenTipo + ' → ' + targetTipo + ')';
   figuraActual = {
     tipo: 'cuadrado',
     nodoDato: origenTipo,
@@ -1573,7 +1557,7 @@ function var2_escribirContraria() {
   };
 }
 
-// V3: Formular la Subcontraria (escribir el enunciado O a partir de I, o I a partir de O)
+// V3: Formular la Subcontraria
 function var3_escribirSubcontraria() {
   var item = azar(TEMAS_PROPOSICIONES);
   var deIaO = Math.random() < 0.5;
@@ -1582,7 +1566,6 @@ function var3_escribirSubcontraria() {
   var fraseOrigen = deIaO ? item.I : item.O;
   var fraseEsperada = deIaO ? item.O : item.I;
 
-  etiquetaActual = 'Formular Subcontraria (' + origenTipo + ' → ' + targetTipo + ')';
   figuraActual = {
     tipo: 'cuadrado',
     nodoDato: origenTipo,
@@ -1613,7 +1596,7 @@ function var3_escribirSubcontraria() {
   };
 }
 
-// V4: Formular la Subalterna (escribir el enunciado particular a partir de la universal)
+// V4: Formular la Subalterna
 function var4_escribirSubalterna() {
   var item = azar(TEMAS_PROPOSICIONES);
   var deAaI = Math.random() < 0.5;
@@ -1622,7 +1605,6 @@ function var4_escribirSubalterna() {
   var fraseOrigen = deAaI ? item.A : item.E;
   var fraseEsperada = deAaI ? item.I : item.O;
 
-  etiquetaActual = 'Formular Subalterna (' + origenTipo + ' → ' + targetTipo + ')';
   figuraActual = {
     tipo: 'cuadrado',
     nodoDato: origenTipo,
@@ -1653,7 +1635,7 @@ function var4_escribirSubalterna() {
   };
 }
 
-// V5: Inferencia de verdad por Contradicción en Cuadrado de Oposición
+// V5: Inferencia de verdad por Contradicción
 function var5_inferirContradictoria() {
   var pares = [
     { orig: 'A', op: 'O', valOrig: 'verdadera', resVal: 'falsa' },
@@ -1663,7 +1645,6 @@ function var5_inferirContradictoria() {
   ];
   var c = azar(pares);
 
-  etiquetaActual = 'Deducción de Verdad: Contradictorias';
   figuraActual = {
     tipo: 'cuadrado',
     nodoDato: c.orig,
@@ -1692,9 +1673,8 @@ function var5_inferirContradictoria() {
   };
 }
 
-// V6: Intersección A ∩ B a partir de la lectura directa del diagrama de Venn
+// V6: Intersección A ∩ B
 function var6_interseccionVenn() {
-  etiquetaActual = 'Intersección A ∩ B (Operador AND)';
   figuraActual = {
     tipo: 'venn',
     nombreA: 'Potencias de 2',
@@ -1729,11 +1709,10 @@ function var6_interseccionVenn() {
   };
 }
 
-// V7: Unión A ∪ B a partir del diagrama
+// V7: Unión A ∪ B
 function var7_unionVenn() {
   var union = [3, 9, 18, 27, 36, 81];
 
-  etiquetaActual = 'Unión A ∪ B (Operador OR)';
   figuraActual = {
     tipo: 'venn',
     nombreA: 'Potencias de 3',
@@ -1768,11 +1747,10 @@ function var7_unionVenn() {
   };
 }
 
-// V8: Diferencia A \ B a partir del diagrama
+// V8: Diferencia A \ B
 function var8_diferenciaVenn() {
   var diff = [2, 4];
 
-  etiquetaActual = 'Diferencia A ∖ B (Operador EXCEPT)';
   figuraActual = {
     tipo: 'venn',
     nombreA: 'Conjunto A',
@@ -1807,11 +1785,10 @@ function var8_diferenciaVenn() {
   };
 }
 
-// V9: Complemento A^c a partir del universo del diagrama
+// V9: Complemento A^c
 function var9_complementoVenn() {
   var comp = [1, 4, 6, 8, 9, 10, 12];
 
-  etiquetaActual = 'Complemento A^c (Dominio de Validación)';
   figuraActual = {
     tipo: 'venn',
     nombreA: 'Primos (A)',
@@ -1846,7 +1823,7 @@ function var9_complementoVenn() {
   };
 }
 
-// V10: Inclusión-Exclusión a partir de cardinalidades visuales
+// V10: Inclusión-Exclusión
 function var10_inclusionExclusion() {
   var nInter = ri(45, 90);
   var nSoloA = ri(90, 150);
@@ -1857,7 +1834,6 @@ function var10_inclusionExclusion() {
   var nB = nSoloB + nInter;
   var nUnion = nSoloA + nSoloB + nInter;
 
-  etiquetaActual = 'Inclusión-Exclusión (Datos Poblacionales)';
   figuraActual = {
     tipo: 'venn',
     nombreA: 'Energía Solar (A)',
@@ -1957,11 +1933,6 @@ function nuevoEjercicio() {
   explicacionBox.innerHTML = '';
   explicacionBox.style.display = 'none';
   document.getElementById('btnExplicacion').setAttribute('aria-pressed', 'false');
-
-  document.getElementById('chipVar').textContent = etiquetaActual;
-  document.getElementById('chipType').textContent = ejercicioActual.escribirProposicion 
-    ? 'Redacción de Enunciado Canónico' 
-    : (ejercicioActual.tipo === 'numerica' ? 'Respuesta Numérica' : 'Respuesta Lógica / Lista');
 
   var probEl = document.getElementById('problemaTexto');
   probEl.innerHTML = ejercicioActual.problema;
@@ -2119,13 +2090,13 @@ function guardarMarcador() {
       racha: racha,
       historial: historial
     };
-    localStorage.setItem('__gen_logica_conjuntos_v7__', JSON.stringify(estado));
+    localStorage.setItem('__gen_logica_conjuntos_v8__', JSON.stringify(estado));
   } catch(e) {}
 }
 
 function cargarMarcador() {
   try {
-    var s = localStorage.getItem('__gen_logica_conjuntos_v7__');
+    var s = localStorage.getItem('__gen_logica_conjuntos_v8__');
     if (s) {
       var obj = JSON.parse(s);
       aciertos = parseInt(obj.aciertos, 10) || 0;
