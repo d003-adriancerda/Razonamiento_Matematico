@@ -1,0 +1,2128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Economía Social Solidaria y Programación e Innovación Digital · Generador de Ejercicios</title>
+  
+  <script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$']] },
+    svg: { fontCache: 'global' },
+    options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'] }
+  };
+  </script>
+  <script id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"
+    onerror="window.__mjFallo=true;"></script>
+
+  <style>
+    :root {
+      --bg: #f4f6fb;
+      --card: #ffffff;
+      --ink: #111827;
+      --muted: #6b7280;
+      --brand: #4f46e5;
+      --brand2: #7c3aed;
+      --brandbg: #eef2ff;
+      --line: #e5e7eb;
+      --ok: #059669;
+      --ok-title: #047857;
+      --okbg: #ecfdf5;
+      --err: #dc2626;
+      --err-title: #b91c1c;
+      --errbg: #fef2f2;
+      --warn: #b45309;
+      --warnbg: #fffbeb;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--ink);
+      line-height: 1.55;
+      padding: 24px 16px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(79, 70, 229, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(124, 58, 237, 0.08) 0%, transparent 40%);
+    }
+
+    ::-webkit-scrollbar { width: 11px; }
+    ::-webkit-scrollbar-track { background: #e6e9f5; }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(var(--brand), var(--brand2)); border-radius: 6px; }
+
+    mjx-container[jax="SVG"]:not([display="true"]) {
+      display: inline-block;
+      max-width: 100%;
+      overflow-x: auto;
+      overflow-y: hidden;
+      vertical-align: middle;
+      padding: 0 2px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 950px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      box-shadow: 0 30px 70px -34px rgba(17, 24, 39, 0.45);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .top-ribbon {
+      height: 5px;
+      background: linear-gradient(90deg, var(--brand), var(--brand2), #059669, var(--brand));
+      background-size: 300% 100%;
+      animation: ribbonAnim 8s ease infinite;
+    }
+
+    @keyframes ribbonAnim {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    header {
+      background: linear-gradient(135deg, var(--brand), var(--brand2));
+      color: #ffffff;
+      padding: 30px 34px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header-dots {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-image: radial-gradient(rgba(255,255,255,0.18) 1.5px, transparent 1.5px);
+      background-size: 18px 18px;
+      pointer-events: none;
+    }
+
+    .header-content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+    }
+
+    h1 {
+      font-size: 1.65rem;
+      font-weight: 800;
+      line-height: 1.25;
+      margin-bottom: 6px;
+      letter-spacing: -0.01em;
+    }
+
+    .subtitle {
+      font-size: 0.98rem;
+      opacity: 0.94;
+      font-weight: 400;
+      line-height: 1.4;
+    }
+
+    .header-art {
+      width: 78px;
+      height: 78px;
+      flex-shrink: 0;
+      opacity: 0.95;
+    }
+
+    main {
+      padding: 30px 34px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .top-action-bar {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
+    .btn {
+      font-family: inherit;
+      font-size: 0.92rem;
+      font-weight: 600;
+      padding: 10px 18px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
+      text-decoration: none;
+    }
+
+    .btn:hover { transform: translateY(-2px); }
+    .btn:active { transform: scale(0.985); }
+    .btn:focus-visible { outline: 3px solid rgba(79, 70, 229, 0.4); outline-offset: 2px; }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--brand), var(--brand2));
+      color: #ffffff;
+      box-shadow: 0 4px 14px -3px rgba(79, 70, 229, 0.4);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--brand);
+      border-color: var(--line);
+    }
+    .btn-ghost:hover {
+      background: var(--brandbg);
+      border-color: rgba(79, 70, 229, 0.3);
+    }
+    .btn-ghost svg { transition: transform 0.4s ease; }
+    .btn-ghost:hover svg { transform: rotate(180deg); }
+
+    .btn-soft {
+      background: var(--brandbg);
+      color: var(--brand);
+    }
+    .btn-soft:hover { background: #e0e7ff; }
+
+    #enunciado {
+      background: #fafbfc;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 26px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .chips-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .chip {
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 20px;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+    .chip-var { background: #f3e8ff; color: var(--brand2); border: 1px solid #e9d5ff; }
+    .chip-type { background: #e0e7ff; color: var(--brand); border: 1px solid #c7d2fe; }
+
+    .enunciado-body {
+      display: flex;
+      gap: 32px;
+      align-items: stretch;
+    }
+
+    .enunciado-texto {
+      flex: 1 1 54%;
+      font-size: 1.04rem;
+      line-height: 1.68;
+      color: #1f2937;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .contexto-parrafo {
+      margin-bottom: 14px;
+      line-height: 1.65;
+    }
+
+    .pregunta-bloque {
+      padding: 14px 16px;
+      background: #f1f5f9;
+      border-left: 4px solid var(--brand);
+      border-radius: 6px;
+      font-size: 1.01rem;
+      line-height: 1.6;
+    }
+
+    .esquema-wrap {
+      flex: 1 1 46%;
+      min-width: 320px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .esquema-canvas-container {
+      width: 100%;
+      height: 290px;
+      background: #ffffff;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      overflow: hidden;
+      position: relative;
+      outline: none;
+      touch-action: none;
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.025);
+    }
+    .esquema-canvas-container:focus-visible {
+      border-color: var(--brand);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.25);
+    }
+
+    .esquema-caption {
+      font-size: 0.76rem;
+      color: var(--muted);
+      text-align: center;
+      user-select: none;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .input-wrap {
+      flex: 1 1 270px;
+      position: relative;
+    }
+
+    input#respuesta {
+      width: 100%;
+      height: 46px;
+      padding: 0 16px;
+      font-size: 1rem;
+      font-family: inherit;
+      border: 1.5px solid var(--line);
+      border-radius: 10px;
+      background: #ffffff;
+      color: var(--ink);
+      transition: all 0.2s ease;
+      outline: none;
+    }
+    input#respuesta:focus {
+      border-color: var(--brand);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.18);
+    }
+    input#respuesta.mal {
+      border-color: var(--err);
+      animation: shake 0.35s ease-in-out;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
+    }
+
+    .feedback {
+      padding: 16px 20px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      display: none;
+    }
+    .feedback.ok {
+      display: block;
+      background: var(--okbg);
+      border: 1px solid #a7f3d0;
+      color: #064e3b;
+    }
+    .feedback.ok .fb-title {
+      color: var(--ok-title);
+      font-weight: 700;
+      margin-bottom: 4px;
+      font-size: 1.05rem;
+    }
+    .feedback.err {
+      display: block;
+      background: var(--errbg);
+      border: 1px solid #fecaca;
+      color: #7f1d1d;
+    }
+    .feedback.err .fb-title {
+      color: var(--err-title);
+      font-weight: 700;
+      margin-bottom: 4px;
+      font-size: 1.05rem;
+    }
+
+    .panel {
+      padding: 18px 22px;
+      border-radius: 12px;
+      font-size: 0.94rem;
+      line-height: 1.65;
+      display: none;
+    }
+    .panel.visible { display: block; }
+    .panel.pista {
+      background: var(--warnbg);
+      border: 1px solid #fde68a;
+      color: #78350f;
+    }
+    .panel.pista h3 {
+      font-size: 0.98rem;
+      margin-bottom: 6px;
+      color: var(--warn);
+    }
+
+    .panel.explicacion {
+      background: #faf5ff;
+      border: 1px solid #e9d5ff;
+      color: #4c1d95;
+    }
+    .panel.explicacion h3 {
+      font-size: 0.98rem;
+      margin-bottom: 10px;
+      color: var(--brand2);
+    }
+    .step-item {
+      margin-bottom: 10px;
+      padding: 4px 0 4px 12px;
+      border-left: 3px solid rgba(124, 58, 237, 0.4);
+    }
+    .step-tag {
+      font-weight: 700;
+      color: var(--brand2);
+      margin-right: 6px;
+    }
+    .sol-final {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px dashed rgba(124, 58, 237, 0.35);
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    .marcador-card {
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .marcador-grid {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .stats-group {
+      display: flex;
+      gap: 22px;
+      flex-wrap: wrap;
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+    }
+    .stat-val {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--ink);
+    }
+    .stat-lbl {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+    }
+
+    .gauge-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .gauge-svg {
+      width: 50px;
+      height: 50px;
+      transform: rotate(-90deg);
+    }
+    .gauge-bg {
+      fill: none;
+      stroke: #e2e8f0;
+      stroke-width: 5;
+    }
+    .gauge-bar {
+      fill: none;
+      stroke: var(--brand);
+      stroke-width: 5;
+      stroke-linecap: round;
+      stroke-dasharray: 125.6;
+      stroke-dashoffset: 125.6;
+      transition: stroke-dashoffset 0.4s ease;
+    }
+
+    .kbd-tip {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    .kbd {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 5px;
+      padding: 2px 7px;
+      font-family: inherit;
+      font-size: 0.75rem;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+    }
+
+    .history-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+    }
+
+    .dots-container {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      min-height: 12px;
+      align-items: center;
+    }
+
+    .h-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #cbd5e1;
+      transition: transform 0.2s;
+    }
+    .h-dot.ok { background: var(--ok); }
+    .h-dot.err { background: var(--err); }
+
+    footer {
+      padding: 20px 26px;
+      text-align: center;
+      font-size: 0.84rem;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      background: #fafbfc;
+    }
+
+    .fb-frac {
+      display: inline-flex;
+      flex-direction: column;
+      vertical-align: middle;
+      text-align: center;
+      padding: 0 2px;
+      font-size: 0.9em;
+    }
+    .fb-num { border-bottom: 1px solid currentColor; padding-bottom: 1px; }
+    .fb-den { padding-top: 1px; }
+
+    @media (max-width: 780px) {
+      .enunciado-body { flex-direction: column; }
+      .esquema-wrap { width: 100%; min-width: 100%; }
+      .esquema-canvas-container { height: 260px; }
+      main { padding: 22px 18px; }
+      header { padding: 24px 20px; }
+    }
+
+    @media (max-width: 560px) {
+      .input-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+      .input-wrap {
+        grid-column: 1 / -1;
+      }
+      .btn-verify {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="top-ribbon"></div>
+  
+  <header>
+    <div class="header-dots"></div>
+    <div class="header-content">
+      <div>
+        <h1>Economía Social Solidaria y Programación e Innovación Digital</h1>
+        <div class="subtitle">Generador de Ejercicios · Razonamiento Lógico-Matemático, Lógica Categórica y Teoría de Conjuntos</div>
+      </div>
+      <svg class="header-art" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="38" cy="50" r="28" stroke="rgba(255,255,255,0.85)" fill="rgba(255,255,255,0.12)"/>
+        <circle cx="62" cy="50" r="28" stroke="rgba(255,255,255,0.85)" fill="rgba(255,255,255,0.12)"/>
+        <path d="M 50 25 Q 56 50 50 75 Q 44 50 50 25 Z" fill="rgba(255,255,255,0.3)" stroke="none"/>
+      </svg>
+    </div>
+  </header>
+
+  <main>
+    <div class="top-action-bar">
+      <button id="btnNuevo" class="btn btn-ghost" title="Generar un nuevo problema (tecla N fuera del input)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+        Nuevo ejercicio
+      </button>
+    </div>
+
+    <div id="enunciado">
+      <div class="chips-row">
+        <span class="chip chip-var" id="chipVar">Variante</span>
+        <span class="chip chip-type" id="chipType">Tipo de respuesta</span>
+      </div>
+
+      <div class="enunciado-body">
+        <div class="enunciado-texto" id="problemaTexto">
+          Cargando ejercicio...
+        </div>
+
+        <div class="esquema-wrap">
+          <div class="esquema-canvas-container" id="esquemaBox" tabindex="0" role="region" aria-label="Esquema interactivo: analiza visualmente la distribución gráfica, arrastra con el cursor o mueve con las flechas">
+            <svg id="esquemaSvg" width="100%" height="100%" style="display:block; overflow:hidden;"></svg>
+          </div>
+          <div class="esquema-caption" id="esquemaCaption">Esquema analítico interactivo · Arrastra libremente · Doble clic para centrar</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-row">
+      <div class="input-wrap">
+        <input type="text" id="respuesta" placeholder="Escribe tu respuesta aquí..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+      </div>
+      <button id="btnVerificar" class="btn btn-primary btn-verify">Verificar</button>
+      <button id="btnPista" class="btn btn-soft" aria-pressed="false" aria-controls="pistaBox">Pista</button>
+      <button id="btnExplicacion" class="btn btn-soft" aria-pressed="false" aria-controls="explicacionBox">Explicación</button>
+    </div>
+
+    <div id="feedback" class="feedback" role="status" aria-live="polite"></div>
+    <div id="pistaBox" class="panel pista"></div>
+    <div id="explicacionBox" class="panel explicacion"></div>
+
+    <div class="marcador-card">
+      <div class="marcador-grid">
+        <div class="stats-group">
+          <div class="stat-item">
+            <span class="stat-val" id="mArc">0</span>
+            <span class="stat-lbl">Aciertos</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-val" id="mInt">0</span>
+            <span class="stat-lbl">Intentos</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-val" id="mRacha">0</span>
+            <span class="stat-lbl">Racha actual</span>
+          </div>
+        </div>
+
+        <div class="gauge-wrap">
+          <svg class="gauge-svg" viewBox="0 0 44 44">
+            <circle class="gauge-bg" cx="22" cy="22" r="18"/>
+            <circle class="gauge-bar" id="mPrecGauge" cx="22" cy="22" r="18"/>
+          </svg>
+          <div class="stat-item">
+            <span class="stat-val" id="mPrec">0%</span>
+            <span class="stat-lbl">Precisión</span>
+          </div>
+        </div>
+
+        <div class="kbd-tip">
+          <span class="kbd">Enter</span> verificar &nbsp;·&nbsp; <span class="kbd">N</span> nuevo
+        </div>
+      </div>
+
+      <div class="history-row">
+        <div class="dots-container" id="historyDots"></div>
+        <button id="btnResetScore" class="btn btn-ghost" style="font-size:0.78rem; padding:4px 10px;">Reiniciar marcador</button>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    Generador educativo · Razonamiento Lógico-Matemático · Economía Social Solidaria y Programación e Innovación Digital
+  </footer>
+</div>
+
+<script>
+/* ==========================================================================
+   UTILIDADES MATEMÁTICAS Y DE PARSEO
+   ========================================================================== */
+
+function escaparHTML(s) {
+  if (typeof s !== 'string') return '';
+  return s.replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+}
+
+function normalizar(valor) {
+  if (typeof valor !== 'string') return '';
+  var s = valor.toLowerCase();
+  s = s.replace(/\$/g, '')
+       .replace(/\\\{/g, '')
+       .replace(/\\\}/g, '')
+       .replace(/\{/g, '')
+       .replace(/\}/g, '')
+       .replace(/\\left/g, '')
+       .replace(/\\right/g, '')
+       .replace(/\s+/g, '')
+       .replace(/·/g, '*')
+       .replace(/\\cdot/g, '*')
+       .replace(/\\times/g, '*')
+       .replace(/×/g, '*')
+       .replace(/−/g, '-')
+       .replace(/–/g, '-');
+  
+  var fracMatch = s.match(/^(-?\d+(?:\.\d+)?)\/(-?\d+(?:\.\d+)?)$/);
+  if (fracMatch) {
+    var den = parseFloat(fracMatch[2]);
+    if (den !== 0) {
+      var nVal = parseFloat(fracMatch[1]) / den;
+      return nVal.toFixed(4).replace(/\.?0+$/, '');
+    }
+  }
+  return s;
+}
+
+function limpiarNumero(txt) {
+  if (typeof txt !== 'string') return '';
+  var s = txt.toLowerCase();
+  s = s.replace(/,/g, '.');
+  s = s.replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '($1)/($2)');
+  s = s.replace(/\\sqrt\{([^}]+)\}/g, 'sqrt($1)');
+  s = s.replace(/√\s*(\d+(\.\d+)?)/g, 'sqrt($1)');
+  s = s.replace(/π/g, 'pi');
+  s = s.replace(/\\pi/g, 'pi');
+  s = s.replace(/°/g, '');
+  s = s.replace(/grados?/g, '');
+  return s;
+}
+
+function aNumero(txt) {
+  var str = limpiarNumero(txt).replace(/\s+/g, '');
+  if (!str) return NaN;
+  
+  var pos = 0;
+  function peek() { return str.charAt(pos); }
+  function get() { return str.charAt(pos++); }
+  
+  function parsePrimary() {
+    var c = peek();
+    if (c === '(') {
+      get();
+      var val = parseExpr();
+      if (peek() === ')') { get(); } else { return NaN; }
+      return val;
+    }
+    if (c === '-') {
+      get();
+      return -parsePrimary();
+    }
+    if (c === '+') {
+      get();
+      return parsePrimary();
+    }
+    if (str.substr(pos, 4) === 'sqrt') {
+      pos += 4;
+      if (peek() === '(') {
+        get();
+        var sv = parseExpr();
+        if (peek() === ')') { get(); } else { return NaN; }
+        return Math.sqrt(sv);
+      }
+      return NaN;
+    }
+    if (str.substr(pos, 2) === 'pi') {
+      pos += 2;
+      return Math.PI;
+    }
+    var start = pos;
+    while ((peek() >= '0' && peek() <= '9') || peek() === '.') {
+      get();
+    }
+    if (start === pos) return NaN;
+    return parseFloat(str.substring(start, pos));
+  }
+  
+  function parsePower() {
+    var base = parsePrimary();
+    while (peek() === '^') {
+      get();
+      var exp = parsePrimary();
+      base = Math.pow(base, exp);
+    }
+    return base;
+  }
+  
+  function parseTerm() {
+    var val = parsePower();
+    while (true) {
+      var c = peek();
+      if (c === '*' || c === '·') {
+        get();
+        val = val * parsePower();
+      } else if (c === '/') {
+        get();
+        var den = parsePower();
+        if (den === 0) return NaN;
+        val = val / den;
+      } else {
+        break;
+      }
+    }
+    return val;
+  }
+  
+  function parseExpr() {
+    var val = parseTerm();
+    while (true) {
+      var c = peek();
+      if (c === '+') {
+        get();
+        val = val + parseTerm();
+      } else if (c === '-') {
+        get();
+        val = val - parseTerm();
+      } else {
+        break;
+      }
+    }
+    return val;
+  }
+  
+  try {
+    var res = parseExpr();
+    if (pos < str.length || isNaN(res) || !isFinite(res)) return NaN;
+    return res;
+  } catch(e) {
+    return NaN;
+  }
+}
+
+function parseConjunto(txt) {
+  if (typeof txt !== 'string') return null;
+  var s = txt.trim().toLowerCase();
+  s = s.replace(/\\emptyset/g, 'vacio')
+       .replace(/∅/g, 'vacio')
+       .replace(/\\\{/g, '')
+       .replace(/\\\}/g, '')
+       .replace(/\{/g, '')
+       .replace(/\}/g, '')
+       .replace(/\[/g, '')
+       .replace(/\]/g, '');
+  if (s === 'vacio' || s === 'ø' || s === '') return [];
+  var parts = s.split(/[,;\s]+/);
+  var arr = [];
+  for (var i = 0; i < parts.length; i++) {
+    var item = parts[i].trim();
+    if (item.length > 0) {
+      var n = parseFloat(item);
+      arr.push(isNaN(n) ? item : n);
+    }
+  }
+  arr.sort(function(a, b) {
+    if (typeof a === 'number' && typeof b === 'number') return a - b;
+    return ('' + a).localeCompare('' + b);
+  });
+  return arr;
+}
+
+function conjuntosIguales(arr1, arr2) {
+  if (!arr1 || !arr2) return false;
+  if (arr1.length !== arr2.length) return false;
+  for (var i = 0; i < arr1.length; i++) {
+    if (arr1[i] !== arr2[i]) return false;
+  }
+  return true;
+}
+
+function coincideTexto(entrada, acepta) {
+  var normE = normalizar(entrada);
+  var numE = aNumero(entrada);
+  var cE = parseConjunto(entrada);
+
+  for (var i = 0; i < acepta.length; i++) {
+    var candidata = acepta[i];
+    if (normE === normalizar(candidata)) return true;
+    
+    var numC = aNumero(candidata);
+    if (!isNaN(numE) && !isNaN(numC)) {
+      if (Math.abs(numE - numC) <= 0.002) return true;
+    }
+
+    var cC = parseConjunto(candidata);
+    if (cE !== null && cC !== null && conjuntosIguales(cE, cC)) return true;
+  }
+  return false;
+}
+
+function ri(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function azar(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+/* ==========================================================================
+   TIPOS Y RENDERIZADO MATEMÁTICO (MATHJAX + RESPALDO LOCAL)
+   ========================================================================== */
+
+function tiposet(nodo, intento) {
+  if (typeof intento === 'undefined') intento = 0;
+  if (window.MathJax && window.MathJax.typesetPromise) {
+    if (window.MathJax.typesetClear) {
+      try { window.MathJax.typesetClear([nodo]); } catch(e) {}
+    }
+    window.MathJax.typesetPromise([nodo]).catch(function() {});
+  } else {
+    if (!window.__mjFallo && intento < 40) {
+      setTimeout(function() {
+        tiposet(nodo, intento + 1);
+      }, 200);
+    } else {
+      aplicarRespaldoMatematico(nodo);
+    }
+  }
+}
+
+function aplicarRespaldoMatematico(nodo) {
+  if (!nodo) return;
+  var walker = document.createTreeWalker(nodo, NodeFilter.SHOW_TEXT, null, false);
+  var textNodes = [];
+  while (walker.nextNode()) {
+    var parent = walker.currentNode.parentNode;
+    var tag = parent ? parent.nodeName.toUpperCase() : '';
+    if (tag !== 'SCRIPT' && tag !== 'STYLE' && tag !== 'TEXTAREA' && tag !== 'PRE' && tag !== 'CODE') {
+      textNodes.push(walker.currentNode);
+    }
+  }
+
+  for (var i = 0; i < textNodes.length; i++) {
+    var tn = textNodes[i];
+    var val = tn.nodeValue;
+    if (val.indexOf('$') !== -1) {
+      var spans = val.replace(/\$([^$]+)\$/g, function(m, f) {
+        return procesarLatexTexto(f);
+      });
+      if (spans !== val) {
+        var temp = document.createElement('span');
+        temp.innerHTML = spans;
+        tn.parentNode.replaceChild(temp, tn);
+      }
+    }
+  }
+}
+
+function procesarLatexTexto(f) {
+  var s = f.replace(/\\left/g, '')
+           .replace(/\\right/g, '')
+           .replace(/\\,/g, ' ')
+           .replace(/\\;/g, ' ')
+           .replace(/\\!/g, '')
+           .replace(/\\displaystyle/g, '');
+
+  s = s.replace(/\\text\{([^}]+)\}/g, '$1')
+       .replace(/\\mathrm\{([^}]+)\}/g, '$1')
+       .replace(/\\mathbf\{([^}]+)\}/g, '$1');
+  
+  s = s.replace(/\\(?:d|t)?frac\{([^}]+)\}\{([^}]+)\}/g, 
+    '<span class="fb-frac"><span class="fb-num">$1</span><span class="fb-den">$2</span></span>');
+  
+  s = s.replace(/\\cap/g, ' ∩ ')
+       .replace(/\\cup/g, ' ∪ ')
+       .replace(/\\setminus/g, ' ∖ ')
+       .replace(/\\subseteq/g, ' ⊆ ')
+       .replace(/\\subset/g, ' ⊂ ')
+       .replace(/\\emptyset/g, ' ∅ ')
+       .replace(/\\dots/g, '…')
+       .replace(/\\cdot/g, '·')
+       .replace(/\\le/g, '≤')
+       .replace(/\\ge/g, '≥')
+       .replace(/\\neq/g, '≠');
+
+  s = s.replace(/\^([0-9a-zA-Z+-]+)/g, '<sup>$1</sup>');
+  s = s.replace(/\^\{([^}]+)\}/g, '<sup>$1</sup>');
+  s = s.replace(/_([0-9a-zA-Z+-]+)/g, '<sub>$1</sub>');
+  s = s.replace(/_\{([^}]+)\}/g, '<sub>$1</sub>');
+  s = s.replace(/\\\{/g, '{').replace(/\\\}/g, '}');
+  s = s.replace(/\{/g, '').replace(/\}/g, '');
+  return s;
+}
+
+/* ==========================================================================
+   ESTADO GLOBAL
+   ========================================================================== */
+
+var ejercicioActual = null;
+var etiquetaActual = '';
+var figuraActual = null;
+var yaVerificadoCorrecto = false;
+
+var aciertos = 0;
+var intentos = 0;
+var racha = 0;
+var historial = [];
+
+/* ==========================================================================
+   ESQUEMA GEOMÉTRICO INTERACTIVO (FUENTE PRIMARIA DE DATOS)
+   ========================================================================== */
+
+var svgState = {
+  dx: 0,
+  dy: 0,
+  scale: 1,
+  isDraggingCanvas: false,
+  draggedNode: null,
+  startX: 0,
+  startY: 0
+};
+
+var cuadradoNodos = {
+  A: { x: -85, y: -75 },
+  E: { x:  85, y: -75 },
+  I: { x: -85, y:  75 },
+  O: { x:  85, y:  75 }
+};
+
+function resetPosicionesNodos() {
+  cuadradoNodos = {
+    A: { x: -85, y: -75 },
+    E: { x:  85, y: -75 },
+    I: { x: -85, y:  75 },
+    O: { x:  85, y:  75 }
+  };
+}
+
+function resetVistaEsquema() {
+  svgState.dx = 0;
+  svgState.dy = 0;
+  svgState.scale = 1;
+  resetPosicionesNodos();
+  dibujarEsquema();
+}
+
+function inicializarControlesEsquema() {
+  var box = document.getElementById('esquemaBox');
+  
+  box.addEventListener('pointerdown', function(e) {
+    var svg = document.getElementById('esquemaSvg');
+    var rect = svg.getBoundingClientRect();
+    var W = rect.width;
+    var H = rect.height;
+    var mouseX = e.clientX - rect.left - (svgState.dx + W / 2);
+    var mouseY = e.clientY - rect.top - (svgState.dy + H / 2);
+
+    if (figuraActual && figuraActual.tipo === 'cuadrado') {
+      var keys = ['A', 'E', 'I', 'O'];
+      for (var k = 0; k < keys.length; k++) {
+        var nodeKey = keys[k];
+        var np = cuadradoNodos[nodeKey];
+        var dist = Math.sqrt((mouseX - np.x) * (mouseX - np.x) + (mouseY - np.y) * (mouseY - np.y));
+        if (dist <= 24) {
+          svgState.draggedNode = nodeKey;
+          if (box.setPointerCapture) box.setPointerCapture(e.pointerId);
+          return;
+        }
+      }
+    }
+
+    svgState.isDraggingCanvas = true;
+    svgState.startX = e.clientX - svgState.dx;
+    svgState.startY = e.clientY - svgState.dy;
+    if (box.setPointerCapture) box.setPointerCapture(e.pointerId);
+  });
+
+  box.addEventListener('pointermove', function(e) {
+    if (svgState.draggedNode) {
+      var svg = document.getElementById('esquemaSvg');
+      var rect = svg.getBoundingClientRect();
+      var W = rect.width;
+      var H = rect.height;
+      var mouseX = e.clientX - rect.left - (svgState.dx + W / 2);
+      var mouseY = e.clientY - rect.top - (svgState.dy + H / 2);
+      cuadradoNodos[svgState.draggedNode].x = mouseX;
+      cuadradoNodos[svgState.draggedNode].y = mouseY;
+      window.requestAnimationFrame(dibujarEsquema);
+      return;
+    }
+
+    if (svgState.isDraggingCanvas) {
+      svgState.dx = e.clientX - svgState.startX;
+      svgState.dy = e.clientY - svgState.startY;
+      window.requestAnimationFrame(dibujarEsquema);
+    }
+  });
+
+  function stopDrag(e) {
+    if (svgState.draggedNode || svgState.isDraggingCanvas) {
+      svgState.draggedNode = null;
+      svgState.isDraggingCanvas = false;
+      if (box.releasePointerCapture && e.pointerId) {
+        try { box.releasePointerCapture(e.pointerId); } catch(err) {}
+      }
+    }
+  }
+
+  box.addEventListener('pointerup', stopDrag);
+  box.addEventListener('pointercancel', stopDrag);
+
+  box.addEventListener('dblclick', function() {
+    resetVistaEsquema();
+  });
+
+  box.addEventListener('keydown', function(e) {
+    var step = 15;
+    if (e.key === 'ArrowLeft') { svgState.dx -= step; }
+    else if (e.key === 'ArrowRight') { svgState.dx += step; }
+    else if (e.key === 'ArrowUp') { svgState.dy -= step; }
+    else if (e.key === 'ArrowDown') { svgState.dy += step; }
+    else { return; }
+    e.preventDefault();
+    dibujarEsquema();
+  });
+}
+
+function dibujarEsquema() {
+  var svg = document.getElementById('esquemaSvg');
+  if (!svg || !figuraActual) return;
+
+  var W = svg.clientWidth || 320;
+  var H = svg.clientHeight || 280;
+  svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+
+  while (svg.firstChild) {
+    svg.removeChild(svg.firstChild);
+  }
+
+  var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  g.setAttribute('transform', 'translate(' + (svgState.dx + W/2) + ',' + (svgState.dy + H/2) + ') scale(' + svgState.scale + ')');
+  svg.appendChild(g);
+
+  if (figuraActual.tipo === 'cuadrado') {
+    dibujarCuadradoOposicion(g, figuraActual);
+  } else if (figuraActual.tipo === 'venn') {
+    dibujarDiagramaVenn(g, figuraActual);
+  }
+}
+
+function dibujarCuadradoOposicion(g, fig) {
+  var pA = cuadradoNodos.A;
+  var pE = cuadradoNodos.E;
+  var pI = cuadradoNodos.I;
+  var pO = cuadradoNodos.O;
+
+  function linea(p1, p2, color, dash, ancho) {
+    var l = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    l.setAttribute('x1', p1.x); l.setAttribute('y1', p1.y);
+    l.setAttribute('x2', p2.x); l.setAttribute('y2', p2.y);
+    l.setAttribute('stroke', color || '#cbd5e1');
+    l.setAttribute('stroke-width', ancho || '2');
+    if (dash) l.setAttribute('stroke-dasharray', dash);
+    g.appendChild(l);
+  }
+
+  linea(pA, pE, '#6366f1', null, '2.5');
+  linea(pI, pO, '#8b5cf6', null, '2.5');
+  linea(pA, pI, '#3b82f6', null, '2.5');
+  linea(pE, pO, '#3b82f6', null, '2.5');
+
+  linea(pA, pO, '#ef4444', '5,4', '2');
+  linea(pE, pI, '#ef4444', '5,4', '2');
+
+  function insigniaTexto(x, y, txt, colorTexto, colorBorde) {
+    var grp = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    
+    var t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    t.setAttribute('x', x);
+    t.setAttribute('y', y);
+    t.setAttribute('fill', colorTexto);
+    t.setAttribute('font-size', '10.5px');
+    t.setAttribute('font-weight', '700');
+    t.setAttribute('text-anchor', 'middle');
+    t.setAttribute('dominant-baseline', 'central');
+    t.textContent = txt;
+
+    var approxW = txt.length * 6.6 + 14;
+    var approxH = 20;
+
+    var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    rect.setAttribute('x', x - approxW / 2);
+    rect.setAttribute('y', y - approxH / 2);
+    rect.setAttribute('width', approxW);
+    rect.setAttribute('height', approxH);
+    rect.setAttribute('rx', 6);
+    rect.setAttribute('fill', '#ffffff');
+    rect.setAttribute('stroke', colorBorde || '#e2e8f0');
+    rect.setAttribute('stroke-width', '1.2');
+
+    grp.appendChild(rect);
+    grp.appendChild(t);
+    g.appendChild(grp);
+  }
+
+  var centroTop = { x: (pA.x + pE.x) / 2, y: (pA.y + pE.y) / 2 - 16 };
+  var centroBottom = { x: (pI.x + pO.x) / 2, y: (pI.y + pO.y) / 2 + 16 };
+  var centroIzq = { x: (pA.x + pI.x) / 2 - 28, y: (pA.y + pI.y) / 2 };
+  var centroDer = { x: (pE.x + pO.x) / 2 + 28, y: (pE.y + pO.y) / 2 };
+  var centroDiag = { x: (pA.x + pE.x + pI.x + pO.x) / 4, y: (pA.y + pE.y + pI.y + pO.y) / 4 };
+
+  insigniaTexto(centroTop.x, centroTop.y, 'Contrarias (A - E)', '#4338ca', '#c7d2fe');
+  insigniaTexto(centroBottom.x, centroBottom.y, 'Subcontrarias (I - O)', '#6d28d9', '#ddd6fe');
+  insigniaTexto(centroIzq.x, centroIzq.y, 'Subalt.', '#1d4ed8', '#bfdbfe');
+  insigniaTexto(centroDer.x, centroDer.y, 'Subalt.', '#1d4ed8', '#bfdbfe');
+  insigniaTexto(centroDiag.x, centroDiag.y, 'Contradictorias', '#b91c1c', '#fecaca');
+
+  var nodos = [
+    { p: pA, nom: 'A', id: 'A' },
+    { p: pE, nom: 'E', id: 'E' },
+    { p: pI, nom: 'I', id: 'I' },
+    { p: pO, nom: 'O', id: 'O' }
+  ];
+
+  for (var i = 0; i < nodos.length; i++) {
+    var n = nodos[i];
+    var esDato = (fig.nodoDato === n.id);
+    
+    var circ = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    circ.setAttribute('cx', n.p.x);
+    circ.setAttribute('cy', n.p.y);
+    circ.setAttribute('r', esDato ? '20' : '16');
+    circ.setAttribute('fill', esDato ? '#4f46e5' : '#ffffff');
+    circ.setAttribute('stroke', esDato ? '#312e81' : '#64748b');
+    circ.setAttribute('stroke-width', esDato ? '3.5' : '2.5');
+    circ.setAttribute('cursor', 'grab');
+    g.appendChild(circ);
+
+    var tn = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    tn.setAttribute('x', n.p.x);
+    tn.setAttribute('y', n.p.y);
+    tn.setAttribute('fill', esDato ? '#ffffff' : '#0f172a');
+    tn.setAttribute('font-size', '14px');
+    tn.setAttribute('font-weight', 'bold');
+    tn.setAttribute('text-anchor', 'middle');
+    tn.setAttribute('dominant-baseline', 'central');
+    tn.setAttribute('pointer-events', 'none');
+    tn.textContent = n.nom;
+    g.appendChild(tn);
+
+    if (esDato && fig.valorDato) {
+      var badgeVal = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      badgeVal.setAttribute('x', n.p.x);
+      badgeVal.setAttribute('y', n.p.y + (n.p.y < 0 ? -28 : 28));
+      badgeVal.setAttribute('fill', fig.valorDato === 'V' ? '#047857' : '#b91c1c');
+      badgeVal.setAttribute('font-size', '11.5px');
+      badgeVal.setAttribute('font-weight', '800');
+      badgeVal.setAttribute('text-anchor', 'middle');
+      badgeVal.textContent = 'Dato: ' + (fig.valorDato === 'V' ? 'Verdadera' : 'Falsa');
+      g.appendChild(badgeVal);
+    }
+  }
+}
+
+function dibujarDiagramaVenn(g, fig) {
+  var rectU = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  rectU.setAttribute('x', -145);
+  rectU.setAttribute('y', -100);
+  rectU.setAttribute('width', 290);
+  rectU.setAttribute('height', 200);
+  rectU.setAttribute('rx', 12);
+  rectU.setAttribute('fill', '#fbfcfd');
+  rectU.setAttribute('stroke', '#cbd5e1');
+  rectU.setAttribute('stroke-width', '1.6');
+  g.appendChild(rectU);
+
+  var textU = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  textU.setAttribute('x', -130);
+  textU.setAttribute('y', -80);
+  textU.setAttribute('font-weight', '800');
+  textU.setAttribute('font-size', '14px');
+  textU.setAttribute('fill', '#475569');
+  textU.textContent = 'U';
+  g.appendChild(textU);
+
+  var circA = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  circA.setAttribute('cx', -42);
+  circA.setAttribute('cy', 8);
+  circA.setAttribute('r', 65);
+  circA.setAttribute('fill', 'rgba(79, 70, 229, 0.16)');
+  circA.setAttribute('stroke', '#4f46e5');
+  circA.setAttribute('stroke-width', '2.5');
+  g.appendChild(circA);
+
+  var circB = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  circB.setAttribute('cx', 42);
+  circB.setAttribute('cy', 8);
+  circB.setAttribute('r', 65);
+  circB.setAttribute('fill', 'rgba(5, 150, 105, 0.16)');
+  circB.setAttribute('stroke', '#059669');
+  circB.setAttribute('stroke-width', '2.5');
+  g.appendChild(circB);
+
+  function rotuloConjunto(x, y, nombre, colorFondo, colorTexto) {
+    if (!nombre) return;
+    var gLabel = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    var w = nombre.length * 7 + 16;
+    var h = 22;
+
+    var pill = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    pill.setAttribute('x', x - w / 2);
+    pill.setAttribute('y', y - h / 2);
+    pill.setAttribute('width', w);
+    pill.setAttribute('height', h);
+    pill.setAttribute('rx', 8);
+    pill.setAttribute('fill', colorFondo);
+    pill.setAttribute('stroke', colorTexto);
+    pill.setAttribute('stroke-width', '1.2');
+
+    var txt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    txt.setAttribute('x', x);
+    txt.setAttribute('y', y);
+    txt.setAttribute('fill', colorTexto);
+    txt.setAttribute('font-weight', '800');
+    txt.setAttribute('font-size', '12px');
+    txt.setAttribute('text-anchor', 'middle');
+    txt.setAttribute('dominant-baseline', 'central');
+    txt.textContent = nombre;
+
+    gLabel.appendChild(pill);
+    gLabel.appendChild(txt);
+    g.appendChild(gLabel);
+  }
+
+  rotuloConjunto(-65, -68, fig.nombreA || 'Conjunto A', '#eef2ff', '#4338ca');
+  rotuloConjunto(65, -68, fig.nombreB || 'Conjunto B', '#ecfdf5', '#047857');
+
+  function valorEnRegion(x, y, contenido, colorTexto) {
+    if (contenido === undefined || contenido === null || contenido === '') return;
+    var grp = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    
+    var t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    t.setAttribute('x', x);
+    t.setAttribute('y', y);
+    t.setAttribute('font-size', '12px');
+    t.setAttribute('font-weight', '700');
+    t.setAttribute('fill', colorTexto || '#0f172a');
+    t.setAttribute('text-anchor', 'middle');
+    t.setAttribute('dominant-baseline', 'central');
+    t.textContent = contenido;
+
+    var strLen = ('' + contenido).length;
+    var pw = Math.max(28, strLen * 7.5 + 12);
+    var ph = 22;
+
+    var bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    bg.setAttribute('x', x - pw / 2);
+    bg.setAttribute('y', y - ph / 2);
+    bg.setAttribute('width', pw);
+    bg.setAttribute('height', ph);
+    bg.setAttribute('rx', 6);
+    bg.setAttribute('fill', 'rgba(255, 255, 255, 0.94)');
+    bg.setAttribute('stroke', '#cbd5e1');
+    bg.setAttribute('stroke-width', '1');
+
+    grp.appendChild(bg);
+    grp.appendChild(t);
+    g.appendChild(grp);
+  }
+
+  if (fig.datosRegiones) {
+    valorEnRegion(-68, 10, fig.datosRegiones.soloA, '#3730a3');
+    valorEnRegion(0, 10, fig.datosRegiones.inter, '#6d28d9');
+    valorEnRegion(68, 10, fig.datosRegiones.soloB, '#065f46');
+    valorEnRegion(85, 75, fig.datosRegiones.afuera, '#475569');
+  }
+}
+
+/* ==========================================================================
+   BANCO DE 10 VARIANTES
+   La gráfica interactiva contiene los datos necesarios.
+   Enunciados directos sin duplicidad. Pistas orientadas a la reflexión universitaria.
+   ========================================================================== */
+
+// VAR 1: Clasificación de proposiciones categóricas estándar (A, E, I, O)
+function var1_clasificarProposicion() {
+  var escenarios = [
+    { area: 'la auditoría algorítmica de modelos de inteligencia artificial', sujeto: 'los datasets de entrenamiento con licencia comunitaria abierta', accion: 'cumplen los estándares de transparencia sin sesgos socioeconómicos' },
+    { area: 'la política pública de conectividad rural y soberanía tecnológica', sujeto: 'las cooperativas de telecomunicaciones comunitarias', accion: 'reciben exención arancelaria para reinversión en fibra óptica abierta' },
+    { area: 'la investigación aplicada en bioeconomía y energías renovables', sujeto: 'los nodos de generación distribuida de biomasa', accion: 'transfieren excedentes a centros comunitarios de salud' }
+  ];
+  var esc = azar(escenarios);
+  var tipos = [
+    { cat: 'A', nom: 'Universal afirmativa', cuant: 'Todos los' },
+    { cat: 'E', nom: 'Universal negativa', cuant: 'Ningún' },
+    { cat: 'I', nom: 'Particular afirmativa', cuant: 'Algunos' },
+    { cat: 'O', nom: 'Particular negativa', cuant: 'Algunos' }
+  ];
+  var sel = azar(tipos);
+  
+  var frase = '';
+  if (sel.cat === 'A') frase = 'Todos ' + esc.sujeto + ' de ' + esc.area + ' ' + esc.accion + '.';
+  else if (sel.cat === 'E') frase = 'Ningún proyecto de ' + esc.area + ' ' + esc.accion + '.';
+  else if (sel.cat === 'I') frase = 'Algunos de ' + esc.sujeto + ' de ' + esc.area + ' ' + esc.accion + '.';
+  else frase = 'Algunos de ' + esc.sujeto + ' de ' + esc.area + ' no ' + esc.accion + '.';
+
+  etiquetaActual = 'Clasificación Categórica (A/E/I/O)';
+  figuraActual = {
+    tipo: 'cuadrado',
+    nodoDato: sel.cat,
+    valorDato: ''
+  };
+
+  var prob = '<p class="contexto-parrafo">En el dictamen técnico sobre ' + esc.area + ' se formula el siguiente postulado: «<em>' + frase + '</em>».</p>' +
+             '<div class="pregunta-bloque"><strong>Pregunta:</strong> ¿A qué vértice del Cuadrado de Oposición ($A$, $E$, $I$ u $O$) corresponde esta proposición? Escribe solo la letra o su denominación formal.</div>';
+
+  var sol = 'Proposición ' + sel.cat + ' (' + sel.nom + ')';
+  var acepta = [sel.cat, sel.cat.toLowerCase(), sel.nom, normalizar(sel.nom)];
+
+  var pista = 'Examina la cantidad del cuantificador y si la cópula afirma o niega la relación lógica.';
+  var exp = 'Paso 1. Analizamos la cantidad: ' + (sel.cat === 'A' || sel.cat === 'E' ? 'Universal' : 'Particular') + '.\n' +
+            'Paso 2. Analizamos la cualidad: ' + (sel.cat === 'A' || sel.cat === 'I' ? 'Afirmativa' : 'Negativa') + '.\n' +
+            'Paso 3. Corresponde formalmente a la forma típica $' + sel.cat + '$ (' + sel.nom + ').';
+
+  return {
+    tipo: 'simbolica',
+    problema: prob,
+    solucion: sol,
+    respuestaLaTeX: '\\text{' + sel.cat + ' (' + sel.nom + ')}',
+    acepta: acepta,
+    pista: pista,
+    explicacion: exp
+  };
+}
+
+// VAR 2: Contradictorias a partir del esquema interactivo
+function var2_contradictorias() {
+  var pares = [
+    { orig: 'A', op: 'O', valOrig: 'verdadera', resVal: 'falsa' },
+    { orig: 'A', op: 'O', valOrig: 'falsa', resVal: 'verdadera' },
+    { orig: 'E', op: 'I', valOrig: 'verdadera', resVal: 'falsa' },
+    { orig: 'E', op: 'I', valOrig: 'falsa', resVal: 'verdadera' },
+    { orig: 'O', op: 'A', valOrig: 'verdadera', resVal: 'falsa' },
+    { orig: 'I', op: 'E', valOrig: 'falsa', resVal: 'verdadera' }
+  ];
+  var c = azar(pares);
+
+  etiquetaActual = 'Contradictorias (A - O / E - I)';
+  figuraActual = {
+    tipo: 'cuadrado',
+    nodoDato: c.orig,
+    valorDato: c.valOrig === 'verdadera' ? 'V' : 'F'
+  };
+
+  var prob = '<p class="contexto-parrafo">En la verificación de un modelo computacional de asignación de créditos comunitarios, la proposición $' + c.orig + '$ presenta el valor de verdad indicado en el esquema interactivo lateral.</p>' +
+             '<div class="pregunta-bloque"><strong>Pregunta:</strong> A partir de las relaciones diagonales del Cuadrado de Oposición, ¿cuál es el valor de verdad de su proposición contradictoria $' + c.op + '$?</div>';
+
+  var sol = c.resVal === 'verdadera' ? 'Verdadera' : 'Falsa';
+  var acepta = [sol, sol.toLowerCase(), c.resVal === 'verdadera' ? 'v' : 'f', c.resVal === 'verdadera' ? 'verdad' : 'falso', c.resVal === 'verdadera' ? 'true' : 'false'];
+
+  var pista = 'Recuerda el principio que gobierna a las diagonales del Cuadrado de Oposición: dos enunciados contradictorios no pueden compartir simultáneamente el mismo valor de verdad.';
+  var exp = 'Paso 1. Las proposiciones $' + c.orig + '$ y $' + c.op + '$ son mutuamente contradictorias.\n' +
+            'Paso 2. Observando el esquema, el dato asignado a $' + c.orig + '$ es ' + c.valOrig + '.\n' +
+            'Paso 3. Por el principio de no contradicción, la proposición $' + c.op + '$ adquiere el valor opuesto: ' + c.resVal + '.';
+
+  return {
+    tipo: 'simbolica',
+    problema: prob,
+    solucion: sol,
+    respuestaLaTeX: '\\text{' + sol + '}',
+    acepta: acepta,
+    pista: pista,
+    explicacion: exp
+  };
+}
+
+// VAR 3: Contrarias y Subcontrarias a partir del esquema
+function var3_contrariasSubcontrarias() {
+  var casos = [
+    { tipoRel: 'contrarias', d: 'A', dVal: 'verdadera', p: 'E', pVal: 'falsa', regla: 'no pueden ser simultáneamente verdaderas' },
+    { tipoRel: 'subcontrarias', d: 'I', dVal: 'falsa', p: 'O', pVal: 'verdadera', regla: 'no pueden ser simultáneamente falsas' },
+    { tipoRel: 'subcontrarias', d: 'O', dVal: 'falsa', p: 'I', pVal: 'verdadera', regla: 'no pueden ser simultáneamente falsas' },
+    { tipoRel: 'contrarias', d: 'E', dVal: 'verdadera', p: 'A', pVal: 'falsa', regla: 'no pueden ser simultáneamente verdaderas' }
+  ];
+  var c = azar(casos);
+
+  etiquetaActual = c.tipoRel === 'contrarias' ? 'Contrarias (A - E)' : 'Subcontrarias (I - O)';
+  figuraActual = {
+    tipo: 'cuadrado',
+    nodoDato: c.d,
+    valorDato: c.dVal === 'verdadera' ? 'V' : 'F'
+  };
+
+  var prob = '<p class="contexto-parrafo">En el diseño de políticas públicas de economía solidaria, la proposición $' + c.d + '$ adopta el estado registrado en el nodo resaltado del esquema.</p>' +
+             '<div class="pregunta-bloque"><strong>Pregunta:</strong> Aplicando la relación de <strong>' + c.tipoRel.toUpperCase() + '</strong>, ¿cuál es el valor de verdad derivado para la proposición $' + c.p + '$?</div>';
+
+  var sol = c.pVal === 'verdadera' ? 'Verdadera' : 'Falsa';
+  var acepta = [sol, sol.toLowerCase(), c.pVal === 'verdadera' ? 'v' : 'f', c.pVal === 'verdadera' ? 'verdad' : 'falso', c.pVal === 'verdadera' ? 'true' : 'false'];
+
+  var pista = c.tipoRel === 'contrarias'
+    ? 'Considera la restricción formal sobre la arista superior: ¿es posible que dos afirmaciones contrarias sean verdaderas al mismo tiempo?'
+    : 'Considera la restricción sobre la arista inferior: ¿es admisible que dos proposiciones subcontrarias resulten falsas en simultáneo?';
+
+  var exp = 'Paso 1. Las proposiciones vinculadas son $' + c.d + '$ y $' + c.p + '$, unidas por la relación de ' + c.tipoRel + '.\n' +
+            'Paso 2. De acuerdo con el Cuadrado de Oposición, las ' + c.tipoRel + ' ' + c.regla + '.\n' +
+            'Paso 3. Puesto que en el esquema $' + c.d + '$ es ' + c.dVal + ', concluimos que $' + c.p + '$ es ' + c.pVal + '.';
+
+  return {
+    tipo: 'simbolica',
+    problema: prob,
+    solucion: sol,
+    respuestaLaTeX: '\\text{' + sol + '}',
+    acepta: acepta,
+    pista: pista,
+    explicacion: exp
+  };
+}
+
+// VAR 4: Subalternación
+function var4_subalternacion() {
+  var casos = [
+    { univ: 'A', part: 'I', sentido: 'descenso', uVal: 'verdadera', pVal: 'verdadera' },
+    { univ: 'E', part: 'O', sentido: 'descenso', uVal: 'verdadera', pVal: 'verdadera' },
+    { univ: 'A', part: 'I', sentido: 'ascenso', uVal: 'falsa', pVal: 'falsa' },
+    { univ: 'E', part: 'O', sentido: 'ascenso', uVal: 'falsa', pVal: 'falsa' }
+  ];
+  var c = azar(casos);
+
+  etiquetaActual = 'Subalternación Lógica';
+  figuraActual = {
+    tipo: 'cuadrado',
+    nodoDato: c.sentido === 'descenso' ? c.univ : c.part,
+    valorDato: (c.sentido === 'descenso' ? c.uVal : c.pVal) === 'verdadera' ? 'V' : 'F'
+  };
+
+  var prob = '';
+  var sol = '';
+  if (c.sentido === 'descenso') {
+    prob = '<p class="contexto-parrafo">En la verificación de un invariante de software para contratos inteligentes, el nodo universal $' + c.univ + '$ exhibe el valor de verdad presentado en el esquema.</p>' +
+           '<div class="pregunta-bloque"><strong>Pregunta:</strong> Por subalternación, ¿qué valor de verdad adquiere la proposición particular $' + c.part + '$?</div>';
+    sol = 'Verdadera';
+  } else {
+    prob = '<p class="contexto-parrafo">En el monitoreo de anomalías en una red de datos comunitaria, el nodo particular $' + c.part + '$ exhibe el valor registrado en el esquema.</p>' +
+           '<div class="pregunta-bloque"><strong>Pregunta:</strong> Por subalternación, ¿cuál es el valor de verdad correspondiente a la proposición universal $' + c.univ + '$?</div>';
+    sol = 'Falsa';
+  }
+
+  var acepta = [sol, sol.toLowerCase(), sol === 'Verdadera' ? 'v' : 'f', sol === 'Verdadera' ? 'verdad' : 'falso', sol === 'Verdadera' ? 'true' : 'false'];
+
+  var pista = 'Analiza el sentido de propagación sobre las aristas verticales: la verdad desciende de la universal a la particular, mientras que la falsedad asciende de la particular a la universal.';
+  var exp = 'Paso 1. La arista vertical vincula a la universal con su particular respectiva mediante subalternación.\n' +
+            'Paso 2. ' + (c.sentido === 'descenso' ? 'Si la proposición universal es verdadera, la verdad desciende con necesidad lógica.' : 'Si la proposición particular resulta falsa, la falsedad asciende e invalida la universalidad.') + '\n' +
+            'Paso 3. Por deducción formal, la proposición adquiere el valor ' + sol.toUpperCase() + '.';
+
+  return {
+    tipo: 'simbolica',
+    problema: prob,
+    solucion: sol,
+    respuestaLaTeX: '\\text{' + sol + '}',
+    acepta: acepta,
+    pista: pista,
+    explicacion: exp
+  };
+}
+
+// VAR 5: Intersección A ∩ B a partir de la lectura directa del diagrama de Venn
+function var5_interseccionConjuntos() {
+  var potencias2 = [4, 8, 16];
+  var inter = [2];
+  var primos = [3, 5, 7, 11];
+
+  var setA = [2, 4, 8, 16];
+  var setB = [2, 3, 5, 7, 11];
+
+  etiquetaActual = 'Intersección A ∩ B (Operador AND)';
+  figuraActual = {
+    tipo: 'venn',
+    nombreA: 'Potencias de 2',
+    nombreB: 'Números Primos',
+    datosRegiones: {
+      soloA: '4, 8, 16',
+      inter: '2',
+      soloB: '3, 5, 7, 11',
+      afuera: '9, 15'
+    }
+  };
+
+  var prob = '<p class="contexto-parrafo">En la partición de un dataset de ciberseguridad, los conjuntos $A$ (potencias de 2) y $B$ (números primos) se distribuyen según el diagrama de Venn lateral.</p>' +
+             '<div class="pregunta-bloque"><strong>Pregunta:</strong> A partir de la lectura del diagrama, determina los elementos de la intersección $A \\cap B$. Escribe los números separados por comas.</div>';
+
+  var strSol = '2';
+  var acepta = ['2', '{2}', '\\{2\\}'];
+
+  var pista = 'Identifica visualmente la región delimitada por la superposición de ambos contornos, representativa de la operación lógica AND.';
+  var exp = 'Paso 1. Observamos en el diagrama los elementos contenidos exclusivamente en la región compartida por los dos círculos.\n' +
+            'Paso 2. El único elemento situado en la intersección geométrica es el número $2$.\n' +
+            'Paso 3. En consecuencia, $A \\cap B = \\{2\\}$.';
+
+  return {
+    tipo: 'simbolica',
+    problema: prob,
+    solucion: strSol,
+    respuestaLaTeX: 'A \\cap B = \\{2\\}',
+    acepta: acepta,
+    pista: pista,
+    explicacion: exp
+  };
+}
+
+// VAR 6: Unión A ∪ B a partir del diagrama
+function var6_unionConjuntos() {
+  var setA = [3, 9, 27, 81];
+  var setB = [9, 18, 27, 36];
+  var union = [3, 9, 18, 27, 36, 81];
+
+  etiquetaActual = 'Unión A ∪ B (Operador OR)';
+  figuraActual = {
+    tipo: 'venn',
+    nombreA: 'Potencias de 3',
+    nombreB: 'Múltiplos de 9',
+    datosRegiones: {
+      soloA: '3, 81',
+      inter: '9, 27',
+      soloB: '18, 36',
+      afuera: '5, 25'
+    }
+  };
+
+  var prob = '<p class="contexto-parrafo">La distribución de factores numéricos en un pipeline de datos está representada en el diagrama de Venn interactivo lateral.</p>' +
+             '<div class="pregunta-bloque"><strong>Pregunta:</strong> A partir del diagrama, determina los elementos del conjunto unión $A \\cup B$. Escribe los números separados por comas.</div>';
+
+  var strSol = union.join(', ');
+  var acepta = [strSol, union.join(','), '{' + union.join(',') + '}', '{' + union.join(', ') + '}'];
+
+  var pista = 'Reúne todos los elementos ubicados al interior de cualquiera de los dos círculos, asegurándote de no duplicar los situados en la región central.';
+  var exp = 'Paso 1. Extraemos los elementos de la región exclusiva de $A$: $\\{3, 81\\}$.\n' +
+            'Paso 2. Extraemos los elementos de la intersección $\\{9, 27\\}$ y de la región exclusiva de $B$: $\\{18, 36\\}$.\n' +
+            'Paso 3. Consolidando y ordenando ascendentemente: $A \\cup B = \\{' + strSol + '\\}$.';
+
+  return {
+    tipo: 'simbolica',
+    problema: prob,
+    solucion: strSol,
+    respuestaLaTeX: 'A \\cup B = \\{' + strSol + '\\}',
+    acepta: acepta,
+    pista: pista,
+    explicacion: exp
+  };
+}
+
+// VAR 7: Diferencia A \ B a partir del diagrama
+function var7_diferenciaConjuntos() {
+  var setA = [2, 4, 8, 16, 32, 64];
+  var setB = [8, 16, 32, 64, 72];
+  var diff = [2, 4];
+
+  etiquetaActual = 'Diferencia A ∖ B (Operador EXCEPT)';
+  figuraActual = {
+    tipo: 'venn',
+    nombreA: 'Conjunto A',
+    nombreB: 'Conjunto B',
+    datosRegiones: {
+      soloA: '2, 4',
+      inter: '8, 16, 32, 64',
+      soloB: '72',
+      afuera: '50'
+    }
+  };
+
+  var prob = '<p class="contexto-parrafo">En una auditoría de algoritmos distribuidos, los identificadores procesados se estructuran según el esquema de Venn mostrado.</p>' +
+             '<div class="pregunta-bloque"><strong>Pregunta:</strong> Con base en el diagrama, calcula los elementos de la diferencia $A \\setminus B$. Escribe los números separados por comas.</div>';
+
+  var strSol = diff.join(', ');
+  var acepta = [strSol, diff.join(','), '{' + diff.join(',') + '}', '{' + diff.join(', ') + '}'];
+
+  var pista = 'Localiza la región geométrica que pertenece estrictamente al contorno de A y descuenta cualquier elemento que caiga dentro de la frontera de B.';
+  var exp = 'Paso 1. Identificamos en el esquema los elementos pertenecientes a $A$ que yacen fuera del círculo $B$.\n' +
+            'Paso 2. La región exclusiva de $A$ contiene a los números $2$ y $4$.\n' +
+            'Paso 3. Por lo tanto, $A \\setminus B = \\{' + strSol + '\\}$.';
+
+  return {
+    tipo: 'simbolica',
+    problema: prob,
+    solucion: strSol,
+    respuestaLaTeX: 'A \\setminus B = \\{' + strSol + '\\}',
+    acepta: acepta,
+    pista: pista,
+    explicacion: exp
+  };
+}
+
+// VAR 8: Complemento A^c a partir del universo del diagrama
+function var8_complementoConjunto() {
+  var setA = [2, 3, 5, 7, 11, 13];
+  var comp = [1, 4, 6, 8, 9, 10, 12];
+
+  etiquetaActual = 'Complemento A^c (Dominio de Validación)';
+  figuraActual = {
+    tipo: 'venn',
+    nombreA: 'Primos (A)',
+    nombreB: '',
+    datosRegiones: {
+      soloA: '2, 3, 5, 7, 11, 13',
+      inter: '',
+      soloB: '',
+      afuera: '1, 4, 6, 8, 9, 10, 12'
+    }
+  };
+
+  var prob = '<p class="contexto-parrafo">El diagrama de Venn presenta la delimitación del conjunto de prueba $A$ al interior del universo muestral $U$.</p>' +
+             '<div class="pregunta-bloque"><strong>Pregunta:</strong> Determina los elementos correspondientes al complemento $A^c$. Escribe los números separados por comas.</div>';
+
+  var strSol = comp.join(', ');
+  var acepta = [strSol, comp.join(','), '{' + comp.join(',') + '}', '{' + comp.join(', ') + '}'];
+
+  var pista = 'Identifica todos los elementos ubicados en el rectángulo del universo $U$ que se encuentran fuera de la frontera del conjunto $A$.';
+  var exp = 'Paso 1. Observamos en el esquema los elementos que forman parte del universo $U$ pero no están contenidos en el círculo $A$.\n' +
+            'Paso 2. Dichos elementos corresponden a la región exterior: $\\{' + strSol + '\\}$.\n' +
+            'Paso 3. Por tanto, el complemento es $A^c = \\{' + strSol + '\\}$.';
+
+  return {
+    tipo: 'simbolica',
+    problema: prob,
+    solucion: strSol,
+    respuestaLaTeX: 'A^c = \\{' + strSol + '\\}',
+    acepta: acepta,
+    pista: pista,
+    explicacion: exp
+  };
+}
+
+// VAR 9: Inclusión-Exclusión a partir de cardinalidades visuales
+function var9_inclusionExclusion() {
+  var nInter = ri(45, 90);
+  var nSoloA = ri(90, 150);
+  var nSoloB = ri(80, 140);
+  var nTotalU = nSoloA + nSoloB + nInter + ri(35, 70);
+
+  var nA = nSoloA + nInter;
+  var nB = nSoloB + nInter;
+  var nUnion = nSoloA + nSoloB + nInter;
+
+  etiquetaActual = 'Inclusión-Exclusión (Datos Poblacionales)';
+  figuraActual = {
+    tipo: 'venn',
+    nombreA: 'Energía Solar (A)',
+    nombreB: 'Banca Ética (B)',
+    datosRegiones: {
+      soloA: '|A|=' + nA,
+      inter: '|A ∩ B|=' + nInter,
+      soloB: '|B|=' + nB,
+      afuera: 'Total=' + nTotalU
+    }
+  };
+
+  var prob = '<p class="contexto-parrafo">En el monitoreo de políticas de bioeconomía y crédito solidario, las métricas cardinales de las cooperativas registradas se muestran en el diagrama de Venn lateral.</p>' +
+             '<div class="pregunta-bloque"><strong>Pregunta:</strong> A partir de los datos del diagrama, calcula el valor exacto de la cardinalidad de la unión $|A \\cup B|$. Escribe un número entero.</div>';
+
+  var sol = nUnion;
+  var acepta = [nUnion.toString()];
+
+  var pista = 'Recuerda que sumar directamente $|A| + |B|$ contabiliza dos veces la región de intersección compartida.';
+  var exp = 'Paso 1. Leemos del diagrama: $|A| = ' + nA + '$, $|B| = ' + nB + '$ y $|A \\cap B| = ' + nInter + '$.\n' +
+            'Paso 2. Aplicamos la fórmula del Principio de Inclusión-Exclusión: $|A \\cup B| = |A| + |B| - |A \\cap B|$.\n' +
+            'Paso 3. Calculamos: $|A \\cup B| = ' + nA + ' + ' + nB + ' - ' + nInter + ' = ' + nUnion + '$.';
+
+  return {
+    tipo: 'numerica',
+    problema: prob,
+    solucion: nUnion.toString(),
+    respuestaLaTeX: '|A \\cup B| = ' + nUnion,
+    acepta: acepta,
+    respuesta: nUnion,
+    tolerancia: 0.001,
+    pista: pista,
+    explicacion: exp
+  };
+}
+
+// VAR 10: Inclusión de subconjuntos B ⊆ A a partir del esquema
+function var10_inclusionYProposicion() {
+  var bTotal = ri(40, 80);
+  var esSubconjunto = Math.random() < 0.5;
+  var inter = esSubconjunto ? bTotal : bTotal - ri(6, 14);
+  var aTotal = inter + ri(15, 35);
+  var soloB = bTotal - inter;
+
+  etiquetaActual = 'Subconjuntos y Lógica Condicional (B ⊆ A)';
+  figuraActual = {
+    tipo: 'venn',
+    nombreA: 'Auditados (A)',
+    nombreB: 'Prioritarios (B)',
+    datosRegiones: {
+      soloA: '|A ∖ B|=' + (aTotal - inter),
+      inter: '|A ∩ B|=' + inter,
+      soloB: '|B ∖ A|=' + soloB,
+      afuera: ''
+    }
+  };
+
+  var prob = '<p class="contexto-parrafo">En la verificación de precondiciones de un programa público de financiamiento solidario, los datos de cobertura se distribuyen según las regiones del diagrama de Venn lateral.</p>' +
+             '<div class="pregunta-bloque"><strong>Pregunta:</strong> A partir de la información del diagrama, ¿es verdadera o falsa la proposición condicional $B \\subseteq A$?</div>';
+
+  var sol = esSubconjunto ? 'Verdadera' : 'Falsa';
+  var acepta = [sol, sol.toLowerCase(), esSubconjunto ? 'v' : 'f', esSubconjunto ? 'verdad' : 'falso', esSubconjunto ? 'true' : 'false'];
+
+  var pista = 'Para que la inclusión $B \\subseteq A$ se cumpla, evalúa visualmente si la región exclusiva $|B \\setminus A|$ es igual a cero o si contiene elementos por fuera de la frontera de A.';
+  var exp = 'Paso 1. La proposición $B \\subseteq A$ exige que todo elemento de $B$ esté contenido en $A$, lo que implica que $|B \\setminus A| = 0$.\n' +
+            'Paso 2. Observando la región exclusiva de $B$ en el diagrama: ' + (esSubconjunto 
+              ? 'se verifica que $|B \\setminus A| = 0$ (toda la cardinalidad de $B$ se halla en la intersección).' 
+              : 'se observa que $|B \\setminus A| = ' + soloB + ' > 0$ (existen elementos de $B$ fuera de $A$).') + '\n' +
+            'Paso 3. Por lo tanto, la proposición es ' + sol.toUpperCase() + '.';
+
+  return {
+    tipo: 'simbolica',
+    problema: prob,
+    solucion: sol,
+    respuestaLaTeX: '\\text{' + sol + '}',
+    acepta: acepta,
+    pista: pista,
+    explicacion: exp
+  };
+}
+
+/* ==========================================================================
+   CONTRATO DEL GENERADOR
+   ========================================================================== */
+
+var ultimaVariante = -1;
+var generadores = [
+  var1_clasificarProposicion,
+  var2_contradictorias,
+  var3_contrariasSubcontrarias,
+  var4_subalternacion,
+  var5_interseccionConjuntos,
+  var6_unionConjuntos,
+  var7_diferenciaConjuntos,
+  var8_complementoConjunto,
+  var9_inclusionExclusion,
+  var10_inclusionYProposicion
+];
+
+function genLogicaYConjuntos() {
+  var idx = Math.floor(Math.random() * generadores.length);
+  if (idx === ultimaVariante) {
+    idx = (idx + 1) % generadores.length;
+  }
+  ultimaVariante = idx;
+  return generadores[idx]();
+}
+
+/* ==========================================================================
+   INTERACCIÓN Y MARCADOR
+   ========================================================================== */
+
+function nuevoEjercicio() {
+  yaVerificadoCorrecto = false;
+  ejercicioActual = genLogicaYConjuntos();
+
+  var input = document.getElementById('respuesta');
+  input.value = '';
+  input.classList.remove('mal');
+  
+  var feedback = document.getElementById('feedback');
+  feedback.className = 'feedback';
+  feedback.innerHTML = '';
+  feedback.style.display = 'none';
+
+  var pistaBox = document.getElementById('pistaBox');
+  pistaBox.className = 'panel pista';
+  pistaBox.innerHTML = '';
+  pistaBox.style.display = 'none';
+  document.getElementById('btnPista').setAttribute('aria-pressed', 'false');
+
+  var explicacionBox = document.getElementById('explicacionBox');
+  explicacionBox.className = 'panel explicacion';
+  explicacionBox.innerHTML = '';
+  explicacionBox.style.display = 'none';
+  document.getElementById('btnExplicacion').setAttribute('aria-pressed', 'false');
+
+  document.getElementById('chipVar').textContent = etiquetaActual;
+  document.getElementById('chipType').textContent = ejercicioActual.tipo === 'numerica' ? 'Respuesta Numérica' : 'Respuesta Lógica / Lista';
+
+  var probEl = document.getElementById('problemaTexto');
+  probEl.innerHTML = ejercicioActual.problema;
+  tiposet(probEl);
+
+  resetVistaEsquema();
+  input.focus();
+}
+
+function verificar() {
+  var input = document.getElementById('respuesta');
+  var valOriginal = input.value.trim();
+  var feedback = document.getElementById('feedback');
+
+  if (valOriginal === '') {
+    intentos++;
+    guardarMarcador();
+    actualizarMarcadorUI();
+    feedback.className = 'feedback err';
+    feedback.innerHTML = '<div class="fb-title">✗ Entrada vacía</div>' +
+                         '<div>Por favor escribe una respuesta antes de presionar Verificar.</div>';
+    feedback.style.display = 'block';
+    input.classList.add('mal');
+    setTimeout(function() { input.classList.remove('mal'); }, 400);
+    return;
+  }
+
+  if (yaVerificadoCorrecto) {
+    feedback.className = 'feedback ok';
+    feedback.innerHTML = '<div class="fb-title">✓ ¡Ya completaste este ejercicio!</div>' +
+                         '<div>Haz clic en <strong>Nuevo ejercicio</strong> (o presiona la tecla N) para continuar practicando.</div>';
+    feedback.style.display = 'block';
+    return;
+  }
+
+  var esCorrecto = false;
+  if (ejercicioActual.tipo === 'numerica') {
+    var num = aNumero(valOriginal);
+    if (!isNaN(num) && Math.abs(num - ejercicioActual.respuesta) <= ejercicioActual.tolerancia) {
+      esCorrecto = true;
+    } else {
+      esCorrecto = coincideTexto(valOriginal, ejercicioActual.acepta);
+    }
+  } else {
+    esCorrecto = coincideTexto(valOriginal, ejercicioActual.acepta);
+  }
+
+  intentos++;
+
+  if (esCorrecto) {
+    aciertos++;
+    racha++;
+    historial.push(1);
+    yaVerificadoCorrecto = true;
+
+    feedback.className = 'feedback ok';
+    feedback.innerHTML = 
+      '<div class="fb-title">✓ ¡Correcto!</div>' +
+      '<div>Escribiste: <code>' + escaparHTML(valOriginal) + '</code></div>' +
+      '<div style="margin-top:4px;">En notación matemática: $' + ejercicioActual.respuestaLaTeX + '$</div>';
+    feedback.style.display = 'block';
+    tiposet(feedback);
+  } else {
+    racha = 0;
+    historial.push(0);
+
+    var mensajesError = [
+      'Revisa con atención los datos observados en el esquema y las condiciones del problema.',
+      'Comprueba si aplicaste la operación de conjuntos o la regla deductiva adecuada.',
+      'Verifica si faltó o sobró algún elemento en tu respuesta.',
+      'Analiza las regiones del esquema paso a paso sin apresurarte.',
+      'Consulta la Pista si deseas una orientación metodológica para guiar tu razonamiento.'
+    ];
+    var msgPedagogico = azar(mensajesError);
+
+    feedback.className = 'feedback err';
+    feedback.innerHTML = 
+      '<div class="fb-title">✗ Todavía no</div>' +
+      '<div>' + msgPedagogico + '</div>' +
+      '<div style="font-size:0.85rem; margin-top:6px; color:#991c1c;">Comprueba el resultado a partir de las regiones del esquema.</div>';
+    feedback.style.display = 'block';
+
+    input.classList.add('mal');
+    setTimeout(function() { input.classList.remove('mal'); }, 400);
+  }
+
+  if (historial.length > 16) {
+    historial.splice(0, historial.length - 16);
+  }
+
+  guardarMarcador();
+  actualizarMarcadorUI();
+}
+
+function alternarPista() {
+  var box = document.getElementById('pistaBox');
+  var btn = document.getElementById('btnPista');
+  var visible = box.classList.contains('visible');
+
+  if (visible) {
+    box.classList.remove('visible');
+    box.style.display = 'none';
+    btn.setAttribute('aria-pressed', 'false');
+  } else {
+    box.innerHTML = '<h3>💡 Pista Conceptual</h3><div>' + ejercicioActual.pista + '</div>';
+    box.classList.add('visible');
+    box.style.display = 'block';
+    btn.setAttribute('aria-pressed', 'true');
+    tiposet(box);
+  }
+}
+
+function alternarExplicacion() {
+  var box = document.getElementById('explicacionBox');
+  var btn = document.getElementById('btnExplicacion');
+  var visible = box.classList.contains('visible');
+
+  if (visible) {
+    box.classList.remove('visible');
+    box.style.display = 'none';
+    btn.setAttribute('aria-pressed', 'false');
+  } else {
+    var lineas = ejercicioActual.explicacion.split('\n');
+    var html = '<h3>📖 Explicación Paso a Paso</h3>';
+    for (var i = 0; i < lineas.length; i++) {
+      var linea = lineas[i].trim();
+      if (linea.length > 0) {
+        var matchPaso = linea.match(/^(Paso \d+\.)\s*(.*)$/);
+        if (matchPaso) {
+          html += '<div class="step-item"><span class="step-tag">' + matchPaso[1] + '</span> ' + matchPaso[2] + '</div>';
+        } else {
+          html += '<div class="step-item">' + linea + '</div>';
+        }
+      }
+    }
+    html += '<div class="sol-final">Respuesta final: $' + ejercicioActual.respuestaLaTeX + '$ (' + escaparHTML(ejercicioActual.solucion) + ')</div>';
+    
+    box.innerHTML = html;
+    box.classList.add('visible');
+    box.style.display = 'block';
+    btn.setAttribute('aria-pressed', 'true');
+    tiposet(box);
+  }
+}
+
+/* ==========================================================================
+   PERSISTENCIA Y MARCADOR
+   ========================================================================== */
+
+function guardarMarcador() {
+  try {
+    var estado = {
+      aciertos: aciertos,
+      intentos: intentos,
+      racha: racha,
+      historial: historial
+    };
+    localStorage.setItem('__gen_logica_conjuntos_v6__', JSON.stringify(estado));
+  } catch(e) {}
+}
+
+function cargarMarcador() {
+  try {
+    var s = localStorage.getItem('__gen_logica_conjuntos_v6__');
+    if (s) {
+      var obj = JSON.parse(s);
+      aciertos = parseInt(obj.aciertos, 10) || 0;
+      intentos = parseInt(obj.intentos, 10) || 0;
+      racha = parseInt(obj.racha, 10) || 0;
+      historial = Array.isArray(obj.historial) ? obj.historial : [];
+    }
+  } catch(e) {}
+}
+
+function reiniciarMarcador() {
+  aciertos = 0;
+  intentos = 0;
+  racha = 0;
+  historial = [];
+  guardarMarcador();
+  actualizarMarcadorUI();
+}
+
+function actualizarMarcadorUI() {
+  document.getElementById('mArc').textContent = aciertos;
+  document.getElementById('mInt').textContent = intentos;
+  document.getElementById('mRacha').textContent = racha;
+
+  var pct = intentos > 0 ? Math.round((aciertos / intentos) * 100) : 0;
+  document.getElementById('mPrec').textContent = pct + '%';
+
+  var gaugeBar = document.getElementById('mPrecGauge');
+  var circ = 2 * Math.PI * 18;
+  var offset = circ - (pct / 100) * circ;
+  gaugeBar.style.strokeDasharray = circ;
+  gaugeBar.style.strokeDashoffset = offset;
+
+  var dotsContainer = document.getElementById('historyDots');
+  dotsContainer.innerHTML = '';
+  for (var i = 0; i < 16; i++) {
+    var dot = document.createElement('div');
+    dot.className = 'h-dot';
+    if (i < historial.length) {
+      dot.className += historial[i] === 1 ? ' ok' : ' err';
+    }
+    dotsContainer.appendChild(dot);
+  }
+}
+
+/* ==========================================================================
+   INICIALIZACIÓN
+   ========================================================================== */
+
+window.addEventListener('DOMContentLoaded', function() {
+  cargarMarcador();
+  actualizarMarcadorUI();
+  inicializarControlesEsquema();
+
+  document.getElementById('btnNuevo').addEventListener('click', function() {
+    nuevoEjercicio();
+  });
+
+  document.getElementById('btnVerificar').addEventListener('click', function() {
+    verificar();
+  });
+
+  document.getElementById('btnPista').addEventListener('click', function() {
+    alternarPista();
+  });
+
+  document.getElementById('btnExplicacion').addEventListener('click', function() {
+    alternarExplicacion();
+  });
+
+  document.getElementById('btnResetScore').addEventListener('click', function() {
+    reiniciarMarcador();
+  });
+
+  var input = document.getElementById('respuesta');
+  input.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      verificar();
+    }
+  });
+
+  window.addEventListener('keydown', function(e) {
+    var tag = e.target.tagName.toLowerCase();
+    if (tag === 'input' || tag === 'textarea') return;
+    if (e.key === 'n' || e.key === 'N') {
+      e.preventDefault();
+      nuevoEjercicio();
+    }
+  });
+
+  nuevoEjercicio();
+});
+</script>
+
+</body>
+</html>
