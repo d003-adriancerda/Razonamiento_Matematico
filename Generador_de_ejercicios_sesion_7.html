@@ -863,14 +863,69 @@ function conjuntosIguales(arr1, arr2) {
   return true;
 }
 
+function limpiarTextoPlano(s) {
+  if (typeof s !== 'string') return '';
+  return s.toLowerCase()
+          .replace(/[áàäâ]/g, 'a')
+          .replace(/[éèëê]/g, 'e')
+          .replace(/[íìïî]/g, 'i')
+          .replace(/[óòöô]/g, 'o')
+          .replace(/[úùüû]/g, 'u')
+          .replace(/[.,;:¿?¡!"'«»()]/g, '')
+          .replace(/\s+/g, ' ')
+          .trim();
+}
+
+// Validador inteligente de proposiciones formuladas por el alumno
+function coincideProposicionCanonica(entrada, tipoEsperado, raizSujeto, raizPredicado) {
+  var s = limpiarTextoPlano(entrada);
+  if (!s) return false;
+
+  var tieneSujeto = s.indexOf(limpiarTextoPlano(raizSujeto)) !== -1;
+  var tienePredicado = s.indexOf(limpiarTextoPlano(raizPredicado)) !== -1;
+  if (!tieneSujeto || !tienePredicado) return false;
+
+  var words = s.split(' ');
+  var primera = words[0];
+
+  if (tipoEsperado === 'A') {
+    var esUniversalAf = (primera === 'todos' || primera === 'todo' || primera === 'todas' || primera === 'toda');
+    var tieneNegacion = s.indexOf(' no ') !== -1 || s.indexOf(' no') !== -1;
+    return esUniversalAf && !tieneNegacion;
+  }
+  if (tipoEsperado === 'E') {
+    var esUniversalNeg = (primera === 'ningun' || primera === 'ninguno' || primera === 'ninguna');
+    return esUniversalNeg;
+  }
+  if (tipoEsperado === 'I') {
+    var esParticular = (primera === 'algunos' || primera === 'algun' || primera === 'algunas' || primera === 'alguna' || primera === 'existen' || primera === 'existe');
+    var tieneNeg = s.indexOf(' no ') !== -1;
+    return esParticular && !tieneNeg;
+  }
+  if (tipoEsperado === 'O') {
+    var esPartNeg = (primera === 'algunos' || primera === 'algun' || primera === 'algunas' || primera === 'alguna' || primera === 'existen' || primera === 'existe' || primera === 'no');
+    var contieneNo = s.indexOf(' no ') !== -1 || primera === 'no';
+    return esPartNeg && contieneNo;
+  }
+  return false;
+}
+
 function coincideTexto(entrada, acepta) {
   var normE = normalizar(entrada);
   var numE = aNumero(entrada);
   var cE = parseConjunto(entrada);
+  var cleanE = limpiarTextoPlano(entrada);
+
+  if (ejercicioActual && ejercicioActual.escribirProposicion) {
+    if (coincideProposicionCanonica(entrada, ejercicioActual.tipoProposicionEsperada, ejercicioActual.raizSujeto, ejercicioActual.raizPredicado)) {
+      return true;
+    }
+  }
 
   for (var i = 0; i < acepta.length; i++) {
     var candidata = acepta[i];
     if (normE === normalizar(candidata)) return true;
+    if (cleanE === limpiarTextoPlano(candidata)) return true;
     
     var numC = aNumero(candidata);
     if (!isNaN(numE) && !isNaN(numC)) {
@@ -992,7 +1047,7 @@ var racha = 0;
 var historial = [];
 
 /* ==========================================================================
-   ESQUEMA GEOMÉTRICO INTERACTIVO (FUENTE PRIMARIA DE DATOS)
+   ESQUEMA GEOMÉTRICO INTERACTIVO
    ========================================================================== */
 
 var svgState = {
@@ -1210,21 +1265,22 @@ function dibujarCuadradoOposicion(g, fig) {
   for (var i = 0; i < nodos.length; i++) {
     var n = nodos[i];
     var esDato = (fig.nodoDato === n.id);
+    var esObjetivo = (fig.nodoObjetivo === n.id);
     
     var circ = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     circ.setAttribute('cx', n.p.x);
     circ.setAttribute('cy', n.p.y);
-    circ.setAttribute('r', esDato ? '20' : '16');
-    circ.setAttribute('fill', esDato ? '#4f46e5' : '#ffffff');
-    circ.setAttribute('stroke', esDato ? '#312e81' : '#64748b');
-    circ.setAttribute('stroke-width', esDato ? '3.5' : '2.5');
+    circ.setAttribute('r', esDato || esObjetivo ? '20' : '16');
+    circ.setAttribute('fill', esDato ? '#4f46e5' : (esObjetivo ? '#fef3c7' : '#ffffff'));
+    circ.setAttribute('stroke', esDato ? '#312e81' : (esObjetivo ? '#b45309' : '#64748b'));
+    circ.setAttribute('stroke-width', esDato || esObjetivo ? '3.5' : '2.5');
     circ.setAttribute('cursor', 'grab');
     g.appendChild(circ);
 
     var tn = document.createElementNS('http://www.w3.org/2000/svg', 'text');
     tn.setAttribute('x', n.p.x);
     tn.setAttribute('y', n.p.y);
-    tn.setAttribute('fill', esDato ? '#ffffff' : '#0f172a');
+    tn.setAttribute('fill', esDato ? '#ffffff' : (esObjetivo ? '#78350f' : '#0f172a'));
     tn.setAttribute('font-size', '14px');
     tn.setAttribute('font-weight', 'bold');
     tn.setAttribute('text-anchor', 'middle');
@@ -1237,12 +1293,22 @@ function dibujarCuadradoOposicion(g, fig) {
       var badgeVal = document.createElementNS('http://www.w3.org/2000/svg', 'text');
       badgeVal.setAttribute('x', n.p.x);
       badgeVal.setAttribute('y', n.p.y + (n.p.y < 0 ? -28 : 28));
-      badgeVal.setAttribute('fill', fig.valorDato === 'V' ? '#047857' : '#b91c1c');
+      badgeVal.setAttribute('fill', fig.valorDato === 'V' ? '#047857' : (fig.valorDato === 'F' ? '#b91c1c' : '#4338ca'));
       badgeVal.setAttribute('font-size', '11.5px');
       badgeVal.setAttribute('font-weight', '800');
       badgeVal.setAttribute('text-anchor', 'middle');
-      badgeVal.textContent = 'Dato: ' + (fig.valorDato === 'V' ? 'Verdadera' : 'Falsa');
+      badgeVal.textContent = fig.valorDato === 'V' ? 'Dato: V' : (fig.valorDato === 'F' ? 'Dato: F' : 'Premisa dada');
       g.appendChild(badgeVal);
+    } else if (esObjetivo) {
+      var badgeObj = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      badgeObj.setAttribute('x', n.p.x);
+      badgeObj.setAttribute('y', n.p.y + (n.p.y < 0 ? -28 : 28));
+      badgeObj.setAttribute('fill', '#b45309');
+      badgeObj.setAttribute('font-size', '11px');
+      badgeObj.setAttribute('font-weight', '800');
+      badgeObj.setAttribute('text-anchor', 'middle');
+      badgeObj.textContent = 'A formular';
+      g.appendChild(badgeObj);
     }
   }
 }
@@ -1362,91 +1428,258 @@ function dibujarDiagramaVenn(g, fig) {
 }
 
 /* ==========================================================================
-   BANCO DE 10 VARIANTES
-   La gráfica interactiva contiene los datos necesarios.
-   Enunciados directos sin duplicidad. Pistas orientadas a la reflexión universitaria.
+   BANCO DE FORMULACIONES (TEMAS: ECONOMÍA SOLIDARIA, IA, PROGRAMACIÓN)
    ========================================================================== */
 
-// VAR 1: Clasificación de proposiciones categóricas estándar (A, E, I, O)
-function var1_clasificarProposicion() {
-  var escenarios = [
-    { area: 'la auditoría algorítmica de modelos de inteligencia artificial', sujeto: 'los datasets de entrenamiento con licencia comunitaria abierta', accion: 'cumplen los estándares de transparencia sin sesgos socioeconómicos' },
-    { area: 'la política pública de conectividad rural y soberanía tecnológica', sujeto: 'las cooperativas de telecomunicaciones comunitarias', accion: 'reciben exención arancelaria para reinversión en fibra óptica abierta' },
-    { area: 'la investigación aplicada en bioeconomía y energías renovables', sujeto: 'los nodos de generación distribuida de biomasa', accion: 'transfieren excedentes a centros comunitarios de salud' }
-  ];
-  var esc = azar(escenarios);
-  var tipos = [
-    { cat: 'A', nom: 'Universal afirmativa', cuant: 'Todos los' },
-    { cat: 'E', nom: 'Universal negativa', cuant: 'Ningún' },
-    { cat: 'I', nom: 'Particular afirmativa', cuant: 'Algunos' },
-    { cat: 'O', nom: 'Particular negativa', cuant: 'Algunos' }
-  ];
-  var sel = azar(tipos);
-  
-  var frase = '';
-  if (sel.cat === 'A') frase = 'Todos ' + esc.sujeto + ' de ' + esc.area + ' ' + esc.accion + '.';
-  else if (sel.cat === 'E') frase = 'Ningún proyecto de ' + esc.area + ' ' + esc.accion + '.';
-  else if (sel.cat === 'I') frase = 'Algunos de ' + esc.sujeto + ' de ' + esc.area + ' ' + esc.accion + '.';
-  else frase = 'Algunos de ' + esc.sujeto + ' de ' + esc.area + ' no ' + esc.accion + '.';
+var TEMAS_PROPOSICIONES = [
+  {
+    tema: 'auditoría de algoritmos de microcrédito solidario',
+    sujeto: 'los algoritmos de asignación de microcréditos',
+    raizSujeto: 'algoritmos',
+    predicado: 'son auditables y transparentes',
+    raizPredicado: 'auditables',
+    A: 'Todos los algoritmos de asignación de microcréditos son auditables y transparentes',
+    E: 'Ningún algoritmo de asignación de microcréditos es auditable y transparente',
+    I: 'Algunos algoritmos de asignación de microcréditos son auditables y transparentes',
+    O: 'Algunos algoritmos de asignación de microcréditos no son auditables y transparentes'
+  },
+  {
+    tema: 'contratos inteligentes en redes comunitarias',
+    sujeto: 'los contratos inteligentes de la red solidaria',
+    raizSujeto: 'contratos inteligentes',
+    predicado: 'garantizan la privacidad de los datos',
+    raizPredicado: 'privacidad',
+    A: 'Todos los contratos inteligentes de la red solidaria garantizan la privacidad de los datos',
+    E: 'Ningún contrato inteligente de la red solidaria garantiza la privacidad de los datos',
+    I: 'Algunos contratos inteligentes de la red solidaria garantizan la privacidad de los datos',
+    O: 'Algunos contratos inteligentes de la red solidaria no garantizan la privacidad de los datos'
+  },
+  {
+    tema: 'cooperativas y pasarelas de pago abiertas',
+    sujeto: 'las cooperativas de comercio justo',
+    raizSujeto: 'cooperativas',
+    predicado: 'implementan pasarelas de pago de código abierto',
+    raizPredicado: 'pasarelas de pago',
+    A: 'Todas las cooperativas de comercio justo implementan pasarelas de pago de código abierto',
+    E: 'Ninguna cooperativa de comercio justo implementa pasarelas de pago de código abierto',
+    I: 'Algunas cooperativas de comercio justo implementan pasarelas de pago de código abierto',
+    O: 'Algunas cooperativas de comercio justo no implementan pasarelas de pago de código abierto'
+  },
+  {
+    tema: 'modelos de inteligencia artificial en políticas públicas',
+    sujeto: 'los modelos predictivos de asignación social',
+    raizSujeto: 'modelos predictivos',
+    predicado: 'presentan sesgos discriminatorios',
+    raizPredicado: 'sesgos',
+    A: 'Todos los modelos predictivos de asignación social presentan sesgos discriminatorios',
+    E: 'Ningún modelo predictivo de asignación social presenta sesgos discriminatorios',
+    I: 'Algunos modelos predictivos de asignación social presentan sesgos discriminatorios',
+    O: 'Algunos modelos predictivos de asignación social no presentan sesgos discriminatorios'
+  },
+  {
+    tema: 'nodos de validación y gobernanza descentralizada',
+    sujeto: 'los nodos de validación comunitaria',
+    raizSujeto: 'nodos de validacion',
+    predicado: 'cobran comisiones especulativas',
+    raizPredicado: 'comisiones',
+    A: 'Todos los nodos de validación comunitaria cobran comisiones especulativas',
+    E: 'Ningún nodo de validación comunitaria cobra comisiones especulativas',
+    I: 'Algunos nodos de validación comunitaria cobran comisiones especulativas',
+    O: 'Algunos nodos de validación comunitaria no cobran comisiones especulativas'
+  }
+];
 
-  etiquetaActual = 'Clasificación Categórica (A/E/I/O)';
+/* ==========================================================================
+   BANCO DE VARIANTES (INCLUYE ESCRITURA DIRECTA DE PROPOSICIONES)
+   ========================================================================== */
+
+// V1: Formular la Contradictoria (escribir el enunciado O a partir de A, o I a partir de E)
+function var1_escribirContradictoria() {
+  var item = azar(TEMAS_PROPOSICIONES);
+  var deAaO = Math.random() < 0.5;
+  var origenTipo = deAaO ? 'A' : 'E';
+  var targetTipo = deAaO ? 'O' : 'I';
+  var fraseOrigen = deAaO ? item.A : item.E;
+  var fraseEsperada = deAaO ? item.O : item.I;
+
+  etiquetaActual = 'Formular Contradictoria (' + origenTipo + ' → ' + targetTipo + ')';
   figuraActual = {
     tipo: 'cuadrado',
-    nodoDato: sel.cat,
-    valorDato: ''
+    nodoDato: origenTipo,
+    nodoObjetivo: targetTipo,
+    valorDato: 'Premisa'
   };
 
-  var prob = '<p class="contexto-parrafo">En el dictamen técnico sobre ' + esc.area + ' se formula el siguiente postulado: «<em>' + frase + '</em>».</p>' +
-             '<div class="pregunta-bloque"><strong>Pregunta:</strong> ¿A qué vértice del Cuadrado de Oposición ($A$, $E$, $I$ u $O$) corresponde esta proposición? Escribe solo la letra o su denominación formal.</div>';
+  var prob = '<p class="contexto-parrafo">En el contexto de ' + item.tema + ', se establece la proposición estándar $' + origenTipo + '$: «<em>' + fraseOrigen + '</em>».</p>' +
+             '<div class="pregunta-bloque"><strong>Pregunta:</strong> Escribe la proposición <strong>contradictoria</strong> correspondiente ($' + targetTipo + '$) en su forma canónica estándar completa.</div>';
 
-  var sol = 'Proposición ' + sel.cat + ' (' + sel.nom + ')';
-  var acepta = [sel.cat, sel.cat.toLowerCase(), sel.nom, normalizar(sel.nom)];
-
-  var pista = 'Examina la cantidad del cuantificador y si la cópula afirma o niega la relación lógica.';
-  var exp = 'Paso 1. Analizamos la cantidad: ' + (sel.cat === 'A' || sel.cat === 'E' ? 'Universal' : 'Particular') + '.\n' +
-            'Paso 2. Analizamos la cualidad: ' + (sel.cat === 'A' || sel.cat === 'I' ? 'Afirmativa' : 'Negativa') + '.\n' +
-            'Paso 3. Corresponde formalmente a la forma típica $' + sel.cat + '$ (' + sel.nom + ').';
+  var pista = 'Identifica en el Cuadrado de Oposición la diagonal correspondiente: la contradictoria de ' + origenTipo + ' debe tener cantidad y cualidad lógicamente opuestas.';
+  var exp = 'Paso 1. La proposición dada es de tipo $' + origenTipo + '$. Su contradictoria diagonal en el Cuadrado de Oposición es de tipo $' + targetTipo + '$.\n' +
+            'Paso 2. ' + (targetTipo === 'O' ? 'La forma canónica O es particular negativa («Algunos S no son P»).' : 'La forma canónica I es particular afirmativa («Algunos S son P»).') + '\n' +
+            'Paso 3. Sustituyendo el sujeto y predicado correspondientes: «' + fraseEsperada + '».';
 
   return {
     tipo: 'simbolica',
+    escribirProposicion: true,
+    tipoProposicionEsperada: targetTipo,
+    raizSujeto: item.raizSujeto,
+    raizPredicado: item.raizPredicado,
     problema: prob,
-    solucion: sol,
-    respuestaLaTeX: '\\text{' + sel.cat + ' (' + sel.nom + ')}',
-    acepta: acepta,
+    solucion: fraseEsperada,
+    respuestaLaTeX: '\\text{«' + fraseEsperada + '»}',
+    acepta: [fraseEsperada, fraseEsperada.toLowerCase(), fraseEsperada + '.'],
     pista: pista,
     explicacion: exp
   };
 }
 
-// VAR 2: Contradictorias a partir del esquema interactivo
-function var2_contradictorias() {
+// V2: Formular la Contraria (escribir el enunciado E a partir de A, o A a partir de E)
+function var2_escribirContraria() {
+  var item = azar(TEMAS_PROPOSICIONES);
+  var deAaE = Math.random() < 0.5;
+  var origenTipo = deAaE ? 'A' : 'E';
+  var targetTipo = deAaE ? 'E' : 'A';
+  var fraseOrigen = deAaE ? item.A : item.E;
+  var fraseEsperada = deAaE ? item.E : item.A;
+
+  etiquetaActual = 'Formular Contraria (' + origenTipo + ' → ' + targetTipo + ')';
+  figuraActual = {
+    tipo: 'cuadrado',
+    nodoDato: origenTipo,
+    nodoObjetivo: targetTipo,
+    valorDato: 'Premisa'
+  };
+
+  var prob = '<p class="contexto-parrafo">Para la gobernanza de ' + item.tema + ', se formula la proposición universal $' + origenTipo + '$: «<em>' + fraseOrigen + '</em>».</p>' +
+             '<div class="pregunta-bloque"><strong>Pregunta:</strong> Escribe la proposición <strong>contraria</strong> ($' + targetTipo + '$) en su forma canónica estándar completa.</div>';
+
+  var pista = 'Analiza la arista horizontal superior del Cuadrado de Oposición: la relación de contrarias vincula a dos enunciados universales con cualidad opuesta.';
+  var exp = 'Paso 1. La proposición original es universal de tipo $' + origenTipo + '$. Su contraria horizontal es de tipo $' + targetTipo + '$.\n' +
+            'Paso 2. ' + (targetTipo === 'E' ? 'La universal negativa canónica E se formula mediante el cuantificador «Ningún S es P».' : 'La universal afirmativa canónica A se formula mediante el cuantificador «Todos los S son P».') + '\n' +
+            'Paso 3. Redactando la proposición canónica resultante: «' + fraseEsperada + '».';
+
+  return {
+    tipo: 'simbolica',
+    escribirProposicion: true,
+    tipoProposicionEsperada: targetTipo,
+    raizSujeto: item.raizSujeto,
+    raizPredicado: item.raizPredicado,
+    problema: prob,
+    solucion: fraseEsperada,
+    respuestaLaTeX: '\\text{«' + fraseEsperada + '»}',
+    acepta: [fraseEsperada, fraseEsperada.toLowerCase(), fraseEsperada + '.'],
+    pista: pista,
+    explicacion: exp
+  };
+}
+
+// V3: Formular la Subcontraria (escribir el enunciado O a partir de I, o I a partir de O)
+function var3_escribirSubcontraria() {
+  var item = azar(TEMAS_PROPOSICIONES);
+  var deIaO = Math.random() < 0.5;
+  var origenTipo = deIaO ? 'I' : 'O';
+  var targetTipo = deIaO ? 'O' : 'I';
+  var fraseOrigen = deIaO ? item.I : item.O;
+  var fraseEsperada = deIaO ? item.O : item.I;
+
+  etiquetaActual = 'Formular Subcontraria (' + origenTipo + ' → ' + targetTipo + ')';
+  figuraActual = {
+    tipo: 'cuadrado',
+    nodoDato: origenTipo,
+    nodoObjetivo: targetTipo,
+    valorDato: 'Premisa'
+  };
+
+  var prob = '<p class="contexto-parrafo">En el monitoreo empírico de ' + item.tema + ', se registra la proposición particular $' + origenTipo + '$: «<em>' + fraseOrigen + '</em>».</p>' +
+             '<div class="pregunta-bloque"><strong>Pregunta:</strong> Escribe la proposición <strong>subcontraria</strong> ($' + targetTipo + '$) en su forma canónica estándar completa.</div>';
+
+  var pista = 'Examina la arista horizontal inferior del Cuadrado de Oposición: las subcontrarias vinculan a dos proposiciones particulares de cualidad opuesta.';
+  var exp = 'Paso 1. La premisa dada es particular de tipo $' + origenTipo + '$. Su subcontraria horizontal es de tipo $' + targetTipo + '$.\n' +
+            'Paso 2. ' + (targetTipo === 'O' ? 'La forma canónica O conserva cantidad particular y adopta cualidad negativa («Algunos S no son P»).' : 'La forma canónica I conserva cantidad particular y adopta cualidad afirmativa («Algunos S son P»).') + '\n' +
+            'Paso 3. Resulta en el enunciado canónico: «' + fraseEsperada + '».';
+
+  return {
+    tipo: 'simbolica',
+    escribirProposicion: true,
+    tipoProposicionEsperada: targetTipo,
+    raizSujeto: item.raizSujeto,
+    raizPredicado: item.raizPredicado,
+    problema: prob,
+    solucion: fraseEsperada,
+    respuestaLaTeX: '\\text{«' + fraseEsperada + '»}',
+    acepta: [fraseEsperada, fraseEsperada.toLowerCase(), fraseEsperada + '.'],
+    pista: pista,
+    explicacion: exp
+  };
+}
+
+// V4: Formular la Subalterna (escribir el enunciado particular a partir de la universal)
+function var4_escribirSubalterna() {
+  var item = azar(TEMAS_PROPOSICIONES);
+  var deAaI = Math.random() < 0.5;
+  var origenTipo = deAaI ? 'A' : 'E';
+  var targetTipo = deAaI ? 'I' : 'O';
+  var fraseOrigen = deAaI ? item.A : item.E;
+  var fraseEsperada = deAaI ? item.I : item.O;
+
+  etiquetaActual = 'Formular Subalterna (' + origenTipo + ' → ' + targetTipo + ')';
+  figuraActual = {
+    tipo: 'cuadrado',
+    nodoDato: origenTipo,
+    nodoObjetivo: targetTipo,
+    valorDato: 'Premisa'
+  };
+
+  var prob = '<p class="contexto-parrafo">En el diseño de arquitecturas de software para ' + item.tema + ', se especifica la proposición universal $' + origenTipo + '$: «<em>' + fraseOrigen + '</em>».</p>' +
+             '<div class="pregunta-bloque"><strong>Pregunta:</strong> Escribe la proposición <strong>subalterna</strong> ($' + targetTipo + '$) en su forma canónica estándar completa.</div>';
+
+  var pista = 'Considera las aristas verticales del Cuadrado de Oposición: la subalternación mantiene constante la cualidad y reduce la cantidad de universal a particular.';
+  var exp = 'Paso 1. La premisa universal es de tipo $' + origenTipo + '$. Su subalterna vertical correspondiente es de tipo $' + targetTipo + '$.\n' +
+            'Paso 2. La subalterna conserva la misma cualidad lógica ' + (targetTipo === 'I' ? 'afirmativa' : 'negativa') + ' pero con cuantificación particular.\n' +
+            'Paso 3. La formulación canónica resultante es: «' + fraseEsperada + '».';
+
+  return {
+    tipo: 'simbolica',
+    escribirProposicion: true,
+    tipoProposicionEsperada: targetTipo,
+    raizSujeto: item.raizSujeto,
+    raizPredicado: item.raizPredicado,
+    problema: prob,
+    solucion: fraseEsperada,
+    respuestaLaTeX: '\\text{«' + fraseEsperada + '»}',
+    acepta: [fraseEsperada, fraseEsperada.toLowerCase(), fraseEsperada + '.'],
+    pista: pista,
+    explicacion: exp
+  };
+}
+
+// V5: Inferencia de verdad por Contradicción en Cuadrado de Oposición
+function var5_inferirContradictoria() {
   var pares = [
     { orig: 'A', op: 'O', valOrig: 'verdadera', resVal: 'falsa' },
     { orig: 'A', op: 'O', valOrig: 'falsa', resVal: 'verdadera' },
     { orig: 'E', op: 'I', valOrig: 'verdadera', resVal: 'falsa' },
-    { orig: 'E', op: 'I', valOrig: 'falsa', resVal: 'verdadera' },
-    { orig: 'O', op: 'A', valOrig: 'verdadera', resVal: 'falsa' },
-    { orig: 'I', op: 'E', valOrig: 'falsa', resVal: 'verdadera' }
+    { orig: 'E', op: 'I', valOrig: 'falsa', resVal: 'verdadera' }
   ];
   var c = azar(pares);
 
-  etiquetaActual = 'Contradictorias (A - O / E - I)';
+  etiquetaActual = 'Deducción de Verdad: Contradictorias';
   figuraActual = {
     tipo: 'cuadrado',
     nodoDato: c.orig,
     valorDato: c.valOrig === 'verdadera' ? 'V' : 'F'
   };
 
-  var prob = '<p class="contexto-parrafo">En la verificación de un modelo computacional de asignación de créditos comunitarios, la proposición $' + c.orig + '$ presenta el valor de verdad indicado en el esquema interactivo lateral.</p>' +
-             '<div class="pregunta-bloque"><strong>Pregunta:</strong> A partir de las relaciones diagonales del Cuadrado de Oposición, ¿cuál es el valor de verdad de su proposición contradictoria $' + c.op + '$?</div>';
+  var prob = '<p class="contexto-parrafo">En la verificación de un modelo de asignación algorítmica, la proposición $' + c.orig + '$ adopta el valor de verdad exhibido en el esquema interactivo.</p>' +
+             '<div class="pregunta-bloque"><strong>Pregunta:</strong> ¿Cuál es el valor de verdad que adquiere necesariamente su proposición contradictoria $' + c.op + '$?</div>';
 
   var sol = c.resVal === 'verdadera' ? 'Verdadera' : 'Falsa';
   var acepta = [sol, sol.toLowerCase(), c.resVal === 'verdadera' ? 'v' : 'f', c.resVal === 'verdadera' ? 'verdad' : 'falso', c.resVal === 'verdadera' ? 'true' : 'false'];
 
-  var pista = 'Recuerda el principio que gobierna a las diagonales del Cuadrado de Oposición: dos enunciados contradictorios no pueden compartir simultáneamente el mismo valor de verdad.';
-  var exp = 'Paso 1. Las proposiciones $' + c.orig + '$ y $' + c.op + '$ son mutuamente contradictorias.\n' +
-            'Paso 2. Observando el esquema, el dato asignado a $' + c.orig + '$ es ' + c.valOrig + '.\n' +
-            'Paso 3. Por el principio de no contradicción, la proposición $' + c.op + '$ adquiere el valor opuesto: ' + c.resVal + '.';
+  var pista = 'Recuerda el principio lógico de las diagonales: dos proposiciones contradictorias tienen valores de verdad estrictamente opuestos.';
+  var exp = 'Paso 1. Observando el esquema, la premisa $' + c.orig + '$ es ' + c.valOrig + '.\n' +
+            'Paso 2. Las formas opuestas por la diagonal son contradictorias.\n' +
+            'Paso 3. Por el principio de no contradicción, la proposición $' + c.op + '$ es ' + c.resVal + '.';
 
   return {
     tipo: 'simbolica',
@@ -1459,104 +1692,8 @@ function var2_contradictorias() {
   };
 }
 
-// VAR 3: Contrarias y Subcontrarias a partir del esquema
-function var3_contrariasSubcontrarias() {
-  var casos = [
-    { tipoRel: 'contrarias', d: 'A', dVal: 'verdadera', p: 'E', pVal: 'falsa', regla: 'no pueden ser simultáneamente verdaderas' },
-    { tipoRel: 'subcontrarias', d: 'I', dVal: 'falsa', p: 'O', pVal: 'verdadera', regla: 'no pueden ser simultáneamente falsas' },
-    { tipoRel: 'subcontrarias', d: 'O', dVal: 'falsa', p: 'I', pVal: 'verdadera', regla: 'no pueden ser simultáneamente falsas' },
-    { tipoRel: 'contrarias', d: 'E', dVal: 'verdadera', p: 'A', pVal: 'falsa', regla: 'no pueden ser simultáneamente verdaderas' }
-  ];
-  var c = azar(casos);
-
-  etiquetaActual = c.tipoRel === 'contrarias' ? 'Contrarias (A - E)' : 'Subcontrarias (I - O)';
-  figuraActual = {
-    tipo: 'cuadrado',
-    nodoDato: c.d,
-    valorDato: c.dVal === 'verdadera' ? 'V' : 'F'
-  };
-
-  var prob = '<p class="contexto-parrafo">En el diseño de políticas públicas de economía solidaria, la proposición $' + c.d + '$ adopta el estado registrado en el nodo resaltado del esquema.</p>' +
-             '<div class="pregunta-bloque"><strong>Pregunta:</strong> Aplicando la relación de <strong>' + c.tipoRel.toUpperCase() + '</strong>, ¿cuál es el valor de verdad derivado para la proposición $' + c.p + '$?</div>';
-
-  var sol = c.pVal === 'verdadera' ? 'Verdadera' : 'Falsa';
-  var acepta = [sol, sol.toLowerCase(), c.pVal === 'verdadera' ? 'v' : 'f', c.pVal === 'verdadera' ? 'verdad' : 'falso', c.pVal === 'verdadera' ? 'true' : 'false'];
-
-  var pista = c.tipoRel === 'contrarias'
-    ? 'Considera la restricción formal sobre la arista superior: ¿es posible que dos afirmaciones contrarias sean verdaderas al mismo tiempo?'
-    : 'Considera la restricción sobre la arista inferior: ¿es admisible que dos proposiciones subcontrarias resulten falsas en simultáneo?';
-
-  var exp = 'Paso 1. Las proposiciones vinculadas son $' + c.d + '$ y $' + c.p + '$, unidas por la relación de ' + c.tipoRel + '.\n' +
-            'Paso 2. De acuerdo con el Cuadrado de Oposición, las ' + c.tipoRel + ' ' + c.regla + '.\n' +
-            'Paso 3. Puesto que en el esquema $' + c.d + '$ es ' + c.dVal + ', concluimos que $' + c.p + '$ es ' + c.pVal + '.';
-
-  return {
-    tipo: 'simbolica',
-    problema: prob,
-    solucion: sol,
-    respuestaLaTeX: '\\text{' + sol + '}',
-    acepta: acepta,
-    pista: pista,
-    explicacion: exp
-  };
-}
-
-// VAR 4: Subalternación
-function var4_subalternacion() {
-  var casos = [
-    { univ: 'A', part: 'I', sentido: 'descenso', uVal: 'verdadera', pVal: 'verdadera' },
-    { univ: 'E', part: 'O', sentido: 'descenso', uVal: 'verdadera', pVal: 'verdadera' },
-    { univ: 'A', part: 'I', sentido: 'ascenso', uVal: 'falsa', pVal: 'falsa' },
-    { univ: 'E', part: 'O', sentido: 'ascenso', uVal: 'falsa', pVal: 'falsa' }
-  ];
-  var c = azar(casos);
-
-  etiquetaActual = 'Subalternación Lógica';
-  figuraActual = {
-    tipo: 'cuadrado',
-    nodoDato: c.sentido === 'descenso' ? c.univ : c.part,
-    valorDato: (c.sentido === 'descenso' ? c.uVal : c.pVal) === 'verdadera' ? 'V' : 'F'
-  };
-
-  var prob = '';
-  var sol = '';
-  if (c.sentido === 'descenso') {
-    prob = '<p class="contexto-parrafo">En la verificación de un invariante de software para contratos inteligentes, el nodo universal $' + c.univ + '$ exhibe el valor de verdad presentado en el esquema.</p>' +
-           '<div class="pregunta-bloque"><strong>Pregunta:</strong> Por subalternación, ¿qué valor de verdad adquiere la proposición particular $' + c.part + '$?</div>';
-    sol = 'Verdadera';
-  } else {
-    prob = '<p class="contexto-parrafo">En el monitoreo de anomalías en una red de datos comunitaria, el nodo particular $' + c.part + '$ exhibe el valor registrado en el esquema.</p>' +
-           '<div class="pregunta-bloque"><strong>Pregunta:</strong> Por subalternación, ¿cuál es el valor de verdad correspondiente a la proposición universal $' + c.univ + '$?</div>';
-    sol = 'Falsa';
-  }
-
-  var acepta = [sol, sol.toLowerCase(), sol === 'Verdadera' ? 'v' : 'f', sol === 'Verdadera' ? 'verdad' : 'falso', sol === 'Verdadera' ? 'true' : 'false'];
-
-  var pista = 'Analiza el sentido de propagación sobre las aristas verticales: la verdad desciende de la universal a la particular, mientras que la falsedad asciende de la particular a la universal.';
-  var exp = 'Paso 1. La arista vertical vincula a la universal con su particular respectiva mediante subalternación.\n' +
-            'Paso 2. ' + (c.sentido === 'descenso' ? 'Si la proposición universal es verdadera, la verdad desciende con necesidad lógica.' : 'Si la proposición particular resulta falsa, la falsedad asciende e invalida la universalidad.') + '\n' +
-            'Paso 3. Por deducción formal, la proposición adquiere el valor ' + sol.toUpperCase() + '.';
-
-  return {
-    tipo: 'simbolica',
-    problema: prob,
-    solucion: sol,
-    respuestaLaTeX: '\\text{' + sol + '}',
-    acepta: acepta,
-    pista: pista,
-    explicacion: exp
-  };
-}
-
-// VAR 5: Intersección A ∩ B a partir de la lectura directa del diagrama de Venn
-function var5_interseccionConjuntos() {
-  var potencias2 = [4, 8, 16];
-  var inter = [2];
-  var primos = [3, 5, 7, 11];
-
-  var setA = [2, 4, 8, 16];
-  var setB = [2, 3, 5, 7, 11];
-
+// V6: Intersección A ∩ B a partir de la lectura directa del diagrama de Venn
+function var6_interseccionVenn() {
   etiquetaActual = 'Intersección A ∩ B (Operador AND)';
   figuraActual = {
     tipo: 'venn',
@@ -1570,14 +1707,14 @@ function var5_interseccionConjuntos() {
     }
   };
 
-  var prob = '<p class="contexto-parrafo">En la partición de un dataset de ciberseguridad, los conjuntos $A$ (potencias de 2) y $B$ (números primos) se distribuyen según el diagrama de Venn lateral.</p>' +
-             '<div class="pregunta-bloque"><strong>Pregunta:</strong> A partir de la lectura del diagrama, determina los elementos de la intersección $A \\cap B$. Escribe los números separados por comas.</div>';
+  var prob = '<p class="contexto-parrafo">En la partición de un dataset de ciberseguridad comunitaria, los conjuntos $A$ (potencias de 2) y $B$ (números primos) se distribuyen según el diagrama de Venn lateral.</p>' +
+             '<div class="pregunta-bloque"><strong>Pregunta:</strong> A partir de la lectura directa del diagrama, determina los elementos de la intersección $A \\cap B$. Escribe los números separados por comas.</div>';
 
   var strSol = '2';
   var acepta = ['2', '{2}', '\\{2\\}'];
 
-  var pista = 'Identifica visualmente la región delimitada por la superposición de ambos contornos, representativa de la operación lógica AND.';
-  var exp = 'Paso 1. Observamos en el diagrama los elementos contenidos exclusivamente en la región compartida por los dos círculos.\n' +
+  var pista = 'Identifica visualmente la región delimitada por la superposición de ambos contornos (operador lógico AND).';
+  var exp = 'Paso 1. Observamos en el diagrama la región compartida por ambos círculos.\n' +
             'Paso 2. El único elemento situado en la intersección geométrica es el número $2$.\n' +
             'Paso 3. En consecuencia, $A \\cap B = \\{2\\}$.';
 
@@ -1592,10 +1729,8 @@ function var5_interseccionConjuntos() {
   };
 }
 
-// VAR 6: Unión A ∪ B a partir del diagrama
-function var6_unionConjuntos() {
-  var setA = [3, 9, 27, 81];
-  var setB = [9, 18, 27, 36];
+// V7: Unión A ∪ B a partir del diagrama
+function var7_unionVenn() {
   var union = [3, 9, 18, 27, 36, 81];
 
   etiquetaActual = 'Unión A ∪ B (Operador OR)';
@@ -1617,9 +1752,9 @@ function var6_unionConjuntos() {
   var strSol = union.join(', ');
   var acepta = [strSol, union.join(','), '{' + union.join(',') + '}', '{' + union.join(', ') + '}'];
 
-  var pista = 'Reúne todos los elementos ubicados al interior de cualquiera de los dos círculos, asegurándote de no duplicar los situados en la región central.';
-  var exp = 'Paso 1. Extraemos los elementos de la región exclusiva de $A$: $\\{3, 81\\}$.\n' +
-            'Paso 2. Extraemos los elementos de la intersección $\\{9, 27\\}$ y de la región exclusiva de $B$: $\\{18, 36\\}$.\n' +
+  var pista = 'Reúne todos los elementos ubicados al interior de cualquiera de los dos círculos, computando cada valor una única vez.';
+  var exp = 'Paso 1. Elementos de la región exclusiva de $A$: $\\{3, 81\\}$.\n' +
+            'Paso 2. Elementos de la intersección $\\{9, 27\\}$ y de la región exclusiva de $B$: $\\{18, 36\\}$.\n' +
             'Paso 3. Consolidando y ordenando ascendentemente: $A \\cup B = \\{' + strSol + '\\}$.';
 
   return {
@@ -1633,10 +1768,8 @@ function var6_unionConjuntos() {
   };
 }
 
-// VAR 7: Diferencia A \ B a partir del diagrama
-function var7_diferenciaConjuntos() {
-  var setA = [2, 4, 8, 16, 32, 64];
-  var setB = [8, 16, 32, 64, 72];
+// V8: Diferencia A \ B a partir del diagrama
+function var8_diferenciaVenn() {
   var diff = [2, 4];
 
   etiquetaActual = 'Diferencia A ∖ B (Operador EXCEPT)';
@@ -1658,7 +1791,7 @@ function var7_diferenciaConjuntos() {
   var strSol = diff.join(', ');
   var acepta = [strSol, diff.join(','), '{' + diff.join(',') + '}', '{' + diff.join(', ') + '}'];
 
-  var pista = 'Localiza la región geométrica que pertenece estrictamente al contorno de A y descuenta cualquier elemento que caiga dentro de la frontera de B.';
+  var pista = 'Localiza la región que pertenece estrictamente al contorno de A y descuenta cualquier elemento ubicado dentro del círculo B.';
   var exp = 'Paso 1. Identificamos en el esquema los elementos pertenecientes a $A$ que yacen fuera del círculo $B$.\n' +
             'Paso 2. La región exclusiva de $A$ contiene a los números $2$ y $4$.\n' +
             'Paso 3. Por lo tanto, $A \\setminus B = \\{' + strSol + '\\}$.';
@@ -1674,9 +1807,8 @@ function var7_diferenciaConjuntos() {
   };
 }
 
-// VAR 8: Complemento A^c a partir del universo del diagrama
-function var8_complementoConjunto() {
-  var setA = [2, 3, 5, 7, 11, 13];
+// V9: Complemento A^c a partir del universo del diagrama
+function var9_complementoVenn() {
   var comp = [1, 4, 6, 8, 9, 10, 12];
 
   etiquetaActual = 'Complemento A^c (Dominio de Validación)';
@@ -1699,7 +1831,7 @@ function var8_complementoConjunto() {
   var acepta = [strSol, comp.join(','), '{' + comp.join(',') + '}', '{' + comp.join(', ') + '}'];
 
   var pista = 'Identifica todos los elementos ubicados en el rectángulo del universo $U$ que se encuentran fuera de la frontera del conjunto $A$.';
-  var exp = 'Paso 1. Observamos en el esquema los elementos que forman parte del universo $U$ pero no están contenidos en el círculo $A$.\n' +
+  var exp = 'Paso 1. Observamos en el esquema los elementos del universo $U$ no contenidos en el círculo $A$.\n' +
             'Paso 2. Dichos elementos corresponden a la región exterior: $\\{' + strSol + '\\}$.\n' +
             'Paso 3. Por tanto, el complemento es $A^c = \\{' + strSol + '\\}$.';
 
@@ -1714,8 +1846,8 @@ function var8_complementoConjunto() {
   };
 }
 
-// VAR 9: Inclusión-Exclusión a partir de cardinalidades visuales
-function var9_inclusionExclusion() {
+// V10: Inclusión-Exclusión a partir de cardinalidades visuales
+function var10_inclusionExclusion() {
   var nInter = ri(45, 90);
   var nSoloA = ri(90, 150);
   var nSoloB = ri(80, 140);
@@ -1744,7 +1876,7 @@ function var9_inclusionExclusion() {
   var sol = nUnion;
   var acepta = [nUnion.toString()];
 
-  var pista = 'Recuerda que sumar directamente $|A| + |B|$ contabiliza dos veces la región de intersección compartida.';
+  var pista = 'Considera qué ocurre con la región compartida de intersección al computar conjuntamente $|A|$ y $|B|$.';
   var exp = 'Paso 1. Leemos del diagrama: $|A| = ' + nA + '$, $|B| = ' + nB + '$ y $|A \\cap B| = ' + nInter + '$.\n' +
             'Paso 2. Aplicamos la fórmula del Principio de Inclusión-Exclusión: $|A \\cup B| = |A| + |B| - |A \\cap B|$.\n' +
             'Paso 3. Calculamos: $|A \\cup B| = ' + nA + ' + ' + nB + ' - ' + nInter + ' = ' + nUnion + '$.';
@@ -1762,67 +1894,22 @@ function var9_inclusionExclusion() {
   };
 }
 
-// VAR 10: Inclusión de subconjuntos B ⊆ A a partir del esquema
-function var10_inclusionYProposicion() {
-  var bTotal = ri(40, 80);
-  var esSubconjunto = Math.random() < 0.5;
-  var inter = esSubconjunto ? bTotal : bTotal - ri(6, 14);
-  var aTotal = inter + ri(15, 35);
-  var soloB = bTotal - inter;
-
-  etiquetaActual = 'Subconjuntos y Lógica Condicional (B ⊆ A)';
-  figuraActual = {
-    tipo: 'venn',
-    nombreA: 'Auditados (A)',
-    nombreB: 'Prioritarios (B)',
-    datosRegiones: {
-      soloA: '|A ∖ B|=' + (aTotal - inter),
-      inter: '|A ∩ B|=' + inter,
-      soloB: '|B ∖ A|=' + soloB,
-      afuera: ''
-    }
-  };
-
-  var prob = '<p class="contexto-parrafo">En la verificación de precondiciones de un programa público de financiamiento solidario, los datos de cobertura se distribuyen según las regiones del diagrama de Venn lateral.</p>' +
-             '<div class="pregunta-bloque"><strong>Pregunta:</strong> A partir de la información del diagrama, ¿es verdadera o falsa la proposición condicional $B \\subseteq A$?</div>';
-
-  var sol = esSubconjunto ? 'Verdadera' : 'Falsa';
-  var acepta = [sol, sol.toLowerCase(), esSubconjunto ? 'v' : 'f', esSubconjunto ? 'verdad' : 'falso', esSubconjunto ? 'true' : 'false'];
-
-  var pista = 'Para que la inclusión $B \\subseteq A$ se cumpla, evalúa visualmente si la región exclusiva $|B \\setminus A|$ es igual a cero o si contiene elementos por fuera de la frontera de A.';
-  var exp = 'Paso 1. La proposición $B \\subseteq A$ exige que todo elemento de $B$ esté contenido en $A$, lo que implica que $|B \\setminus A| = 0$.\n' +
-            'Paso 2. Observando la región exclusiva de $B$ en el diagrama: ' + (esSubconjunto 
-              ? 'se verifica que $|B \\setminus A| = 0$ (toda la cardinalidad de $B$ se halla en la intersección).' 
-              : 'se observa que $|B \\setminus A| = ' + soloB + ' > 0$ (existen elementos de $B$ fuera de $A$).') + '\n' +
-            'Paso 3. Por lo tanto, la proposición es ' + sol.toUpperCase() + '.';
-
-  return {
-    tipo: 'simbolica',
-    problema: prob,
-    solucion: sol,
-    respuestaLaTeX: '\\text{' + sol + '}',
-    acepta: acepta,
-    pista: pista,
-    explicacion: exp
-  };
-}
-
 /* ==========================================================================
    CONTRATO DEL GENERADOR
    ========================================================================== */
 
 var ultimaVariante = -1;
 var generadores = [
-  var1_clasificarProposicion,
-  var2_contradictorias,
-  var3_contrariasSubcontrarias,
-  var4_subalternacion,
-  var5_interseccionConjuntos,
-  var6_unionConjuntos,
-  var7_diferenciaConjuntos,
-  var8_complementoConjunto,
-  var9_inclusionExclusion,
-  var10_inclusionYProposicion
+  var1_escribirContradictoria,
+  var2_escribirContraria,
+  var3_escribirSubcontraria,
+  var4_escribirSubalterna,
+  var5_inferirContradictoria,
+  var6_interseccionVenn,
+  var7_unionVenn,
+  var8_diferenciaVenn,
+  var9_complementoVenn,
+  var10_inclusionExclusion
 ];
 
 function genLogicaYConjuntos() {
@@ -1846,6 +1933,14 @@ function nuevoEjercicio() {
   input.value = '';
   input.classList.remove('mal');
   
+  if (ejercicioActual.escribirProposicion) {
+    input.placeholder = "Redacta la proposición canónica completa aquí...";
+  } else if (ejercicioActual.tipo === 'numerica') {
+    input.placeholder = "Escribe un número entero...";
+  } else {
+    input.placeholder = "Escribe tu respuesta aquí...";
+  }
+
   var feedback = document.getElementById('feedback');
   feedback.className = 'feedback';
   feedback.innerHTML = '';
@@ -1864,7 +1959,9 @@ function nuevoEjercicio() {
   document.getElementById('btnExplicacion').setAttribute('aria-pressed', 'false');
 
   document.getElementById('chipVar').textContent = etiquetaActual;
-  document.getElementById('chipType').textContent = ejercicioActual.tipo === 'numerica' ? 'Respuesta Numérica' : 'Respuesta Lógica / Lista';
+  document.getElementById('chipType').textContent = ejercicioActual.escribirProposicion 
+    ? 'Redacción de Enunciado Canónico' 
+    : (ejercicioActual.tipo === 'numerica' ? 'Respuesta Numérica' : 'Respuesta Lógica / Lista');
 
   var probEl = document.getElementById('problemaTexto');
   probEl.innerHTML = ejercicioActual.problema;
@@ -1924,7 +2021,7 @@ function verificar() {
     feedback.innerHTML = 
       '<div class="fb-title">✓ ¡Correcto!</div>' +
       '<div>Escribiste: <code>' + escaparHTML(valOriginal) + '</code></div>' +
-      '<div style="margin-top:4px;">En notación matemática: $' + ejercicioActual.respuestaLaTeX + '$</div>';
+      '<div style="margin-top:4px;">Formulación canónica formal: $' + ejercicioActual.respuestaLaTeX + '$</div>';
     feedback.style.display = 'block';
     tiposet(feedback);
   } else {
@@ -1933,9 +2030,9 @@ function verificar() {
 
     var mensajesError = [
       'Revisa con atención los datos observados en el esquema y las condiciones del problema.',
-      'Comprueba si aplicaste la operación de conjuntos o la regla deductiva adecuada.',
-      'Verifica si faltó o sobró algún elemento en tu respuesta.',
-      'Analiza las regiones del esquema paso a paso sin apresurarte.',
+      'Comprueba la formulación del cuantificador y la relación lógica esperada.',
+      'Verifica si la redacción respeta la estructura canónica requerida.',
+      'Analiza las regiones o los nodos del esquema paso a paso sin apresurarte.',
       'Consulta la Pista si deseas una orientación metodológica para guiar tu razonamiento.'
     ];
     var msgPedagogico = azar(mensajesError);
@@ -1944,7 +2041,7 @@ function verificar() {
     feedback.innerHTML = 
       '<div class="fb-title">✗ Todavía no</div>' +
       '<div>' + msgPedagogico + '</div>' +
-      '<div style="font-size:0.85rem; margin-top:6px; color:#991c1c;">Comprueba el resultado a partir de las regiones del esquema.</div>';
+      '<div style="font-size:0.85rem; margin-top:6px; color:#991c1c;">Asegúrate de formular la respuesta conforme a la relación del Cuadrado de Oposición o la operación de conjuntos.</div>';
     feedback.style.display = 'block';
 
     input.classList.add('mal');
@@ -2000,7 +2097,7 @@ function alternarExplicacion() {
         }
       }
     }
-    html += '<div class="sol-final">Respuesta final: $' + ejercicioActual.respuestaLaTeX + '$ (' + escaparHTML(ejercicioActual.solucion) + ')</div>';
+    html += '<div class="sol-final">Respuesta formal esperada: $' + ejercicioActual.respuestaLaTeX + '$ (' + escaparHTML(ejercicioActual.solucion) + ')</div>';
     
     box.innerHTML = html;
     box.classList.add('visible');
@@ -2022,13 +2119,13 @@ function guardarMarcador() {
       racha: racha,
       historial: historial
     };
-    localStorage.setItem('__gen_logica_conjuntos_v6__', JSON.stringify(estado));
+    localStorage.setItem('__gen_logica_conjuntos_v7__', JSON.stringify(estado));
   } catch(e) {}
 }
 
 function cargarMarcador() {
   try {
-    var s = localStorage.getItem('__gen_logica_conjuntos_v6__');
+    var s = localStorage.getItem('__gen_logica_conjuntos_v7__');
     if (s) {
       var obj = JSON.parse(s);
       aciertos = parseInt(obj.aciertos, 10) || 0;
